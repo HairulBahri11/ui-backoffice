@@ -49,6 +49,19 @@
                             <form action="" method="get">
                                 <div class="row">
                                     @if (Auth::guard('staff')->check() == true)
+                                        @php
+                                            $branch = DB::table('branch')->get();
+                                        @endphp
+                                        <div class="col-md-3">
+                                            <select name="branch" id="" class="form-control select2">
+                                                <option value="">---U&I Location---</option>
+                                                @foreach ($branch as $t)
+                                                    <option value="{{ $t->id }}"
+                                                        {{ Request::get('branch') == $t->id ? 'selected' : '' }}>
+                                                        {{ $t->location }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
                                         <div class="col-md-3">
                                             <select name="teacher" id="" class="form-control select2">
                                                 <option value="">---Choose Teacher---</option>
@@ -164,10 +177,12 @@
                                                         @endif
                                                     </div>
                                                     <br>
+                                                    <b style="font-size: 11px">({{ $item->location }})</b> <br>
                                                     <b>{{ $item->day_one }}
                                                         {{ $item->day1 != $item->day2 ? '&' : '' }}
                                                         {{ $item->day1 != $item->day2 ? $item->day_two : '' }}</b>
                                                     <br>
+                                                   
                                                     <b>{{ $item->course_time }}</b> <br>
                                                     <i>{{ $student_total . ' Students' }}</i>
 

@@ -1,0 +1,56 @@
+* {
+    font-size: 12px;
+    font-family: 'Arial';
+}
+
+.content-title {
+    font-size: 12pt !important;
+    font-weight: bolder;
+}
+
+.p2 {
+    font-size: 8pt !important;
+    font-weight: 500;
+}
+
+.centered {
+    text-align: center;
+    align-content: center;
+}
+
+.ticket {
+    width: 200px;
+    max-width: 200px;
+}
+
+.foot {
+    font-size: 6pt !important;
+    font-style: italic;
+}
+
+.subtitle {
+    margin-block-start: 0px;
+    margin-block-end: 0px;
+}
+
+
+hr {
+    border: none;
+    border-top: 2px dotted #000;
+    color: #fff;
+    background-color: #fff;
+    height: 1px;
+    width: 100%;
+}
+
+.container {
+    display: flex;
+    margin-left: 16px;
+    margin-right: 16px;
+
+    justify-content: space-between;
+}
+
+.container span {
+    font-size: 8pt !important;
+}

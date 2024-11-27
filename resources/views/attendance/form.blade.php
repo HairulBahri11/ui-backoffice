@@ -858,16 +858,9 @@
                     var dataHour = $(this).data('hour');
                     var dataClass = $(this).data('class');
                     var conditionPoint = pointDay
-
-                    // var conditionPoint = $(this).data('hour') != '' || dataClass == 39 || dataClass == 42 ?
-                    //     parseInt(10) : pointDay
                     if ($(this).is(':checked')) {
                         $("#inPointAbsent" + i).text(parseInt(conditionPoint));
                         $("#isAbsentPoint" + i).val(parseInt(conditionPoint));
-                        //$("#totalPoint" + i).text(parseInt($("#totalPoint" + i).text()) + conditionPoint);
-                        //$("#inpTotalPoint" + i).val(parseInt($("#inpTotalPoint" + i).val() != '' ? $(
-                        //    "#inpTotalPoint" + i).val() : 0) + conditionPoint);
-
                         var tmpTotalPoint = 0;
                         var getVal = $('#categories' + i).val();
                         dataCtgr.forEach(element => {
@@ -895,15 +888,6 @@
 
 
                     } else {
-
-                        //console.log(parseInt($("#totalPoint" + i).text()));
-                        //console.log(parseInt($("#totalPoint" + i).text()) - conditionPoint);
-
-
-
-                        //$("#totalPoint" + i).text(parseInt($("#totalPoint" + i).text()) - conditionPoint);
-                        //$("#inpTotalPoint" + i).val(parseInt($("#inpTotalPoint" + i).val() != '' ? $(
-                        //    "#inpTotalPoint" + i).val() : 0) - conditionPoint);
                         $("#inPointAbsent" + i).text(0);
                         $("#isAbsentPoint" + i).val(0);
 
@@ -948,17 +932,11 @@
                         birthDayPoint + parseInt($("#inPointAbsent" + i).text()));
                     $("#inpTotalPoint" + i).val(tmpTotalPoint +
                         birthDayPoint + parseInt($("#inPointAbsent" + i).text()));
+                        console.log(tmpTotalPoint);
 
                 });
-                // $('#point_category' + i).keyup(function() {
-                //     var tmpTotalPoint = 0;
-                //     var point = isNaN(parseInt($('#point_category' + i).val())) == true ? 0 : parseInt($(
-                //         '#point_category' + i).val());
-                //     $("#totalPoint" + i).text(point + parseInt($("#inPointAbsent" + i).text()));
-                //     $("#inpTotalPoint" + i).val(point + parseInt($("#inPointAbsent" + i).text()));
-
-                // });
             }
+
 
         });
 
@@ -1034,30 +1012,6 @@
                 $('#cekAllAbsen').val(0);
             }
         }
-
-        // function confirm() {
-        //     swal("Are you sure ?", "Data will be updated", {
-        //         icon: "info",
-        //         buttons: {
-        //             confirm: {
-        //                 className: 'btn btn-success',
-        //                 text: 'Ok'
-        //             },
-        //             dismiss: {
-        //                 className: 'btn btn-secondary',
-        //                 text: 'Cancel'
-        //             },
-        //         },
-        //     }).then((result) => {
-        //         /* Read more about isConfirmed, isDenied below */
-        //         if (result == true) {
-        //             $('#form-submit').submit();
-        //         }
-        //     });
-        //     $('#form-submit').submit(function() {
-        //         $('#btn-success').addClass('disabled');
-        //     });
-        // }
                 function confirm_update() {
             swal("Are you sure ?", "Data will be updated", {
                 icon: "info",

@@ -849,93 +849,70 @@
             var len = $('.cekBox').length;
 
             for (let i = 1; i <= len; i++) {
-                var pointDay = {{ Request::get('day1') }} == 5 || {{ Request::get('day1') }} == 6 ||
-                    {{ Request::get('day2') }} == 5 || {{ Request::get('day2') }} == 6 ||
-                    {{ Request::get('day1') }} == {{ Request::get('day2') }} ? 20 : 10;
-                var birthDayPoint = 0;
-                var totalPoint = parseInt($("#totalPoint" + i).text());
-                $('#cbAbsent' + i).on('change', function() {
-                    var dataHour = $(this).data('hour');
-                    var dataClass = $(this).data('class');
-                    var conditionPoint = pointDay
-                    if ($(this).is(':checked')) {
-                        $("#inPointAbsent" + i).text(parseInt(conditionPoint));
-                        $("#isAbsentPoint" + i).val(parseInt(conditionPoint));
-                        var tmpTotalPoint = 0;
-                        var getVal = $('#categories' + i).val();
-                        dataCtgr.forEach(element => {
-                            getVal.forEach(x => {
-                                if (element.id.toString() == x.toString()) {
-                                    tmpTotalPoint += element.point;
-                                }
-                            })
-                        });
+    var pointDay = (parseInt({{ Request::get('day1') }}, 10) === 5 || 
+                    parseInt({{ Request::get('day1') }}, 10) === 6 || 
+                    parseInt({{ Request::get('day2') }}, 10) === 5 || 
+                    parseInt({{ Request::get('day2') }}, 10) === 6 || 
+                    parseInt({{ Request::get('day1') }}, 10) === parseInt({{ Request::get('day2') }}, 10)) ? 20 : 10;
 
-                        $("#totalPoint" + i).text(tmpTotalPoint +
-                            birthDayPoint + parseInt($("#inPointAbsent" + i).text()));
-                        $("#inpTotalPoint" + i).val(tmpTotalPoint +
-                            birthDayPoint + parseInt($("#inPointAbsent" + i).text()));
+    var birthDayPoint = 0;
 
+    var totalPoint = Number($("#totalPoint" + i).text()) || 0;
 
-                        //alpha dan permission diset menjadi checked kemudian panggil eventnya
-                        $('#permissionCheckBox' + (i - 1)).next('span').removeClass('checked');
-                        $('#permissionCheckBox' + (i - 1)).val(0);
-                        $('#permissionCheckBox' + (i - 1)).removeAttr('checked', 'checked');
+    $('#cbAbsent' + i).on('change', function () {
+        var conditionPoint = pointDay;
+        var tmpTotalPoint = 0;
 
-                        $('#alphaCheckBox' + (i - 1)).next('span').removeClass('checked');
-                        $('#alphaCheckBox' + (i - 1)).val(0);
-                        $('#alphaCheckBox' + (i - 1)).removeAttr('checked', 'checked');
+        var getVal = $('#categories' + i).val() || [];
+        dataCtgr.forEach(element => {
+            getVal.forEach(x => {
+                if (element.id.toString() === x.toString()) {
+                    tmpTotalPoint += Number(element.point) || 0;
+                }
+            });
+        });
 
+        if ($(this).is(':checked')) {
+            $("#inPointAbsent" + i).text(Number(conditionPoint) || 0);
+            $("#isAbsentPoint" + i).val(Number(conditionPoint) || 0);
 
-                    } else {
-                        $("#inPointAbsent" + i).text(0);
-                        $("#isAbsentPoint" + i).val(0);
+            $("#totalPoint" + i).text(tmpTotalPoint + birthDayPoint + (Number($("#inPointAbsent" + i).text()) || 0));
+            $("#inpTotalPoint" + i).val(tmpTotalPoint + birthDayPoint + (Number($("#inPointAbsent" + i).text()) || 0));
 
+            // Reset alpha dan permission
+            $('#permissionCheckBox' + (i - 1)).next('span').removeClass('checked').val(0).prop('checked', false);
+            $('#alphaCheckBox' + (i - 1)).next('span').removeClass('checked').val(0).prop('checked', false);
 
-                        var tmpTotalPoint = 0;
-                        var getVal = $('#categories' + i).val();
-                        dataCtgr.forEach(element => {
-                            getVal.forEach(x => {
-                                if (element.id.toString() == x.toString()) {
-                                    tmpTotalPoint += element.point;
-                                }
-                            })
-                        });
+        } else {
+            $("#inPointAbsent" + i).text(0);
+            $("#isAbsentPoint" + i).val(0);
 
-                        $("#totalPoint" + i).text(tmpTotalPoint +
-                            birthDayPoint + parseInt($("#inPointAbsent" + i).text()));
-                        $("#inpTotalPoint" + i).val(tmpTotalPoint +
-                            birthDayPoint + parseInt($("#inPointAbsent" + i).text()));
+            $("#totalPoint" + i).text(tmpTotalPoint + birthDayPoint + (Number($("#inPointAbsent" + i).text()) || 0));
+            $("#inpTotalPoint" + i).val(tmpTotalPoint + birthDayPoint + (Number($("#inPointAbsent" + i).text()) || 0));
+        }
 
+        // Update cekAllAbsen
+        $('#cekAllAbsen').val($('.cekBox:checked').length > 0 ? 1 : 0);
+    });
 
-                    }
-                    if ($('.cekBox:checked').length != 0) {
-                        $('#cekAllAbsen').val(1);
-                    } else {
-                        $('#cekAllAbsen').val(0);
-                    }
-                });
+    $('#categories' + i).change(function () {
+        var tmpTotalPoint = 0;
 
-                $('#categories' + i).change(function() {
-                    var tmpTotalPoint = 0;
-                    console.log(tmpTotalPoint);
-                    var getVal = $('#categories' + i).val();
-                    dataCtgr.forEach(element => {
-                        getVal.forEach(x => {
-                            if (element.id.toString() == x.toString()) {
-                                tmpTotalPoint += element.point;
-                            }
-                        })
-                    });
+        var getVal = $('#categories' + i).val() || [];
+        dataCtgr.forEach(element => {
+            getVal.forEach(x => {
+                if (element.id.toString() === x.toString()) {
+                    tmpTotalPoint += Number(element.point) || 0;
+                }
+            });
+        });
 
-                    $("#totalPoint" + i).text(tmpTotalPoint +
-                        birthDayPoint + parseInt($("#inPointAbsent" + i).text()));
-                    $("#inpTotalPoint" + i).val(tmpTotalPoint +
-                        birthDayPoint + parseInt($("#inPointAbsent" + i).text()));
-                        console.log(tmpTotalPoint);
+        $("#totalPoint" + i).text(tmpTotalPoint + birthDayPoint + (Number($("#inPointAbsent" + i).text()) || 0));
+        $("#inpTotalPoint" + i).val(tmpTotalPoint + birthDayPoint + (Number($("#inPointAbsent" + i).text()) || 0));
+        console.log(tmpTotalPoint);
+    });
+}
 
-                });
-            }
 
 
         });

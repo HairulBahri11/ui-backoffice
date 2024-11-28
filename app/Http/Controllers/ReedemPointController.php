@@ -135,6 +135,9 @@ class ReedemPointController extends Controller
         if (Auth::guard('staff')->check() == true && Auth::guard('staff')->user()->id != 7) {
             $where = $where . ' AND id_staff = ' . Auth::guard('staff')->user()->id;
         }
+        if ($request->branch && Auth::guard('staff')->check() == true) {
+            $where = $where . ' AND branch_id = ' . $request->branch;
+        }
         if ($request->teacher) {
             $where = $where . ' AND id_teacher = ' . $request->teacher;
         }
@@ -147,7 +150,12 @@ class ReedemPointController extends Controller
         if ($request->day && Auth::guard('teacher')->check() == true) {
             $where = $where . ' AND day1 = ' . $request->day; /* . ' AND id_teacher =' . Auth::guard('teacher')->user()->id; */
         }
-        $class = DB::select("SELECT DISTINCT priceid,day1,day2,course_time,id_teacher,price.level,price.program,day_1.day day_one,day_2.day day_two,teacher.name teacher_name from student join price on student.priceid = price.id join day day_1 on student.day1 = day_1.id join day day_2 on student.day2 = day_2.id join teacher on student.id_teacher = teacher.id  WHERE day1 is NOT null AND day2 is NOT null AND course_time is NOT null AND id_teacher is NOT null $where ORDER BY priceid ASC, day1,course_time;");
+        $class = DB::select("SELECT DISTINCT priceid,day1,day2,course_time,id_teacher,price.level,price.program,day_1.day day_one,day_2.day day_two,teacher.name teacher_name, branch.location from student 
+        join price on student.priceid = price.id 
+        join day day_1 on student.day1 = day_1.id 
+        join day day_2 on student.day2 = day_2.id
+         join branch on student.branch_id = branch.id
+        join teacher on student.id_teacher = teacher.id  WHERE day1 is NOT null AND day2 is NOT null AND course_time is NOT null AND id_teacher is NOT null $where ORDER BY priceid ASC, day1,course_time;");
         $private = [];
         $general = [];
         foreach ($class as $key => $value) {

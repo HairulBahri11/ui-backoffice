@@ -38,17 +38,30 @@
                             <form action="" method="get">
                                 <div class="row">
                                     @if (Auth::guard('staff')->check() == true)
-                                        <div class="col-md-3">
-                                            <select name="teacher" id="" class="form-control select2">
-                                                <option value="">---Choose Teacher---</option>
-                                                @foreach ($teachers as $t)
-                                                    <option value="{{ $t->id }}"
-                                                        {{ Request::get('teacher') == $t->id ? 'selected' : '' }}>
-                                                        {{ $t->name }}</option>
-                                                @endforeach
-                                            </select>
-                                        </div>
-                                    @endif
+                                    @php
+                                        $branch = DB::table('branch')->get();
+                                    @endphp
+                                    <div class="col-md-3">
+                                        <select name="branch" id="" class="form-control select2">
+                                            <option value="">---U&I Location---</option>
+                                            @foreach ($branch as $t)
+                                                <option value="{{ $t->id }}"
+                                                    {{ Request::get('branch') == $t->id ? 'selected' : '' }}>
+                                                    {{ $t->location }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <select name="teacher" id="" class="form-control select2">
+                                            <option value="">---Choose Teacher---</option>
+                                            @foreach ($teachers as $t)
+                                                <option value="{{ $t->id }}"
+                                                    {{ Request::get('teacher') == $t->id ? 'selected' : '' }}>
+                                                    {{ $t->name }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                @endif
                                     <div class="col-md-3">
                                         <select name="level" id="" class="form-control select2">
                                             <option value="">---Choose Class---</option>
@@ -91,6 +104,7 @@
                                                         </div>
                                                     </div>
                                                     <br>
+                                                    <b style="font-size: 12px; color:rgb(127, 127, 255)">({{ $item->location }})</b> <br>
                                                     <b>{{ $item->day_one }}
                                                         {{ $item->day1 != $item->day2 ? '&' : '' }}
                                                         {{ $item->day1 != $item->day2 ? $item->day_two : '' }}</b>
@@ -138,6 +152,7 @@
                                                             <br>
                                                         </div>
                                                     </div> <i class="fa fas fa-angle-right"></i>
+                                                    <b style="font-size: 12px; color:rgb(127, 127, 255)">({{ $item->location }})</b> <br>
                                                     <b>{{ $item->day_one }} {{ $item->day1 != $item->day2 ? '&' : '' }}
                                                         {{ $item->day1 != $item->day2 ? $item->day_two : '' }}</b>
                                                     <br>

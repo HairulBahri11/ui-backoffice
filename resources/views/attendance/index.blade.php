@@ -177,7 +177,7 @@
                                                         @endif
                                                     </div>
                                                     <br>
-                                                    <b style="font-size: 11px">({{ $item->location }})</b> <br>
+                                                    <b style="font-size: 12px; color:rgb(127, 127, 255)">({{ $item->location }})</b> <br>
                                                     <b>{{ $item->day_one }}
                                                         {{ $item->day1 != $item->day2 ? '&' : '' }}
                                                         {{ $item->day1 != $item->day2 ? $item->day_two : '' }}</b>
@@ -329,6 +329,7 @@
                                                         @endif
                                                     </div>
                                                     <br>
+                                                    <b style="font-size: 12px; color:rgb(127, 127, 255)">({{ $itemSemiPrivate->location }})</b> <br>
                                                     <b>{{ $itemSemiPrivate->day_one }}
                                                         {{ $itemSemiPrivate->day1 != $itemSemiPrivate->day2 ? '&' : '' }}
                                                         {{ $itemSemiPrivate->day1 != $itemSemiPrivate->day2 ? $itemSemiPrivate->day_two : '' }}</b>
@@ -452,6 +453,8 @@
                                                                 </div>
                                                             @endif
                                                         </div> <i class="fa fas fa-angle-right"></i>
+                                                        <b style="font-size: 11px; color:rgb(127, 127, 255)">({{ $item->location }})</b> <br>
+                                                        
                                                         <b>{{ $item->day_one }}
                                                             {{ $item->day1 != $item->day2 ? '&' : '' }}
                                                             {{ $item->day1 != $item->day2 ? $item->day_two : '' }}</b>

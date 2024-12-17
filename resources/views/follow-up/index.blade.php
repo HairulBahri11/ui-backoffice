@@ -124,7 +124,7 @@
                                                     <td>{{ $item->class->program }}</td>
                                                     <td>{{ $item->day1 . '-' . $item->day2 . '/' . $item->course_time }}
                                                     </td>
-                                                    <td>{{ $item->teacher->name }}</td>
+                                                    <td>{{ $item->teacher->name ?? '-'  }}</td>
                                                     <td>
                                                         @if ($order_reviews_nya != null)
                                                             {{ Carbon\Carbon::parse($order_reviews_nya[0]->due_date)->format('d M Y') }}

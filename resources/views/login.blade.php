@@ -70,6 +70,8 @@
                     swal("{{ session('message') }}", {
                         buttons: false,
                         timer: 3000,
+                        icon: "error",
+
                     });
                 </script>
             @endif

@@ -408,8 +408,8 @@ class ScoreController extends Controller
                         $pdf->SetXY(200, 187);
                         $pdf->Cell(40, 10, $getStudent->teacher != null ? $getStudent->teacher->name : '', '', 0, 'L');
 
-                        $pdf->Image(public_path('../../ui-master-update/upload/signature/' . $getStudent->teacher->signature), 215, 170, 19.2, 12.6);
-                        $pdf->Image(public_path('../../ui-master-update/upload/signature/principal.png'), 70, 170, 19.2, 12.6);
+                        $pdf->Image(public_path('../../ui-payment.primtechdev.com/upload/signature/' . $getStudent->teacher->signature), 215, 170, 19.2, 12.6);
+                        $pdf->Image(public_path('../../ui-payment.primtechdev.com/upload/signature/principal.png'), 70, 170, 19.2, 12.6);
                     }
                     //kid -advanced
                     else {
@@ -521,8 +521,8 @@ class ScoreController extends Controller
                         $pdf->SetXY(200, 187);
                         $pdf->Cell(40, 10, $getStudent->teacher != null ? $getStudent->teacher->name : '', '', 0, 'L');
 
-                        $pdf->Image(public_path('../../ui-master-update/upload/signature/' . $getStudent->teacher->signature), 215, 170, 19.2, 12.6);
-                        $pdf->Image(public_path('../../ui-master-update/upload/signature/principal.png'), 70, 170, 19.2, 12.6);
+                        $pdf->Image(public_path('../../ui-payment.primtechdev.com/upload/signature/' . $getStudent->teacher->signature), 215, 170, 19.2, 12.6);
+                        $pdf->Image(public_path('../../ui-payment.primtechdev.com/upload/signature/principal.png'), 70, 170, 19.2, 12.6);
                     }
 
                     $pdf->Output(public_path('certificate/' . $nama_file), 'F');

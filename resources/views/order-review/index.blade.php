@@ -94,7 +94,7 @@
                                             <tr>
                                                 <td>{{ $loop->iteration }}</td>
                                                 @if (Auth::guard('teacher')->user() == null)
-                                                    <td>{{ $item->teacher->name }}</td>
+                                                    <td>{{ $item->teacher->name ?? '-' }}</td>
                                                 @endif
                                                 <td>{{ !empty($class[5]) ? (!empty($class[6]) ? $class[0] . ' ' . $class[1] . ' ' . $class[2] . ' ' . $class[3] . ' ' . $class[4] : $class[0] . ' ' . $class[1] . ' ' . $class[2] . ' ' . $class[3]) : $class[0] . ' ' . $class[1] . ' ' . $class[2] }}
                                                 </td>
@@ -118,7 +118,7 @@
                                                         <a href="javascript:void(0)" data-toggle="modal"
                                                             data-target="#exampleModal" data-id="{{ $item->id }}"
                                                             data-class="{{ $item->class }}"
-                                                            data-teacher="{{ $item->teacher->name }}"
+                                                            data-teacher="{{ $item->teacher->name ?? '-' }}"
                                                             class="btn btn-sm btn-primary modalAction">Add Comment</a>
 
                                                         {{-- @if ($item->is_done == 1)

@@ -33,6 +33,9 @@ class ScoreController extends Controller
             if (Auth::guard('teacher')->check() == true) {
                 $where = 'AND id_teacher = ' . Auth::guard('teacher')->user()->id;
             }
+            if ($request->branch && Auth::guard('staff')->check() == true) {
+                $where = $where . ' AND branch_id = ' . $request->branch;
+            }
             if ($request->level && Auth::guard('staff')->check() == true) {
                 $where = $where . ' AND priceid = ' . $request->level;
             }
@@ -40,11 +43,12 @@ class ScoreController extends Controller
                 $where = $where . ' AND priceid = ' . $request->level . ' AND id_teacher =' . Auth::guard('teacher')->user()->id;
             }
             $class = DB::select("SELECT DISTINCT priceid,day1,day2,course_time,id_teacher,price.level,price.program,day_1.day day_one,day_2.day day_two,teacher.name teacher_name,
-             student.id_teacher as teacher_id,  student.day1 as d1, student.day2 as d2  from student
+             student.id_teacher as teacher_id,  student.day1 as d1, student.day2 as d2, branch.location   from student
              join price on student.priceid = price.id
              join day day_1 on student.day1 = day_1.id
              join day day_2 on student.day2 = day_2.id
              join teacher on student.id_teacher = teacher.id
+             join branch on student.branch_id = branch.id
 
               WHERE day1 is NOT null AND day2 is NOT null AND course_time is NOT null AND id_teacher is NOT null AND student.status = 'ACTIVE' $where ORDER BY priceid ASC, day1,course_time;");
 

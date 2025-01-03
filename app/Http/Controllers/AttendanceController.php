@@ -44,6 +44,9 @@ class AttendanceController extends Controller
         if ($request->teacher) {
             $where = $where . ' AND id_teacher = ' . $request->teacher;
         }
+        if ($request->branch) {
+            $where = $where . ' AND branch_id = ' . $request->branch;
+        }
         if ($request->level && Auth::guard('staff')->check() == true) {
             $where = $where . ' AND priceid = ' . $request->level;
         }
@@ -53,10 +56,11 @@ class AttendanceController extends Controller
         if ($request->day && Auth::guard('teacher')->check() == true) {
             $where = $where . ' AND (day1 = ' . $request->day . ' OR day2 = ' . $request->day . ') AND id_teacher =' . Auth::guard('teacher')->user()->id;
         }
-        $class = DB::select("SELECT DISTINCT priceid,day1,day2,course_time,id_teacher,price.level,price.program,day_1.day day_one,day_2.day day_two,teacher.name teacher_name, is_class_new from student
+        $class = DB::select("SELECT DISTINCT priceid,day1,day2,course_time,id_teacher,price.level,price.program,day_1.day day_one,day_2.day day_two,teacher.name teacher_name, is_class_new, branch.location from student
         join price on student.priceid = price.id
         join day day_1 on student.day1 = day_1.id
         join day day_2 on student.day2 = day_2.id
+        join branch on student.branch_id = branch.id
         -- join attendance_details ad on student.id = ad.student_id
         join teacher on student.id_teacher = teacher.id  WHERE day1 is NOT null AND day2 is NOT null AND course_time is NOT null AND id_teacher is NOT null AND student.status = 'ACTIVE' $where ORDER BY priceid ASC, day1,course_time;");
 

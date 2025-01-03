@@ -194,10 +194,10 @@ class PaymentController extends Controller
 
             if (strpos($program, "Private") !== false) {
                 //redirect(base_url("escpos/example/reprintprivate.php?id=".$id));
-                $url_cetak = "https://primtech-sistem.com/ui-master-update/cetak/printprivate_parent/" . $data->id;
+                $url_cetak = "https://ui-payment.primtechdev.com/cetak/printprivate_parent/" . $data->id;
             } elseif (strpos($program, "Regular") !== false) {
                 //redirect("escpos/example/reprintregular.php?id=".$id));
-                $url_cetak = "https://primtech-sistem.com/ui-master-update/cetak/printregular_parent/" . $data->id;
+                $url_cetak = "https://ui-payment.primtechdev.com/cetak/printregular_parent/" . $data->id;
             } else {
                 $url_cetak = "https://primtech-sistem.com/ui-master-update/cetak/printother_parent/" . $data->id;
             }

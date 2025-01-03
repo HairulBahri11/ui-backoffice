@@ -35,6 +35,21 @@
                         <div class="card-body">
                             <form action="" method="get">
                                 <div class="row">
+                                    @if (Auth::guard('staff')->check() == true)
+                                        @php
+                                            $branch = DB::table('branch')->get();
+                                        @endphp
+                                        <div class="col-md-3">
+                                            <select name="branch" id="" class="form-control select2">
+                                                <option value="">---U&I Location---</option>
+                                                @foreach ($branch as $t)
+                                                    <option value="{{ $t->id }}"
+                                                        {{ Request::get('branch') == $t->id ? 'selected' : '' }}>
+                                                        {{ $t->location }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                    @endif
                                     <div class="col-md-3">
                                         <select name="level" id="" class="form-control select2">
                                             <option value="">---Choose Class---</option>
@@ -100,6 +115,7 @@
                                                         </div>
                                                     </div>
                                                     <br>
+                                                    <b style="font-size: 12px; color:rgb(127, 127, 255)">({{ $item->location }})</b> <br>
                                                     <b>{{ $item->day_one }}
                                                         {{ $item->day_two != $item->day_one ? ' & ' . $item->day_two : '' }}</b>
                                                     <br>

@@ -49,6 +49,19 @@
                             <form action="" method="get">
                                 <div class="row">
                                     @if (Auth::guard('staff')->check() == true)
+                                        @php
+                                            $branch = DB::table('branch')->get();
+                                        @endphp
+                                        <div class="col-md-3">
+                                            <select name="branch" id="" class="form-control select2">
+                                                <option value="">---U&I Location---</option>
+                                                @foreach ($branch as $t)
+                                                    <option value="{{ $t->id }}"
+                                                        {{ Request::get('branch') == $t->id ? 'selected' : '' }}>
+                                                        {{ $t->location }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
                                         <div class="col-md-3">
                                             <select name="teacher" id="" class="form-control select2">
                                                 <option value="">---Choose Teacher---</option>
@@ -164,10 +177,12 @@
                                                         @endif
                                                     </div>
                                                     <br>
+                                                    <b style="font-size: 12px; color:rgb(127, 127, 255)">({{ $item->location }})</b> <br>
                                                     <b>{{ $item->day_one }}
                                                         {{ $item->day1 != $item->day2 ? '&' : '' }}
                                                         {{ $item->day1 != $item->day2 ? $item->day_two : '' }}</b>
                                                     <br>
+                                                   
                                                     <b>{{ $item->course_time }}</b> <br>
                                                     <i>{{ $student_total . ' Students' }}</i>
 
@@ -314,6 +329,7 @@
                                                         @endif
                                                     </div>
                                                     <br>
+                                                    <b style="font-size: 12px; color:rgb(127, 127, 255)">({{ $itemSemiPrivate->location }})</b> <br>
                                                     <b>{{ $itemSemiPrivate->day_one }}
                                                         {{ $itemSemiPrivate->day1 != $itemSemiPrivate->day2 ? '&' : '' }}
                                                         {{ $itemSemiPrivate->day1 != $itemSemiPrivate->day2 ? $itemSemiPrivate->day_two : '' }}</b>
@@ -437,6 +453,8 @@
                                                                 </div>
                                                             @endif
                                                         </div> <i class="fa fas fa-angle-right"></i>
+                                                        <b style="font-size: 11px; color:rgb(127, 127, 255)">({{ $item->location }})</b> <br>
+                                                        
                                                         <b>{{ $item->day_one }}
                                                             {{ $item->day1 != $item->day2 ? '&' : '' }}
                                                             {{ $item->day1 != $item->day2 ? $item->day_two : '' }}</b>

@@ -95,34 +95,47 @@ class UsersController extends Controller
 
     public function login(Request $request)
     {
-        // return $request;
-        // return bcrypt('teacher');
-        $this->validate($request, [
+        // Validate the incoming request
+        $request->validate([
             'email' => 'required',
             'password' => 'required'
         ]);
-        // return Auth::guard('staff')->attempt(['username' => $request->email, 'password' => $request->password]);
+
+        // Check if the email exists in staff or teacher table
+        $staff = DB::table('staff')->where('username', $request->email)->first();
+        $teacher = DB::table('teacher')->where('username', $request->email)->first();
+
+        // If neither staff nor teacher exists, redirect back to login page
+        if (!$staff && !$teacher) {
+            return redirect()->intended('/')->withErrors(['email' => 'Invalid credentials']);
+        }
+
+        // If the account is inactive, redirect with message
+        if ($teacher && $teacher->status === 'nonactive') {
+            return redirect()->intended('/')->with('message', 'Your account is inactive');
+        }
+
+        // Attempt login based on user type (teacher or staff)
         try {
-            if ($request->type == 'teacher') {
+            if ($request->type === 'teacher' && $teacher) {
                 if (Auth::guard('teacher')->attempt(['username' => $request->email, 'password' => $request->password])) {
-                    // if successful, then redirect to their intended location
                     return redirect()->intended('/dashboard');
-                } else {
-                    return redirect()->intended('/');
                 }
-            } else {
+            } elseif ($request->type === 'staff' && $staff) {
                 if (Auth::guard('staff')->attempt(['username' => $request->email, 'password' => $request->password])) {
-                    // if successful, then redirect to their intended location
-                    return redirect('/dashboard')->with('message', 'Need to follow up');
-                } else {
-                    return redirect()->intended('/');
+                    return redirect()->intended('/dashboard')->with('message', 'Need to follow up');
                 }
             }
-        } catch (\Throwable $th) {
-            //throw $th;
-            return $th;
+
+            // If authentication failed, redirect back to login
+            return redirect()->intended('/')->withErrors(['email' => 'Invalid credentials or incorrect password']);
+
+        } catch (\Exception $e) {
+            // Handle unexpected errors
+            return redirect()->intended('/')->withErrors(['error' => 'An error occurred during login.']);
         }
     }
+
 
     public function logout()
     {

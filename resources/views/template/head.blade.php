@@ -28,9 +28,9 @@
 
     <!-- CSS Files -->
 
-    <link rel="stylesheet" href="{{ url('/') }}/assets/css/bootstrap.min.css">
+    {{-- <link rel="stylesheet" href="{{ url('/') }}/assets/css/bootstrap.min.css">
     <link rel="stylesheet" href="{{ url('/') }}/assets/css/atlantis.min.css">
-    <script src="{{ url('/') }}/assets/js/core/jquery.3.2.1.min.js"></script>
+    <script src="{{ url('/') }}/assets/js/core/jquery.3.2.1.min.js"></script> --}}
     <style>
         .custom-checkbox-size::before,
         .custom-checkbox-size::after {
@@ -54,7 +54,7 @@
     </style>
 
 
-    <!-- CSS Just for demo purpose, don't include it in your project -->
+    {{-- <!-- CSS Just for demo purpose, don't include it in your project -->
     <link rel="stylesheet" href="{{ url('/') }}/assets/css/demo.css">
     <script src="{{ url('/') }}/assets/js/plugin/sweetalert/sweetalert.min.js"></script>
     <link rel="stylesheet" href="{{ url('/') }}/assets/dropify/dist/css/dropify.min.css">
@@ -63,5 +63,27 @@
     <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-bs4.min.js"></script>
 
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script> --}}
+
+
+    <!-- CSS Frameworks -->
+<link rel="stylesheet" href="{{ url('/') }}/assets/css/bootstrap.min.css">
+<link rel="stylesheet" href="{{ url('/') }}/assets/css/atlantis.min.css">
+
+<!-- CSS Plugin Styles -->
+<link rel="stylesheet" href="{{ url('/') }}/assets/dropify/dist/css/dropify.min.css">
+<link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-bs4.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet">
+
+<!-- CSS Just for demo purpose (Optional) -->
+<link rel="stylesheet" href="{{ url('/') }}/assets/css/demo.css">
+
+<!-- JS Core Libraries -->
+<script src="{{ url('/') }}/assets/js/core/jquery.3.2.1.min.js"></script>
+
+<!-- JS Plugins -->
+<script src="{{ url('/') }}/assets/js/plugin/sweetalert/sweetalert.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-bs4.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
 </head>

@@ -206,19 +206,21 @@ class PaymentController extends Controller
             // $message = "Pembayaran dengan nominal *" . $amount . "* dengan kode pembayaran *" . $data->id . "*"  .
             //     "Berikut link bukti pembayaran : " . $url_receipt;
             
-          $message = sprintf(
-    "*Payment is successful*\n\n" .
-        "Total Amount: *%s*\n" .
-        "Payment Code: *%s*\n\n\n" .
-        "This is your e-receipt link:\n\n%s\n\n" . // Extra newline added here
-        "Thank you for preserving our environment by being paperless. \n\n" .
-        "NB:\n".
-        "Save this contact if the link is not clickable.\n".
-        "-U&I English Course-",
-    $amount,
-    $data->id,
-    $url_cetak
-);
+            $message = sprintf(
+                "*Payment is successful*\n\n" .
+                    "Total Amount: *%s*\n" .
+                    "Payment Code: *%s*\n\n\n" .
+                    "This is your e-receipt link:\n\n%s\n\n" . // Extra newline added here
+                    "Thank you for preserving our environment by being paperless. \n\n" .
+                    "This WhatsApp number (0823-3890-5700) is U&I English Course's official number specified to send:\n".
+                    "1. the link of E-Receipt for any payments\n".
+                    "2. OTP code for U&I's App Member\n".
+                    "Please save this number to enable the activation of E-Receipt Link. \n\n".
+                    "-U&I English Course-",
+                $amount,
+                $data->id,
+                $url_cetak
+            );
 
 //  $message = sprintf(
 //                 "*Payment is successful*\n\n" .

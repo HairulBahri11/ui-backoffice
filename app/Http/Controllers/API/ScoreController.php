@@ -570,7 +570,7 @@ class ScoreController extends Controller
                     'count_class' => count($countClass)
                 ]);
             } else {
-                $fileName = explode('/certificate/' , $file)[0];
+                // $fileName = explode('/certificate/' , $file)[0];
                 $data = ([
                     'total_score' => 0,
                     'class' => $class->program,
@@ -578,7 +578,7 @@ class ScoreController extends Controller
                     'grade' => Helper::getGrade(0),
                     'total_test' => 0,
                     'total_test_passed' => 0,
-                    'file' => $fileName,
+                    'file' => $file,
                     'class_id' => $class->priceid,
                     'count_class' => count($countClass)
                 ]);

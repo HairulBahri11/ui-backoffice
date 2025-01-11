@@ -551,11 +551,11 @@ class ScoreController extends Controller
                 $total = $totalScore / $totalTest;
 
 
-                // get $file just name of certificate
-                // https://primtech-sistem.com/ui-payment-backoffice/public/certificate/4-1713942111_Kennard Ethan Lie.pdf
-                $fileName = explode('/certificate/' , $file)[1];
-                // contoh outputnya
-                // 4-1713942111_Kennard Ethan Lie.pdf
+                // // get $file just name of certificate
+                // // https://primtech-sistem.com/ui-payment-backoffice/public/certificate/4-1713942111_Kennard Ethan Lie.pdf
+                // $fileName = explode('/certificate/' , $file)[1];
+                // // contoh outputnya
+                // // 4-1713942111_Kennard Ethan Lie.pdf
             
 
                 $data = ([
@@ -565,7 +565,7 @@ class ScoreController extends Controller
                     'grade' => Helper::getGrade($total),
                     'total_test' => $test,
                     'total_test_passed' => $totalTest,
-                    'file' => $fileName,
+                    'file' => $file,
                     'class_id' => $class->priceid,
                     'count_class' => count($countClass)
                 ]);

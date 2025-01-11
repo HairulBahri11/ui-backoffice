@@ -570,7 +570,7 @@ class ScoreController extends Controller
                     'count_class' => count($countClass)
                 ]);
             } else {
-                $fileName = explode('/certificate/' , $file)[1];
+                $fileName = explode('/certificate/' , $file)[0];
                 $data = ([
                     'total_score' => 0,
                     'class' => $class->program,

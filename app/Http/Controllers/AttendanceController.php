@@ -1009,7 +1009,7 @@ if ($request->level == '' && $request->teacher == '' && Auth::guard('staff')->us
 
 
             $date = new \DateTime(date('Y-m-d'));
-            $date->modify('-14 day');
+            $date->modify('-30 day');
 
 
             $attendance = $attendance

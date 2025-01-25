@@ -402,10 +402,10 @@ class PaymentController extends Controller
                         "Thank you, and have a great day!\n\n" .
                         "- U&I English Course -"
                     ,
-                    $datanya->name,
-                    $datanya->monthpay
+                    $datanya['name'],
+                    $datanya['lastpaydate']
                 );
-            $send = Helper::sendMessage($datanya->phone, $message);
+            $send = Helper::sendMessage($datanya['phone'], $message);
             if ($send) {
                 return response()->json([
                     'code' => '00',

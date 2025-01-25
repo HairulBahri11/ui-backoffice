@@ -380,9 +380,15 @@ class PaymentController extends Controller
         }
     }
 
-    function broadcastLatePayment($data){
+    function broadcastLatePayment(Request $request){
         try{
-            foreach($data as $datanya){
+            // Ambil data dari body request
+        $data = $request->input(); // Jika data dikirim sebagai JSON
+        
+        // Jika data dalam format JSON, langsung decode jika diperlukan
+        $decodedData = is_array($data) ? $data : json_decode($data, true);
+            // $data = urldecode($data);
+            foreach($decodedData as $datanya){
                 $message = sprintf(
                     "*📢 Announcement 📢*\n\n" .
                         "Dear parents of *%s*,\n\n" .

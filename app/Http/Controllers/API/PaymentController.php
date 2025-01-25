@@ -381,14 +381,64 @@ class PaymentController extends Controller
     }
 
     function broadcastLatePayment(Request $request){
-        try{
-            // Ambil data dari body request
-        $data = $request->input(); // Jika data dikirim sebagai JSON
+        // try{
+        //     // Ambil data dari body request
+        // $data = $request->input(); // Jika data dikirim sebagai JSON
         
-        // Jika data dalam format JSON, langsung decode jika diperlukan
-        $decodedData = is_array($data) ? $data : json_decode($data, true);
-            // $data = urldecode($data);
-            foreach($decodedData as $datanya){
+        // // Jika data dalam format JSON, langsung decode jika diperlukan
+        // $decodedData = is_array($data) ? $data : json_decode($data, true);
+        //     // $data = urldecode($data);
+        //     foreach($decodedData as $datanya){
+        //         $message = sprintf(
+        //             "*📢 Announcement 📢*\n\n" .
+        //                 "Dear parents of *%s*,\n\n" .
+        //                 "We would like to kindly remind you that the latest course payment was for *%s*. " .
+        //                 "Please ensure to complete the payment for this month's course at your earliest convenience.\n\n" .
+        //                 "Thank you for your prompt attention to this matter.\n\n" .
+        //                 "This WhatsApp number (0823-3890-5700) is the official contact number of *U&I English Course* and is used exclusively for:\n" .
+        //                 "1. Sending the E-Receipt link for any payments.\n" .
+        //                 "2. Delivering OTP codes for U&I's App Member.\n\n" .
+        //                 "Please save this number in your contacts to activate the E-Receipt Link feature.\n\n" .
+        //                 "Thank you, and have a great day!\n\n" .
+        //                 "- U&I English Course -"
+        //             ,
+        //             $datanya['name'],
+        //             $datanya['lastpaydate']
+        //         );
+        //     $send = Helper::sendMessage($datanya['phone'], $message);
+        //     if ($send) {
+        //         return response()->json([
+        //             'code' => '00',
+        //             'payload' => 'Success',
+        //         ], 200);
+        //     } else {
+        //         return response()->json([
+        //             'code' => '10',
+        //             'message' => 'Failed verify payment, please try again later',
+        //         ], 200);
+        //     }
+        // }
+        // } catch (\Throwable $th) {
+        //     return response()->json([
+        //         'code' => '400',
+        //         'error' => 'internal server error',
+        //         'message' => $th,
+        //     ], 403);
+        // }
+
+
+        try {
+            // Ambil data dari body request
+            $data = $request->input(); // Jika data dikirim sebagai JSON
+        
+            // Jika data dalam format JSON, langsung decode jika diperlukan
+            $decodedData = is_array($data) ? $data : json_decode($data, true);
+        
+            $success = [];
+            $failed = [];
+        
+            // Iterasi data yang diterima
+            foreach ($decodedData as $datanya) {
                 $message = sprintf(
                     "*📢 Announcement 📢*\n\n" .
                         "Dear parents of *%s*,\n\n" .
@@ -400,32 +450,39 @@ class PaymentController extends Controller
                         "2. Delivering OTP codes for U&I's App Member.\n\n" .
                         "Please save this number in your contacts to activate the E-Receipt Link feature.\n\n" .
                         "Thank you, and have a great day!\n\n" .
-                        "- U&I English Course -"
-                    ,
+                        "- U&I English Course -",
                     $datanya['name'],
                     $datanya['lastpaydate']
                 );
-            $send = Helper::sendMessage($datanya['phone'], $message);
-            if ($send) {
-                return response()->json([
-                    'code' => '00',
-                    'payload' => 'Success',
-                ], 200);
-            } else {
-                return response()->json([
-                    'code' => '10',
-                    'message' => 'Failed verify payment, please try again later',
-                ], 200);
+        
+                // Kirim pesan menggunakan helper
+                $send = Helper::sendMessage($datanya['phone'], $message);
+        
+                // Catat hasil pengiriman
+                if ($send) {
+                    $success[] = $datanya['phone']; // Data yang berhasil dikirim
+                } else {
+                    $failed[] = $datanya['phone']; // Data yang gagal dikirim
+                }
             }
-        }
+        
+            // Kirimkan respon akhir setelah semua data diproses
+            return response()->json([
+                'code' => '00',
+                'payload' => [
+                    'success' => $success,
+                    'failed' => $failed,
+                ],
+            ], 200);
+        
         } catch (\Throwable $th) {
+            // Tangani error
             return response()->json([
                 'code' => '400',
                 'error' => 'internal server error',
-                'message' => $th,
+                'message' => $th->getMessage(), // Ubah untuk hanya menampilkan pesan error
             ], 403);
         }
-
-
+        
     }
 }

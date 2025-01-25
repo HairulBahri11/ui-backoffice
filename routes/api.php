@@ -52,5 +52,5 @@ Route::group(['middleware' => ['jwt.auth']], function () {
     });
     
     Route::get('/e-receipt/{transId}/{phoneNumber}', [PaymentController::class, 'eReceipt']);
-    Route::get('/broadcast/{data}', [PaymentController::class, 'eReceipt'] );
+    Route::post('/broadcast', [PaymentController::class, 'broadcastLatePayment'] );
 });

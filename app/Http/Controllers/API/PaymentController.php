@@ -379,4 +379,47 @@ class PaymentController extends Controller
             ], 403);
         }
     }
+
+    function broadcastLatePayment($data){
+        try{
+            foreach($data as $datanya){
+                $message = sprintf(
+                    "*📢 Announcement 📢*\n\n" .
+                        "Dear parents of *%s*,\n\n" .
+                        "We would like to kindly remind you that the latest course payment was for *%s*. " .
+                        "Please ensure to complete the payment for this month's course at your earliest convenience.\n\n" .
+                        "Thank you for your prompt attention to this matter.\n\n" .
+                        "This WhatsApp number (0823-3890-5700) is the official contact number of *U&I English Course* and is used exclusively for:\n" .
+                        "1. Sending the E-Receipt link for any payments.\n" .
+                        "2. Delivering OTP codes for U&I's App Member.\n\n" .
+                        "Please save this number in your contacts to activate the E-Receipt Link feature.\n\n" .
+                        "Thank you, and have a great day!\n\n" .
+                        "- U&I English Course -"
+                    ,
+                    $datanya->name,
+                    $datanya->monthpay
+                );
+            $send = Helper::sendMessage($datanya->phone, $message);
+            if ($send) {
+                return response()->json([
+                    'code' => '00',
+                    'payload' => 'Success',
+                ], 200);
+            } else {
+                return response()->json([
+                    'code' => '10',
+                    'message' => 'Failed verify payment, please try again later',
+                ], 200);
+            }
+        }
+        } catch (\Throwable $th) {
+            return response()->json([
+                'code' => '400',
+                'error' => 'internal server error',
+                'message' => $th,
+            ], 403);
+        }
+
+
+    }
 }

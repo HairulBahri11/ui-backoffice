@@ -13,7 +13,7 @@ class Helper
             //     'number' => $phone,
             //     'message' => $message,
             // ]);
-             $response = Http::withHeaders([
+            $response = Http::withHeaders([
                 'Authorization' => env('API_KEY')
             ])->post(env('URL_GATEWAY'), [
                 'recipient_type' => 'individual',
@@ -43,6 +43,25 @@ class Helper
             return 'B';
         } else if (intval($score) >= 86 && intval($score) <= 100) {
             return 'A';
+        }
+    }
+
+    public static function sendBroadCast($phone, $message)
+    {
+        try {
+            $response = Http::withHeaders([
+                'Authorization' => env('API_KEY_BROADCAST')
+            ])->post(env('URL_GATEWAY_BROADCAST'), [
+                'recipient_type' => 'individual',
+                'to' => $phone,
+                'type' => 'text',
+                'text' => [
+                    'body' => $message
+                ]
+            ]);
+            return $response;
+        } catch (\Throwable $th) {
+            return $th;
         }
     }
 }

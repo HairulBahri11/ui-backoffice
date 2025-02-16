@@ -2,22 +2,23 @@
 
 namespace App\Http\Controllers\API;
 
-use App\Http\Controllers\Controller;
-use App\Models\HistoryBilling;
-use App\Models\Parents;
-use App\Models\ParentStudents;
-use App\Models\PaymentBill;
-use App\Models\PaymentBillDetail;
-use App\Models\PaymentFromApp;
-use App\Models\Students;
-use App\Models\PaymentFromAppDetail;
-use App\Models\Price;
-use Carbon\Carbon;
-use Helper;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use PDF;
+use Helper;
+use DateTime;
+use Carbon\Carbon;
+use App\Models\Price;
+use App\Models\Parents;
+use App\Models\Students;
+use App\Models\PaymentBill;
+use Illuminate\Http\Request;
+use App\Models\HistoryBilling;
+use App\Models\ParentStudents;
+use App\Models\PaymentFromApp;
+use App\Models\PaymentBillDetail;
+use Illuminate\Support\Facades\DB;
+use App\Http\Controllers\Controller;
+use App\Models\PaymentFromAppDetail;
+use Illuminate\Support\Facades\Auth;
 
 class PaymentController extends Controller
 {
@@ -180,7 +181,7 @@ class PaymentController extends Controller
             ], 403);
         }
     }
-    
+
     function eReceipt($transId, $phoneNumber, Request $request)
     {
         $program = $request->program;
@@ -205,34 +206,34 @@ class PaymentController extends Controller
             // $url_receipt = '<a href="' . $url_cetak . '">' . $url_cetak . '</a>';
             // $message = "Pembayaran dengan nominal *" . $amount . "* dengan kode pembayaran *" . $data->id . "*"  .
             //     "Berikut link bukti pembayaran : " . $url_receipt;
-            
+
             $message = sprintf(
                 "*Payment is successful*\n\n" .
                     "Total Amount: *%s*\n" .
                     "Payment Code: *%s*\n\n\n" .
                     "This is your e-receipt link:\n\n%s\n\n" . // Extra newline added here
                     "Thank you for preserving our environment by being paperless. \n\n" .
-                    "This WhatsApp number (0823-3890-5700) is U&I English Course's official number specified to send:\n".
-                    "1. the link of E-Receipt for any payments\n".
-                    "2. OTP code for U&I's App Member\n".
-                    "Please save this number to enable the activation of E-Receipt Link. \n\n".
+                    "This WhatsApp number (0823-3890-5700) is U&I English Course's official number specified to send:\n" .
+                    "1. the link of E-Receipt for any payments\n" .
+                    "2. OTP code for U&I's App Member\n" .
+                    "Please save this number to enable the activation of E-Receipt Link. \n\n" .
                     "-U&I English Course-",
                 $amount,
                 $data->id,
                 $url_cetak
             );
 
-//  $message = sprintf(
-//                 "*Payment is successful*\n\n" .
-//                     "Total Amount: *%s*\n" .
-//                     "Payment Code: *%s*\n\n\n" .
-//                     "_This is your e-receipt link:_\n%s",
-//                     // "Thank you for preserving our environment by being paperless. \n\n" .
-//                     // "-U&I English Course-",
-//                     $amount,
-//                 $data->id,
-//                 $url_cetak
-//             );
+            //  $message = sprintf(
+            //                 "*Payment is successful*\n\n" .
+            //                     "Total Amount: *%s*\n" .
+            //                     "Payment Code: *%s*\n\n\n" .
+            //                     "_This is your e-receipt link:_\n%s",
+            //                     // "Thank you for preserving our environment by being paperless. \n\n" .
+            //                     // "-U&I English Course-",
+            //                     $amount,
+            //                 $data->id,
+            //                 $url_cetak
+            //             );
 
             $send = Helper::sendMessage($phoneNumber, $message);
             if ($send) {
@@ -380,11 +381,12 @@ class PaymentController extends Controller
         }
     }
 
-    function broadcastLatePayment(Request $request){
+    function broadcastLatePayment(Request $request)
+    {
         // try{
         //     // Ambil data dari body request
         // $data = $request->input(); // Jika data dikirim sebagai JSON
-        
+
         // // Jika data dalam format JSON, langsung decode jika diperlukan
         // $decodedData = is_array($data) ? $data : json_decode($data, true);
         //     // $data = urldecode($data);
@@ -428,45 +430,71 @@ class PaymentController extends Controller
 
 
         try {
-            // Ambil data dari body request
-            $data = $request->input(); // Jika data dikirim sebagai JSON
-        
-            // Jika data dalam format JSON, langsung decode jika diperlukan
+            $data = $request->input();
             $decodedData = is_array($data) ? $data : json_decode($data, true);
-        
+
+            if (!is_array($decodedData)) {
+                return response()->json([
+                    'code' => '400',
+                    'error' => 'Invalid data format',
+                    'message' => 'Data should be an array',
+                ], 400);
+            }
+
             $success = [];
             $failed = [];
-        
-            // Iterasi data yang diterima
+            $currentDate = new DateTime();
+            $monthlyFee = 300000;
+
             foreach ($decodedData as $datanya) {
-                $message = sprintf(
-                    "*📢 Announcement 📢*\n\n" .
-                        "Dear parents of *%s*,\n\n" .
-                        "We would like to kindly remind you that the latest course payment was for *%s*. " .
-                        "Please ensure to complete the payment for this month's course at your earliest convenience.\n\n" .
-                        "Thank you for your prompt attention to this matter.\n\n" .
-                        "This WhatsApp number (0823-3890-5700) is the official contact number of *U&I English Course* and is used exclusively for:\n" .
-                        "1. Sending the E-Receipt link for any payments.\n" .
-                        "2. Delivering OTP codes for U&I's App Member.\n\n" .
-                        "Please save this number in your contacts to activate the E-Receipt Link feature.\n\n" .
-                        "Thank you, and have a great day!\n\n" .
-                        "- U&I English Course -",
-                    $datanya['name'],
-                    $datanya['lastpaydate']
-                );
-        
-                // Kirim pesan menggunakan helper
-                $send = Helper::sendMessage($datanya['phone'], $message);
-        
-                // Catat hasil pengiriman
+                if (!isset($datanya['name'], $datanya['phone'], $datanya['lastpaydate'])) {
+                    $failed[] = $datanya['phone'] ?? 'Unknown Phone';
+                    continue;
+                }
+
+                $lastPayDate = DateTime::createFromFormat('M Y', $datanya['lastpaydate']);
+                if (!$lastPayDate) {
+                    $failed[] = $datanya['phone'];
+                    continue;
+                }
+
+                // 🟢 Perbaikan LOOP bulan yang belum dibayar
+                $monthsUnpaid = [];
+                $totalAmount = 0;
+                $monthIterator = clone $lastPayDate;
+                $monthIterator->modify('+1 month');
+
+                while ((int)$monthIterator->format('Ym') <= (int)$currentDate->format('Ym')) {
+                    $monthsUnpaid[] = $monthIterator->format('F Y');
+                    $totalAmount += $monthlyFee;
+                    $monthIterator->modify('+1 month');
+                }
+
+                if (empty($monthsUnpaid)) {
+                    continue;
+                }
+
+                $message = "*📢 Pengumuman 📢*\n\n" .
+                    "*Yth: Orang tua murid " . $datanya['name'] . ",*\n\n" .
+                    "Mohon segera melakukan pembayaran *SPP* untuk bulan berikut:\n\n" .
+                    implode(", ", $monthsUnpaid) . "\n\n" .
+                    "Total yang harus dibayar: *Rp" . number_format($totalAmount, 0, ',', '.') . "*.\n\n" .
+                    "● Pembayaran bisa dilakukan langsung di *front desk U&I* atau transfer ke *BCA (Lie Citro Dewi Ruslie) 464 1327 187* hingga akhir bulan ini.\n\n" .
+                    "● Pembayaran lewat batas waktu akan dikenakan *biaya keterlambatan 10%*.\n\n" .
+                    "Terima kasih.\n\n" .
+                    "*U&I ENGLISH COURSE*\n\n" .
+                    "*NB: Abaikan pesan ini jika telah melakukan pembayaran.*";
+
+                // 🟢 Perbaikan jumlah argumen di Helper::sendBroadCast
+                $send = Helper::sendBroadCast($datanya['phone'], $message); // Pastikan hanya mengirim argumen yang dibutuhkan
+
                 if ($send) {
-                    $success[] = $datanya['phone']; // Data yang berhasil dikirim
+                    $success[] = $datanya['phone'];
                 } else {
-                    $failed[] = $datanya['phone']; // Data yang gagal dikirim
+                    $failed[] = $datanya['phone'];
                 }
             }
-        
-            // Kirimkan respon akhir setelah semua data diproses
+
             return response()->json([
                 'code' => '00',
                 'payload' => [
@@ -474,15 +502,12 @@ class PaymentController extends Controller
                     'failed' => $failed,
                 ],
             ], 200);
-        
         } catch (\Throwable $th) {
-            // Tangani error
             return response()->json([
                 'code' => '400',
                 'error' => 'internal server error',
-                'message' => $th->getMessage(), // Ubah untuk hanya menampilkan pesan error
+                'message' => $th->getMessage(),
             ], 403);
         }
-        
     }
 }

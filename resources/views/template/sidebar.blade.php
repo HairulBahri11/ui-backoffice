@@ -8,11 +8,11 @@
                     </div>
                     <div class="info">
                         <a data-toggle="collapse" href="#collapseExample" aria-expanded="true">
-                            
-                                <span class="user-level">
 
-                                    {{ (Auth::guard('teacher')->user() != null ? Auth::guard('teacher')->user()->name : Auth::guard('staff')->user()->name) ?? '' }}
-                                </span>
+                            <span class="user-level">
+
+                                {{ (Auth::guard('teacher')->user() != null ? Auth::guard('teacher')->user()->name : Auth::guard('staff')->user()->name) ?? '' }}
+                            </span>
                         </a>
 
                     </div>
@@ -162,6 +162,13 @@
                         <a href="{{ url('/review') }}" class="collapsed">
                             <i class="fas fa-book"></i>
                             <p>Review &Test Order</p>
+                        </a>
+
+                    </li>
+                    <li class="nav-item {{ Request::segment(1) == 'result-form' ? 'active' : '' }}">
+                        <a href="{{ url('/result-form') }}" class="collapsed">
+                            <i class="fas fa-pencil-alt"></i>
+                            <p>Poor Result</p>
                         </a>
 
                     </li>

@@ -1,24 +1,25 @@
 <?php
 
-use App\Http\Controllers\UsersController;
-use App\Http\Controllers\AdvertisesController;
-use App\Http\Controllers\AnnouncesController;
-use App\Http\Controllers\API\PaymentController;
-use App\Http\Controllers\AttendanceController;
-use App\Http\Controllers\EcertificateController;
-use App\Http\Controllers\FollowUpController;
-use App\Http\Controllers\LandingPageController;
-use App\Http\Controllers\ParentsController;
-use App\Http\Controllers\ParentStudentsController;
-use App\Http\Controllers\PointCategoriesController;
-use App\Http\Controllers\ReedemItemsController;
-use App\Http\Controllers\ReedemPointController;
-use App\Http\Controllers\ReviewTestPaperController;
-use App\Http\Controllers\ScheduleClassController;
-use App\Http\Controllers\ScoreController;
-use App\Http\Controllers\TestItemsController;
 use App\Models\Attendance;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\ScoreController;
+use App\Http\Controllers\UsersController;
+use App\Http\Controllers\ParentsController;
+use App\Http\Controllers\FollowUpController;
+use App\Http\Controllers\AnnouncesController;
+use App\Http\Controllers\TestItemsController;
+use App\Http\Controllers\AdvertisesController;
+use App\Http\Controllers\AttendanceController;
+use App\Http\Controllers\ResultFormController;
+use App\Http\Controllers\API\PaymentController;
+use App\Http\Controllers\LandingPageController;
+use App\Http\Controllers\ReedemItemsController;
+use App\Http\Controllers\ReedemPointController;
+use App\Http\Controllers\EcertificateController;
+use App\Http\Controllers\ScheduleClassController;
+use App\Http\Controllers\ParentStudentsController;
+use App\Http\Controllers\PointCategoriesController;
+use App\Http\Controllers\ReviewTestPaperController;
 
 /*
 |--------------------------------------------------------------------------
@@ -119,6 +120,8 @@ Route::middleware(['web'])->group(function () {
     Route::resource('/e-certificate', EcertificateController::class);
     Route::delete('bulk/follow-up', [FollowUpController::class, 'bulkDestroy'])->name('bulk.follow-up');
     Route::resource('/follow-up', FollowUpController::class);
-    
+
     Route::post('/teacher-transfer', [AttendanceController::class, 'mutasi_class'])->name('mutasi-class');
+
+    Route::get('/result-form', [ResultFormController::class, 'index']);
 });

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Students;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 
 class ResultFormController extends Controller
 {
@@ -15,6 +16,9 @@ class ResultFormController extends Controller
      */
     public function index()
     {
+
+
+
         $result = DB::table('student_scores')
             ->select(
                 'student_scores.*',
@@ -41,10 +45,14 @@ class ResultFormController extends Controller
                     $subQuery->where('student.priceid', '>', 21)
                         ->where('student_scores.test_id', 1);
                 });
-            })
-            ->get();
+            });
 
+        // **Menambahkan filter hanya jika teacher login**
+        if (Auth::guard('teacher')->check()) {
+            $result->where('student.id_teacher', Auth::guard('teacher')->user()->id);
+        }
 
+        $result = $result->get();
 
         return view('result-form.index', compact('result'));
     }

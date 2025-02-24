@@ -28,12 +28,12 @@ class UsersController extends Controller
     {
 
         $student = Students::where('status', 'ACTIVE')->where('course_time', '!=', null)->where('priceid', '!=', null)->count();
-        
+
         // dd($student);
         $parent = Parents::count();
         $teacher = Teacher::count();
 
-       $arr = [];
+        $arr = [];
         if (Auth::guard('teacher')->check()) {
 
             $today = Carbon::today()->toDateString();
@@ -85,7 +85,71 @@ class UsersController extends Controller
         ]);
 
 
-        return view('dashboard.index', compact('data', 'arr', 'parent'));
+        // Cek student_birthday
+        $teacherId = Auth::guard('teacher')->id(); // Ambil ID guru jika login
+
+        // Query awal
+        $query = Students::where('status', 'ACTIVE')
+            ->whereNotNull('course_time')
+            ->whereNotNull('priceid')
+            ->with(['class', 'teacher'])
+            ->orderBy('name', 'asc');
+
+        // Jika login sebagai teacher, filter berdasarkan id_teacher
+        if ($teacherId) {
+            $query->where('id_teacher', $teacherId);
+        }
+
+        $student_list_active = $query->get();
+
+        $student_birthday = [];
+
+        foreach ($student_list_active as $item) {
+            $birthdayString = trim($item->birthday); // Hapus spasi ekstra
+
+            // Pastikan format tanggal valid sebelum diproses
+            if (preg_match('/^\d{4} [A-Za-z]+ \d{1,2}$/', $birthdayString)) {
+                // Format "2019 November 24" → "2019-11-24"
+                $date = Carbon::createFromFormat('Y F d', $birthdayString);
+            } elseif (preg_match('/^[A-Za-z]+ \d{1,2}$/', $birthdayString)) {
+                // Format "November 24" → "2025-11-24" (asumsi tahun ini)
+                $birthdayString .= ' ' . now()->year;
+                $date = Carbon::createFromFormat('F d Y', $birthdayString);
+            } else {
+                continue; // Lewati jika format salah
+            }
+
+            // Hitung umur hanya jika tahun ada
+            $age = $date->year != now()->year ? now()->diffInYears($date) : null;
+
+            // Cek apakah ulang tahun bulan ini
+            $isThisMonthBirthday = ($date->format('m') == now()->format('m'));
+
+            // Cek apakah ulang tahun hari ini
+            $isTodayBirthday = ($date->format('m-d') == now()->format('m-d'));
+
+            // Pastikan data `class` dan `teacher` tersedia sebelum mengaksesnya
+            $className = $item->class->program ?? 'Unknown';
+            $teacherName = $item->teacher->name ?? 'Unknown';
+
+            // Tambahkan hanya siswa yang ulang tahun bulan ini
+            if ($isThisMonthBirthday) {
+                $student_birthday[] = [
+                    'id' => $item->id,
+                    'name' => $item->name,
+                    'birthday' => $date->format('Y-m-d'), // Format "YYYY-MM-DD"
+                    'class' => $className,
+                    'teacher' => $teacherName,
+                    'age' => $age,
+                    'is_today_birthday' => $isTodayBirthday
+                ];
+            }
+        }
+
+
+        // dd($student_birthday);
+
+        return view('dashboard.index', compact('data', 'arr', 'parent', 'student_birthday'));
     }
 
     public function viewLogin()
@@ -129,7 +193,6 @@ class UsersController extends Controller
 
             // If authentication failed, redirect back to login
             return redirect()->intended('/')->withErrors(['email' => 'Invalid credentials or incorrect password']);
-
         } catch (\Exception $e) {
             // Handle unexpected errors
             return redirect()->intended('/')->withErrors(['error' => 'An error occurred during login.']);
@@ -242,7 +305,6 @@ class UsersController extends Controller
             }
         } catch (\Throwable $th) {
             return $th;
-            return redirect('/user')->with('error', 'Success update profile');
         }
         return $request;
     }
@@ -262,11 +324,15 @@ class UsersController extends Controller
     {
         return view('report.print');
     }
-    
-    public function tes()
+
+    function parseBirthday($birthday)
     {
-        return 'Hey';
+        // Coba parsing format "Y F d" (contoh: 2017 October 15)
+        try {
+            return Carbon::createFromFormat('Y F d', $birthday);
+        } catch (\Exception $e) {
+            // Jika gagal, coba parsing format "F Y" (contoh: Agustus 2025)
+            return false;
+        }
     }
-    
-    
 }

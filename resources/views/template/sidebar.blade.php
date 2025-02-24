@@ -102,6 +102,13 @@
                             </a>
 
                         </li>
+                        <li class="nav-item {{ Request::segment(1) == 'birhdayPoint' ? 'active' : '' }}">
+                            <a href="{{ url('/birthday-point') }}" class="collapsed">
+                                <i class="fas fa-birthday-cake"></i>
+                                <p>Birthday Point</p>
+                            </a>
+
+                        </li>
                         <li class="nav-item {{ Request::segment(1) == 'schedule-class' ? 'active' : '' }}">
                             <a href="{{ url('/schedule-class') }}" class="collapsed">
                                 <i class="fas fa-calendar"></i>

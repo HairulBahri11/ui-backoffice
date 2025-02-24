@@ -15,6 +15,7 @@ use App\Http\Controllers\API\PaymentController;
 use App\Http\Controllers\LandingPageController;
 use App\Http\Controllers\ReedemItemsController;
 use App\Http\Controllers\ReedemPointController;
+use App\Http\Controllers\birthdayPoinController;
 use App\Http\Controllers\EcertificateController;
 use App\Http\Controllers\ScheduleClassController;
 use App\Http\Controllers\ParentStudentsController;
@@ -124,4 +125,7 @@ Route::middleware(['web'])->group(function () {
     Route::post('/teacher-transfer', [AttendanceController::class, 'mutasi_class'])->name('mutasi-class');
 
     Route::get('/result-form', [ResultFormController::class, 'index']);
+
+    Route::get('/birthday-point', [birthdayPoinController::class, 'index']);
+    Route::post('/birthday-point/store', [birthdayPoinController::class, 'store'])->name('birthday-point.store');
 });

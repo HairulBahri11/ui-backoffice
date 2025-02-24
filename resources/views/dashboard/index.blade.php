@@ -203,7 +203,7 @@
             @endif
 
             <div class="row">
-                <div class="col-md-12">
+                <div class="col-md-8">
                     <div class="card">
                         <div class="card-header">
                             <h4 class="card-title">Announcement</h4>
@@ -215,7 +215,7 @@
                                         <div class="col-md-12">
                                             @if ($data->announces)
                                                 <!--<img style="width: 100%"
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        src="{{ url('/storage') . '/' . $data->announces->banner }}" alt="">-->
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                src="{{ url('/storage') . '/' . $data->announces->banner }}" alt="">-->
                                                 <img style="width: 100%" src="{{ url($data->announces->banner) }}"
                                                     alt="">
                                             @endif
@@ -232,6 +232,44 @@
                         </div>
                     </div>
                 </div>
+                <div class="col-md-4">
+                    <div class="card mb-3 shadow-sm border-0">
+                        <div class="card-body border-1" style="background-color: #cdcdcd">
+                            <h5 class="card-title text-center text-white">🎉 Today's Birthday</h5>
+                            <ul class="list-group list-group-flush">
+                                @php
+                                    $today_birthdays = array_filter(
+                                        $student_birthday,
+                                        fn($s) => $s['is_today_birthday'],
+                                    );
+                                @endphp
+
+                                @if (!empty($today_birthdays))
+                                    @foreach ($today_birthdays as $student)
+                                        <li
+                                            class="list-group-item d-flex justify-content-between align-items-center bg-light rounded my-1 shadow-sm">
+                                            <div>
+                                                <strong>👦 {{ $student['name'] }}</strong><br>
+                                                <small>🏫 Class: {{ $student['class'] }}</small><br>
+                                                <small>👨‍🏫 Teacher:
+                                                    {{ $student['teacher'] ?? 'Unknown' }}</small>
+                                            </div>
+                                            <span class="badge bg-danger text-white rounded-pill px-3 py-2">
+                                                {{ $student['age'] }} yrs
+                                            </span>
+                                        </li>
+                                    @endforeach
+                                @else
+                                    <li class="list-group-item text-muted text-center bg-white rounded shadow-sm">No
+                                        birthdays today.</li>
+                                @endif
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+
+
             </div>
         </div>
     </div>

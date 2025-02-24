@@ -201,11 +201,22 @@
     // });
 </script>
 
-<script>
+{{-- <script>
     $(document).ready(function() {
         $('#basic-datatables').DataTable({
             responsive: true
         });
 
+    });
+</script> --}}
+<script>
+    $(document).ready(function() {
+        if ($.fn.DataTable.isDataTable('#basic-datatables')) {
+            $('#basic-datatables').DataTable().destroy();
+        }
+
+        $('#basic-datatables').DataTable({
+            "ordering": false // Menonaktifkan fitur sorting
+        });
     });
 </script>

@@ -88,12 +88,16 @@ class UsersController extends Controller
         // Cek student_birthday
         $teacherId = Auth::guard('teacher')->id(); // Ambil ID guru jika login
 
-        // Query awal
+        // Ambil siswa aktif
         $query = Students::where('status', 'ACTIVE')
             ->whereNotNull('course_time')
             ->whereNotNull('priceid')
             ->with(['class', 'teacher'])
-            ->orderBy('name', 'asc');
+            ->join('day as day_one', 'day_one.id', '=', 'student.day1')
+            ->join('day as day_two', 'day_two.id', '=', 'student.day2')
+            ->select('student.*', 'day_one.day as day1_name', 'day_two.day as day2_name')
+            ->orderBy('student.name', 'asc');
+
 
         // Jika login sebagai teacher, filter berdasarkan id_teacher
         if ($teacherId) {
@@ -131,6 +135,8 @@ class UsersController extends Controller
             // Pastikan data `class` dan `teacher` tersedia sebelum mengaksesnya
             $className = $item->class->program ?? 'Unknown';
             $teacherName = $item->teacher->name ?? 'Unknown';
+            $day1 = $item->day1_name ?? 'Unknown';
+            $day2 = $item->day2_name ?? 'Unknown';
 
             // Tambahkan hanya siswa yang ulang tahun bulan ini
             if ($isThisMonthBirthday) {
@@ -141,7 +147,10 @@ class UsersController extends Controller
                     'class' => $className,
                     'teacher' => $teacherName,
                     'age' => $age,
-                    'is_today_birthday' => $isTodayBirthday
+                    'is_today_birthday' => $isTodayBirthday,
+                    'day1' => $day1,
+                    'day2' => $day2,
+                    'course_time' => $item->course_time
                 ];
             }
         }

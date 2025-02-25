@@ -16,9 +16,6 @@ class ResultFormController extends Controller
      */
     public function index()
     {
-
-
-
         $result = DB::table('student_scores')
             ->select(
                 'student_scores.*',
@@ -51,7 +48,7 @@ class ResultFormController extends Controller
         if (Auth::guard('teacher')->check()) {
             $result->where('student.id_teacher', Auth::guard('teacher')->user()->id);
         }
-
+        $result->whereColumn('student_scores.price_id', 'student.priceid');
         $result = $result->get();
 
         return view('result-form.index', compact('result'));

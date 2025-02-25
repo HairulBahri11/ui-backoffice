@@ -215,7 +215,7 @@
                                         <div class="col-md-12">
                                             @if ($data->announces)
                                                 <!--<img style="width: 100%"
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                src="{{ url('/storage') . '/' . $data->announces->banner }}" alt="">-->
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        src="{{ url('/storage') . '/' . $data->announces->banner }}" alt="">-->
                                                 <img style="width: 100%" src="{{ url($data->announces->banner) }}"
                                                     alt="">
                                             @endif
@@ -235,34 +235,75 @@
                 <div class="col-md-4">
                     <div class="card mb-3 shadow-sm border-0">
                         <div class="card-body border-1" style="background-color: #cdcdcd">
-                            <h5 class="card-title text-center text-white">🎉 Today's Birthday</h5>
+                            <h5 class="card-title text-center text-white mb-2" style="font-weight: bold">🎉 Birthday Point
+                            </h5>
+                            <small class="text-white text-center text-danger">*Ignore if the birthday field has already
+                                been
+                                filled in</small>
+
                             <ul class="list-group list-group-flush">
                                 @php
-                                    $today_birthdays = array_filter(
-                                        $student_birthday,
-                                        fn($s) => $s['is_today_birthday'],
-                                    );
+                                    $todayMonthDay = date('m-d'); // Format bulan-tanggal hari ini
+                                    $todayDay = date('l'); // Nama hari ini (Monday, Tuesday, dll.)
+
+                                    $birthday_points = array_filter($student_birthday, function ($s) use (
+                                        $todayMonthDay,
+                                        $todayDay,
+                                    ) {
+                                        // Ambil bulan dan tanggal dari birthday siswa
+                                        $studentMonthDay = date('m-d', strtotime($s['birthday']));
+
+                                        // Hitung batas akhir tampilan (7 hari setelah ulang tahun)
+                                        $birthday_plus_5 = date('m-d', strtotime($s['birthday'] . ' +7 days'));
+
+                                        // Cek apakah hari ini dalam rentang ulang tahun hingga 7 hari setelahnya
+                                        $is_within_5_days =
+                                            $todayMonthDay >= $studentMonthDay && $todayMonthDay <= $birthday_plus_5;
+
+                                        // Cek apakah hari ini cocok dengan day1 atau day2
+                                        $is_matching_day = in_array($todayDay, [$s['day1'], $s['day2']]);
+
+                                        return $is_within_5_days && $is_matching_day;
+                                    });
+
+                                    // dd($today_birthdays);
+
                                 @endphp
 
-                                @if (!empty($today_birthdays))
-                                    @foreach ($today_birthdays as $student)
+
+
+
+
+
+
+                                @if (!empty($birthday_points))
+                                    @foreach ($birthday_points as $student)
                                         <li
-                                            class="list-group-item d-flex justify-content-between align-items-center bg-light rounded my-1 shadow-sm">
+                                            class="list-group-item mt-2 bg-white rounded shadow-sm p-3 d-flex justify-content-between align-items-center">
                                             <div>
-                                                <strong>👦 {{ $student['name'] }}</strong><br>
-                                                <small>🏫 Class: {{ $student['class'] }}</small><br>
-                                                <small>👨‍🏫 Teacher:
-                                                    {{ $student['teacher'] ?? 'Unknown' }}</small>
+                                                <h6 class="mb-1">👦 {{ $student['name'] }}</h6>
+                                                <p class="mb-1 text-muted text-small">
+                                                    🏫 <strong>Class:</strong> {{ $student['class'] }} -
+                                                    {{ $student['day1'] . '' . $student['day2'] . ' ' . $student['course_time'] }}
+                                                    <br>
+                                                    👨‍🏫 <strong>Teacher:</strong> {{ $student['teacher'] ?? 'Unknown' }}
+                                                    <br>
+                                                    📅<strong>Birthday:</strong>
+                                                    {{ date('F j', strtotime($student['birthday'])) }}
+
+                                                </p>
                                             </div>
-                                            <span class="badge bg-danger text-white rounded-pill px-3 py-2">
+                                            <span class="badge bg-danger text-white rounded-pill px-3 py-2 fs-6">
                                                 {{ $student['age'] }} yrs
                                             </span>
                                         </li>
                                     @endforeach
                                 @else
-                                    <li class="list-group-item text-muted text-center bg-white rounded shadow-sm">No
-                                        birthdays today.</li>
+                                    <li class="list-group-item text-muted text-center bg-light rounded shadow-sm p-3">
+                                        🎉 No birthday points today.
+                                    </li>
                                 @endif
+
                             </ul>
                         </div>
                     </div>

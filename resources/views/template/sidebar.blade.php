@@ -109,6 +109,14 @@
                             </a>
 
                         </li>
+                        @if (Auth::guard('staff')->check() == true)
+                            <li class="nav-item {{ Request::segment(1) == 'extra-point' ? 'active' : '' }}">
+                                <a href="{{ url('/extra-point') }}" class="collapsed">
+                                    <i class="fas fa-star"></i>
+                                    <p>Extrass Exam Point</p>
+                                </a>
+                            </li>
+                        @endif
                         <li class="nav-item {{ Request::segment(1) == 'schedule-class' ? 'active' : '' }}">
                             <a href="{{ url('/schedule-class') }}" class="collapsed">
                                 <i class="fas fa-calendar"></i>

@@ -68,7 +68,7 @@ class ExamPointController extends Controller
                 'keterangan'        => $request->category,
                 'total_point'       => $request->point,
                 'type'              => 'in',
-                'balance_in_advanced' => $request->point_history + $request->point,
+                'balance_in_advanced' => $request->point_history,
                 'date'              => now()->format('Y-m-d'),
                 'created_at'        => now(),
                 'updated_at'        => now(),

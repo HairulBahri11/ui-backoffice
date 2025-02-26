@@ -7,6 +7,7 @@ use App\Http\Controllers\UsersController;
 use App\Http\Controllers\ParentsController;
 use App\Http\Controllers\FollowUpController;
 use App\Http\Controllers\AnnouncesController;
+use App\Http\Controllers\ExamPointController;
 use App\Http\Controllers\TestItemsController;
 use App\Http\Controllers\AdvertisesController;
 use App\Http\Controllers\AttendanceController;
@@ -129,4 +130,7 @@ Route::middleware(['web'])->group(function () {
 
     Route::get('/birthday-point', [birthdayPoinController::class, 'index']);
     Route::post('/birthday-point/store', [birthdayPoinController::class, 'store'])->name('birthday-point.store');
+
+    Route::get('/extra-point', [ExamPointController::class, 'index']);
+    Route::post('/extra-point/store', [ExamPointController::class, 'store'])->name('extra-point.store');
 });

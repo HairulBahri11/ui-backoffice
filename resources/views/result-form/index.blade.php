@@ -1,4 +1,18 @@
 @extends('template.app')
+<style>
+    .staff-comment {
+        width: 100% !important;
+        min-height: 120px !important;
+        resize: vertical;
+        font-size: 14px;
+        padding: 8px;
+    }
+
+    table.dataTable tbody td {
+        white-space: normal !important;
+        word-wrap: break-word;
+    }
+</style>
 
 @section('content')
     <div class="content">
@@ -42,278 +56,161 @@
             <div class="row">
                 <div class="col-md-12">
                     <div class="card">
-                        <div class="card-header">
+                        <div class="card-header d-flex justify-content-between align-items-center">
                             <h4 class="card-title">Data Students</h4>
                         </div>
                         <div class="card-body">
                             <div class="table-responsive">
-                                <form action="{{ route('bulk.follow-up') }}" method="POST" id="submitPassed">
-                                    @method('delete')
-                                    @csrf
-                                    <table id="basic-datatables" class="display table table-striped table-hover">
-                                        <thead>
-                                            <tr>
-                                                <th>ID</th>
-                                                <th>Student Name</th>
-                                                <th>Class</th>
-                                                <th>Teacher</th>
-                                                <th>Test</th>
-                                                <th>Average Score</th>
-                                                <th>Category Score</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            @foreach ($result as $item)
-                                                <?php
-                                                $get_grade = Helper::getGrade($item->average_score);
-                                                
-                                                ?>
-                                                <tr>
-                                                    <td>{{ $item->student_id }}</td>
-                                                    <td>{{ ucwords($item->name) }}</td>
-                                                    <td>{{ $item->class }}</td>
+                                <table id="basic-datatables" class="display table table-striped table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th width="20%">Student Info</th>
+                                            <th>Test</th>
+                                            <th width="10%">Date</th>
+                                            <th>Last Update</th>
+                                            <th width="5%">Avg Score</th>
+                                            <th width="5%">Grade</th>
+                                            <th width="15%">Teacher Comment</th>
+                                            <th class="no-print" width="25%">Staff Comment</th>
+                                            @if (Auth::guard('staff')->check() == true)
+                                                <th class="no-print">Action</th>
+                                            @endif
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach ($resultnya as $item)
+                                            <?php $get_grade = Helper::getGrade($item->average_score); ?>
 
-                                                    <td>{{ $item->teacher_name ?? '-' }}</td>
-                                                    <td>{{ $item->test_name }}</td>
-                                                    <td class="text-center">{{ $item->average_score }}</td>
+                                            <tr>
+                                                <!-- Student Info -->
+                                                <td>
+                                                    <strong>{{ $item->name }}</strong> <br>
+                                                    <small>ID: {{ $item->student_id }} | {{ $item->class }} -
+                                                        {{ $item->teacher_name ?? '-' }}</small>
+                                                </td>
+
+                                                <td>{{ $item->test_name }}</td>
+                                                <td>{{ date('d M Y', strtotime($item->date)) }}</td>
+                                                <td>{{ date('d M Y', strtotime($item->updated_at)) }}</td>
+                                                <td class="text-center">{{ $item->average_score }}</td>
+
+                                                <!-- Grade -->
+                                                <td class="text-center">
+                                                    <span
+                                                        class="badge 
+                                                        @if ($get_grade == 'A') bg-success 
+                                                        @elseif($get_grade == 'B') bg-primary 
+                                                        @elseif($get_grade == 'C') bg-warning text-dark 
+                                                        @elseif($get_grade == 'D') bg-danger 
+                                                        @else bg-dark @endif
+                                                        text-white p-2 rounded">
+                                                        {{ $get_grade }}
+                                                    </span>
+                                                </td>
+
+                                                <!-- Teacher Comment -->
+                                                <td>
+                                                    @if ($item->comment)
+                                                        <div class=" p-2">
+
+                                                            <span class="text-dark">{{ $item->comment }}</span>
+                                                        </div>
+                                                    @else
+                                                        <span class="text-muted">No Comment</span>
+                                                    @endif
+                                                </td>
+
+                                                <form action="{{ route('result-form.update', $item->id) }}" method="POST">
+                                                    @csrf
+
+                                                    <!-- Staff Comment -->
                                                     <td class="text-center">
-                                                        @if ($get_grade == 'A')
-                                                            <span class="text-white bg-success p-2 "
-                                                                style="border-radius : 5px">A</span>
-                                                        @elseif($get_grade == 'B')
-                                                            <span class="text-white bg-primary p-2 "
-                                                                style="border-radius : 5px">B</span>
-                                                        @elseif($get_grade == 'C')
-                                                            <span class="text-white bg-warning p-2 "
-                                                                style="border-radius : 5px">C</span>
-                                                        @elseif($get_grade == 'D')
-                                                            <span class="text-white bg-danger p-2 "
-                                                                style="border-radius : 5px">D</span>
+                                                        @if (Auth::guard('staff')->check() == true && $item->staff_comment == null)
+                                                            <textarea name="staff_comment" class="form-control border-primary shadow-sm"
+                                                                style="width: 100%; min-height: 120px; resize: vertical;" placeholder="Write your comment here..."></textarea>
                                                         @else
-                                                            <span class="text-white bg-dark p-2 "
-                                                                style="border-radius : 5px">E</span>
+                                                            <div class="p-2">
+                                                                @if ($item->staff_comment)
+                                                                    <span
+                                                                        class="text-dark">{{ $item->staff_comment }}</span>
+                                                                @else
+                                                                    <span class="text-muted">No Comment</span>
+                                                                @endif
+                                                            </div>
                                                         @endif
                                                     </td>
-                                                </tr>
-                                            @endforeach
 
-                                        </tbody>
-                                    </table>
-                                    {{-- @if (Auth::guard('teacher')->check() == true)
-                                        <div class="d-flex justify-content-end mt-4">
-                                            <button type="button" class="btn btn-primary" style="text-align: end"
-                                                onclick="submitPassed()">Save changes</button>
-                                        </div>
-                                    @endif --}}
-                                </form>
+                                                    <!-- Action -->
+                                                    @if (Auth::guard('staff')->check() == true)
+                                                        <td class="text-center no-print">
+                                                            @if ($item->staff_comment)
+                                                                <span class="badge bg-secondary">Followed Up</span>
+                                                            @else
+                                                                <button class="btn btn-sm btn-primary" type="submit">
+                                                                    <i class="fas fa-check"></i> Follow Up
+                                                                </button>
+                                                            @endif
+                                                        </td>
+                                                    @endif
+                                                </form>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+
+
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
+
+
+
         </div>
     </div>
-    <!-- Modal -->
-    <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
-        aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Promote Class</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <form method="POST" class="form-inline" id="formDelete">
-                        @method('delete')
-                        @csrf
-                        <div class="row">
-                            <div class="col-md-12">
-                                <div class="form-group">
-                                    <input class="form-check-input" type="checkbox" value="true" id="defaultCheck1"
-                                        name="promoted">
-                                    <label class="form-check-label" for="defaultCheck1">
-                                        Promoted to next grade
-                                    </label>
-                                </div>
-                            </div>
-                            <div id="form_new">
-                                <div class="col-md-4">
-                                    <div class="form-group">
-                                        <label for="email2">New Class</label>
-                                        {{-- <select name="new_class" id="new_class" class="form-control">
-                                            <option value="">---Choose Class</option>
-                                            @foreach ($class as $classData)
-                                                <option value="{{ $classData->id }}">{{ $classData->program }}</option>
-                                            @endforeach
-                                        </select> --}}
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="form-group">
-                                        <label for="email2">New Teacher</label>
-                                        {{-- <select name="new_teacher" id="new_teacher" class="form-control">
-                                            <option value="">---Choose Teacher</option>
-                                            @foreach ($teacher as $teacherData)
-                                                <option value="{{ $teacherData->id }}">{{ $teacherData->name }}</option>
-                                            @endforeach
-                                        </select> --}}
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="form-group">
-                                        <label for="email2">New Course Time</label>
-                                        <input type="time" class="form-control" name="new_course_time">
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="form-group">
-                                        <label for="email2">New Day 1</label>
-                                        {{-- <select name="new_day1" id="new_day1" class="form-control">
-                                            <option value="">---Choose day</option>
-                                            @foreach ($day as $dayData)
-                                                <option value="{{ $dayData->id }}">{{ $dayData->day }}</option>
-                                            @endforeach
-                                        </select> --}}
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="form-group">
-                                        <label for="email2">New Day 2</label>
-                                        {{-- <select name="new_day2" id="new_day2" class="form-control">
-                                            <option value="">---Choose day</option>
-                                            @foreach ($day as $dayData)
-                                                <option value="{{ $dayData->id }}">{{ $dayData->day }}</option>
-                                            @endforeach
-                                        </select> --}}
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary" onclick="submitDelete()">Save changes</button>
-                </div>
-            </div>
-        </div>
-    </div>
-    <script>
-        $("#form_new").hide();
-
-        function failed(id) {
-            $('#studentIdDis' + id).prop('disabled', false);
-        }
-
-        function passed(id) {
-            $('#studentIdDis' + id).prop('disabled', false);
-        }
-        $('#defaultCheck1').change(function() {
-            if (this.checked) {
-                $("#form_new").show();
-            } else {
-                $("#form_new").hide();
-            }
-        });
-
-        function confirm(id) {
-            $('#formDelete').attr('action', "{{ url('/') }}/follow-up/" + id);
-        }
-
-        function submitDelete() {
-            swal("Are you sure ?", "Data will be updated", {
-                icon: "info",
-                buttons: {
-                    confirm: {
-                        className: 'btn btn-success',
-                        text: 'Ok'
-                    },
-                    dismiss: {
-                        className: 'btn btn-secondary',
-                        text: 'Cancel'
-                    },
-                },
-            }).then((result) => {
-                /* Read more about isConfirmed, isDenied below */
-                if (result == true) {
-                    $('#formDelete').submit();
-                }
-            });
-        }
-
-        function submitPassed() {
-            swal("Are you sure ?", "Data will be updated", {
-                icon: "info",
-                buttons: {
-                    confirm: {
-                        className: 'btn btn-success',
-                        text: 'Ok'
-                    },
-                    dismiss: {
-                        className: 'btn btn-secondary',
-                        text: 'Cancel'
-                    },
-                },
-            }).then((result) => {
-                /* Read more about isConfirmed, isDenied below */
-                if (result == true) {
-                    $('#submitPassed').submit();
-                }
-            });
-        }
-
-        const dataStudent = {
-            id: [],
-        };
-
-        function onClickFollowUp(id) {
-            const checkbox = document.getElementById('studentId' + id);
-            if (checkbox.checked) {
-                if (dataStudent.id.indexOf(id) === -1) {
-                    dataStudent.id.push(id);
-                    var newElement = $(`<input type="hidden" id="idSiswa${id}" name="student_id[]" value="${id}">`);
-                    $("#idSiswaFollowUp").append(newElement);
-                    if (dataStudent.id.length != 0) {
-                        $('#buttonBulkDelete').prop('disabled', false);
-                    } else {
-                        $('#buttonBulkDelete').prop('disabled', true);
-                    }
-                }
-            } else {
-                const index = dataStudent.id.indexOf(id);
-                $("#idSiswa" + id).remove();
-                if (index !== -1) {
-                    dataStudent.id.splice(index, 1);
-                    if (dataStudent.id.length != 0) {
-                        $('#buttonBulkDelete').prop('disabled', false);
-                    } else {
-                        $('#buttonBulkDelete').prop('disabled', true);
-                    }
-                }
-            }
-        }
-
-        function submitBulkDelete() {
-            swal("Are you sure ?", "Data will be bulk updated", {
-                icon: "info",
-                buttons: {
-                    confirm: {
-                        className: 'btn btn-success',
-                        text: 'Ok'
-                    },
-                    dismiss: {
-                        className: 'btn btn-secondary',
-                        text: 'Cancel'
-                    },
-                },
-            }).then((result) => {
-                /* Read more about isConfirmed, isDenied below */
-                if (result == true) {
-                    $('#formBulkDelete').submit();
-                }
-            });
-        }
-    </script>
 @endsection
+
+
+@push('js')
+    <!-- DataTables CSS -->
+    {{-- <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css"> --}}
+    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.2/css/buttons.dataTables.min.css">
+
+    <!-- DataTables JS -->
+    {{-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script> --}}
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.print.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.html5.min.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            if ($.fn.DataTable.isDataTable('#basic-datatables')) {
+                $('#basic-datatables').DataTable().destroy();
+            }
+
+            $('#basic-datatables').DataTable({
+                "ordering": false, // Menonaktifkan sorting
+            });
+
+            // let table = $('#basic-datatables').DataTable({
+            //     "ordering": false,
+            //     "dom": 'Bfrtip',
+            //     "buttons": [{
+            //         extend: 'print',
+            //         text: '🖨 Print Data',
+            //         title: `<div style="text-align:center;">
+        //                          <img src="{{ asset('assets/img/logoui.png') }}" width="80px" style="margin-bottom:10px;">
+        //                          <h2>Data Students</h2>
+        //                          <h5>{{ date('d M Y') }}</h5>
+        //                      </div>`,
+            //         exportOptions: {
+            //             columns: ':not(.no-print)' // Jangan cetak kolom "Action"
+            //         }
+            //     }]
+            // });
+        });
+    </script>
+@endpush

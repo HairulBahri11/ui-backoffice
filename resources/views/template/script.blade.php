@@ -40,6 +40,7 @@
 <!-- Atlantis DEMO methods, don't include it in your project! -->
 <script src="{{ url('/') }}/assets/js/setting-demo.js"></script>
 <script src="{{ url('/') }}/assets/js/demo.js"></script>
+
 <style>
     .select2-hidden-accessible {
         border: 0 !important;
@@ -209,6 +210,7 @@
 
     });
 </script> --}}
+
 <script>
     $(document).ready(function() {
         if ($.fn.DataTable.isDataTable('#basic-datatables')) {
@@ -216,7 +218,9 @@
         }
 
         $('#basic-datatables').DataTable({
-            "ordering": false // Menonaktifkan fitur sorting
+            "ordering": false, // Menonaktifkan sorting
         });
     });
 </script>
+
+@stack('js')

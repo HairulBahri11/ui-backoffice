@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Students;
+use App\Models\StudentScore;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
@@ -31,6 +32,7 @@ class ResultFormController extends Controller
             ->where('student.status', 'ACTIVE')
             ->whereNotNull('student.priceid')
             ->whereNotNull('student.course_time')
+            ->where('student_scores.follow_up', '=', 1)
             ->where('student_scores.average_score', '<=', 59)
             ->where('student_scores.average_score', '>', 0)
 
@@ -47,11 +49,15 @@ class ResultFormController extends Controller
         // **Menambahkan filter hanya jika teacher login**
         if (Auth::guard('teacher')->check()) {
             $result->where('student.id_teacher', Auth::guard('teacher')->user()->id);
+            $count_result = $result->count();
         }
         $result->whereColumn('student_scores.price_id', 'student.priceid');
-        $result = $result->get();
 
-        return view('result-form.index', compact('result'));
+
+        $resultnya = $result->get();
+        $count_result = $result->whereNull('student_scores.staff_comment')->count();
+
+        return view('result-form.index', compact('resultnya', 'count_result'));
     }
 
     /**
@@ -106,7 +112,11 @@ class ResultFormController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $student_scores = StudentScore::where('id', $id)->first();
+        $student_scores->staff_comment = $request->staff_comment;
+        $student_scores->save();
+
+        return redirect('/result-form')->with('status', 'Success update follow up');
     }
 
     /**

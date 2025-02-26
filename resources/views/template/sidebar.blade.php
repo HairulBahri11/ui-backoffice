@@ -102,13 +102,13 @@
                             </a>
 
                         </li>
-                        {{-- <li class="nav-item {{ Request::segment(1) == 'birhdayPoint' ? 'active' : '' }}">
+                        <li class="nav-item {{ Request::segment(1) == 'birthday-point' ? 'active' : '' }}">
                             <a href="{{ url('/birthday-point') }}" class="collapsed">
                                 <i class="fas fa-birthday-cake"></i>
-                                <p>Birthday Point</p>
+                                <p>Student's Birthday</p>
                             </a>
 
-                        </li> --}}
+                        </li>
                         <li class="nav-item {{ Request::segment(1) == 'schedule-class' ? 'active' : '' }}">
                             <a href="{{ url('/schedule-class') }}" class="collapsed">
                                 <i class="fas fa-calendar"></i>
@@ -176,6 +176,11 @@
                         <a href="{{ url('/result-form') }}" class="collapsed">
                             <i class="fas fa-pencil-alt"></i>
                             <p>Poor Result</p>
+
+                            {{-- @if (isset($count_result) && $count_result > 0)
+                                <span class="badge badge-danger">{{ $count_result }}</span>
+                            @endif --}}
+
                         </a>
 
                     </li>

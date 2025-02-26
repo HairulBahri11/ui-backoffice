@@ -125,6 +125,7 @@ Route::middleware(['web'])->group(function () {
     Route::post('/teacher-transfer', [AttendanceController::class, 'mutasi_class'])->name('mutasi-class');
 
     Route::get('/result-form', [ResultFormController::class, 'index']);
+    Route::post('/result-form/{id}', [ResultFormController::class, 'update'])->name('result-form.update');
 
     Route::get('/birthday-point', [birthdayPoinController::class, 'index']);
     Route::post('/birthday-point/store', [birthdayPoinController::class, 'store'])->name('birthday-point.store');

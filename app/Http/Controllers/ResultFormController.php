@@ -114,6 +114,7 @@ class ResultFormController extends Controller
     {
         $student_scores = StudentScore::where('id', $id)->first();
         $student_scores->staff_comment = $request->staff_comment;
+        $student_scores->updated_at = date('Y-m-d H:i:s');
         $student_scores->save();
 
         return redirect('/result-form')->with('status', 'Success update follow up');

@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\API;
 
 use PDF;
-use Helper;
+use App\Helper\Helper;
 use DateTime;
 use Carbon\Carbon;
 use App\Models\Price;

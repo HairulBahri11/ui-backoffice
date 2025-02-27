@@ -70,10 +70,22 @@
                                             <th>Last Update</th>
                                             <th width="5%">Avg Score</th>
                                             <th width="5%">Grade</th>
-                                            <th width="15%">Teacher Comment</th>
+                                            @php
+                                                $count_resultnya = '';
+                                                if (Auth::guard('staff')->check() == true) {
+                                                    if ($count_result > 0) {
+                                                        $count_resultnya =
+                                                            '<span class="badge badge-warning">' .
+                                                            $count_result .
+                                                            '</span>';
+                                                    }
+                                                }
+                                            @endphp
+                                            <th width="15%">Teacher Comment </th>
+
                                             <th class="no-print" width="25%">Staff Comment</th>
                                             @if (Auth::guard('staff')->check() == true)
-                                                <th class="no-print">Action</th>
+                                                <th class="no-print">{!! $count_resultnya !!} Action</th>
                                             @endif
                                         </tr>
                                     </thead>

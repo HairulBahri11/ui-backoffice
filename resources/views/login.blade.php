@@ -81,23 +81,31 @@
             <!--        <div class="form-group">-->
             <!--            <label for="username" class="placeholder"><b>Username</b></label>-->
             <!--            <input id="username" name="email" type="text"-->
-            <!--                class="form-control @error('email') is-invalid @enderror" required>-->
-            <!--            @error('email')-->
-            <!--                <label class="mt-1" style="color: red">{{ $message }}</label>-->
-            <!--            @enderror-->
+            <!--                class="form-control @error('email')
+is-invalid
+@enderror" required>-->
+            <!--            @error('email')
+    -->
+                <!--                <label class="mt-1" style="color: red">{{ $message }}</label>-->
+                <!--
+@enderror-->
             <!--        </div>-->
             <!--        <div class="form-group">-->
             <!--            <label for="password" class="placeholder"><b>Password</b></label>-->
 
             <!--            <div class="position-relative">-->
             <!--                <input id="password" name="password" type="password"-->
-            <!--                    class="form-control @error('password') is-invalid @enderror" required>-->
+            <!--                    class="form-control @error('password')
+is-invalid
+@enderror" required>-->
             <!--                <div class="show-password">-->
             <!--                    <i class="icon-eye"></i>-->
             <!--                </div>-->
-            <!--                @error('password')-->
-            <!--                    <label class="mt-1" style="color: red">{{ $message }}</label>-->
-            <!--                @enderror-->
+            <!--                @error('password')
+    -->
+                <!--                    <label class="mt-1" style="color: red">{{ $message }}</label>-->
+                <!--
+@enderror-->
             <!--            </div>-->
             <!--        </div>-->
             <!--        <div class="form-group">-->
@@ -134,7 +142,7 @@
                 </div>
 
                 <div class="col-md-6 ">
-                    <h3 class="text-center ">Sign In To Admin</h3>
+                    <h3 class="text-center ">Sign in to Admin</h3>
                     <div class="login-form">
                         <form action="{{ url('login') }}" method="POST">
                             @csrf
@@ -181,9 +189,9 @@
 
                             </div>
                         </form>
-                         <!--<a href="{{url('tes')}}" id="tes" class="link">tes</a>-->
-                        
-                        
+                        <!--<a href="{{ url('tes') }}" id="tes" class="link">tes</a>-->
+
+
                         {{-- <div class="login-account">
                             <span class="msg">Don't have an account yet ?</span>
                             <a href="#" id="show-signup" class="link">Sign Up</a>
@@ -207,7 +215,8 @@
                 <div class="form-group">
                     <label for="passwordsignin" class="placeholder"><b>Password</b></label>
                     <div class="position-relative">
-                        <input id="passwordsignin" name="passwordsignin" type="password" class="form-control" required>
+                        <input id="passwordsignin" name="passwordsignin" type="password" class="form-control"
+                            required>
                         <div class="show-password">
                             <i class="icon-eye"></i>
                         </div>

@@ -81,9 +81,9 @@
                                                     }
                                                 }
                                             @endphp
-                                            <th width="15%">Teacher Comment </th>
+                                            <th width="15%">Teacher's Comment </th>
 
-                                            <th class="no-print" width="25%">Staff Comment</th>
+                                            <th class="no-print" width="25%">Staff's Comment</th>
                                             @if (Auth::guard('staff')->check() == true)
                                                 <th class="no-print">{!! $count_resultnya !!} Action</th>
                                             @endif

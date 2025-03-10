@@ -35,7 +35,11 @@ class ResultFormController extends Controller
             ->where('student_scores.follow_up', '=', 1)
             ->where('student_scores.average_score', '<=', 59)
             ->where('student_scores.average_score', '>', 0)
-
+            // ambil tahun ini dan tahun kemarin
+            ->where(function ($query) {
+                $query->whereYear('student_scores.created_at', '=', now()->year)
+                    ->orWhereYear('student_scores.created_at', '=', now()->subYear()->year);
+            })
             ->where(function ($query) {
                 $query->where(function ($subQuery) {
                     $subQuery->whereBetween('student.priceid', [1, 21])

@@ -113,7 +113,7 @@
                             <li class="nav-item {{ Request::segment(1) == 'extra-point' ? 'active' : '' }}">
                                 <a href="{{ url('/extra-point') }}" class="collapsed">
                                     <i class="fas fa-star"></i>
-                                    <p>Extrass Exam Point</p>
+                                    <p>Extra Point</p>
                                 </a>
                             </li>
                         @endif

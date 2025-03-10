@@ -81,7 +81,7 @@
             <div class="page-inner py-5">
                 <div class="d-flex align-items-left align-items-md-center flex-column flex-md-row">
                     <div>
-                        <h2 class="text-white pb-2 fw-bold">Extras Exam Point</h2>
+                        <h2 class="text-white pb-2 fw-bold">Extra Exam Point</h2>
 
                     </div>
 
@@ -219,7 +219,7 @@
                                         <div class="col-md-7">
                                             <div class="card">
                                                 <div class="card-header bg-info text-white rounded">
-                                                    <h5 class="mb-0">Add Extrass Exam Point</h5>
+                                                    <h5 class="mb-0">Add Extra Exam Point</h5>
                                                 </div>
                                                 <div class="card-body">
                                                     <form action="{{ route('extra-point.store') }}" method="POST">

@@ -215,7 +215,7 @@
                                         <div class="col-md-12">
                                             @if ($data->announces)
                                                 <!--<img style="width: 100%"
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        src="{{ url('/storage') . '/' . $data->announces->banner }}" alt="">-->
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            src="{{ url('/storage') . '/' . $data->announces->banner }}" alt="">-->
                                                 <img style="width: 100%" src="{{ url($data->announces->banner) }}"
                                                     alt="">
                                             @endif
@@ -237,45 +237,58 @@
                         <div class="card-body border-1" style="background-color: #cdcdcd">
                             <h5 class="card-title text-center text-white mb-2" style="font-weight: bold">🎉 Birthday Point
                             </h5>
-                            <small class="text-white text-center text-danger">*Ignore if the birthday field has already
+                            {{-- <small class="text-white text-center text-danger">*Ignore if the birthday field has already
                                 been
-                                filled in</small>
+                                filled in</small> --}}
 
                             <ul class="list-group list-group-flush">
                                 @php
                                     $todayMonthDay = date('m-d'); // Format bulan-tanggal hari ini
                                     $todayDay = date('l'); // Nama hari ini (Monday, Tuesday, dll.)
 
+                                    // Ambil daftar student_id yang sudah memiliki point_category_id = 7 di tahun ini
+                                    $students_with_points = DB::table('attendance_detail_points')
+                                        ->where('point_category_id', 7)
+                                        ->whereYear('created_at', date('Y'))
+                                        ->pluck('attendance_detail_id') // Ambil ID attendance_details
+                                        ->toArray();
+
+                                    // Ambil daftar student_id dari attendance_details
+                                    $students_with_attendance = DB::table('attendance_details')
+                                        ->whereIn('id', $students_with_points)
+                                        ->pluck('student_id') // Ambil student_id
+                                        ->toArray();
+
+                                    // Filter siswa yang belum memiliki point_category_id = 7 tahun ini
                                     $birthday_points = array_filter($student_birthday, function ($s) use (
                                         $todayMonthDay,
                                         $todayDay,
+                                        $students_with_attendance,
                                     ) {
-                                        // Ambil bulan dan tanggal dari birthday siswa
+                                        // Jika student_id sudah ada dalam daftar attendance_detail_points, maka tidak ditampilkan
+                                        if (in_array($s['id'], $students_with_attendance)) {
+                                            return false;
+                                        }
+
+                                        // Ambil bulan dan tanggal dari ulang tahun siswa
                                         $studentMonthDay = date('m-d', strtotime($s['birthday']));
 
                                         // Hitung batas akhir tampilan (7 hari setelah ulang tahun)
-                                        $birthday_plus_5 = date('m-d', strtotime($s['birthday'] . ' +7 days'));
+                                        $birthday_plus_7 = date('m-d', strtotime($s['birthday'] . ' +7 days'));
 
                                         // Cek apakah hari ini dalam rentang ulang tahun hingga 7 hari setelahnya
-                                        $is_within_5_days =
-                                            $todayMonthDay >= $studentMonthDay && $todayMonthDay <= $birthday_plus_5;
+                                        $is_within_7_days =
+                                            $todayMonthDay >= $studentMonthDay && $todayMonthDay <= $birthday_plus_7;
 
-                                        // Cek apakah hari ini cocok dengan day1 atau day2
+                                        // Cek apakah hari ini cocok dengan day1 atau day2 siswa
                                         $is_matching_day = in_array($todayDay, [$s['day1'], $s['day2']]);
 
-                                        return $is_within_5_days && $is_matching_day;
+                                        return $is_within_7_days && $is_matching_day;
                                     });
 
-                                    // dd($today_birthdays);
+                                    // dd($birthday_points);
 
                                 @endphp
-
-
-
-
-
-
-
                                 @if (!empty($birthday_points))
                                     @foreach ($birthday_points as $student)
                                         <li

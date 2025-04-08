@@ -59,10 +59,10 @@
 
         /* Create the permissionCheckBox/indicator (hidden when not checked) */
         /*.permissionCheckBox:after {
-                                            content: "";
-                                            position: absolute;
-                                            display: none;
-                                        }*/
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    content: "";
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    position: absolute;
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    display: none;
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                }*/
 
 
 
@@ -74,10 +74,10 @@
 
         /* Show the permissionCheckBox when checked */
         /*.permission input[type=checkbox]:checked~.permissionCheckBox:after {
-                                            display: block;
-                                        }*.
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    display: block;
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                }*.
 
-                                        /* Style the permissionCheckBox/indicator */
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                /* Style the permissionCheckBox/indicator */
         .permission .permissionCheckBox::after {
             left: 9px;
             top: 5px;
@@ -121,10 +121,10 @@
 
         /* Create the alphaCheckBox/indicator (hidden when not checked) */
         /*.alphaCheckBox:after {
-                                            content: "";
-                                            position: absolute;
-                                            display: none;
-                                        }*/
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    content: "";
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    position: absolute;
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    display: none;
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                }*/
 
         span.alphaCheckBox.checked::after {
             content: "";
@@ -134,8 +134,8 @@
 
         /* Show the alphaCheckBox when checked */
         /*.alpha input[type=checkbox]:checked~.alphaCheckBox:after {
-                                            display: block;
-                                        }*/
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    display: block;
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                }*/
 
 
 
@@ -192,36 +192,49 @@
             pointer-events: none;
             cursor: default;
         }
+
+        .agenda-scroll {
+            white-space: nowrap;
+            scroll-snap-type: x mandatory;
+        }
+
+        .agenda-card {
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 12px;
+            padding: 16px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            height: 100%;
+        }
     </style>
     <div class="content">
         <div class="page-inner py-5 panel-header bg-primary-gradient" style="background:#01c293 !important">
             <div class="d-flex align-items-left align-items-md-center flex-column flex-md-row">
                 <div class="">
                     <h2 class="text-white pb-2 fw-bold">{{ $title }}</h2>
-       @if (count($attendance) > 0)
-    @if ($attendance[0]->mutasi_teacher != null)
-        @php
-            $tgl_mutasi = $attendance[0]->tgl_mutasi;
-            $teacher = \App\Models\Teacher::where('id', $attendance[0]->mutasi_teacher)->first();
-        @endphp
+                    @if (count($attendance) > 0)
+                        @if ($attendance[0]->mutasi_teacher != null)
+                            @php
+                                $tgl_mutasi = $attendance[0]->tgl_mutasi;
+                                $teacher = \App\Models\Teacher::where('id', $attendance[0]->mutasi_teacher)->first();
+                            @endphp
 
-        @if ($teacher != null)
-            <h5 class="text-white pb-2 fw-italic">
-                Previous Teacher was {{ $teacher->name }} stopped at {{ $tgl_mutasi }} 
-                <i class="fas fa-ban-circle fa-2x bg-danger text-white fw-italic"></i>
-            </h5>
-        @else
-            <h5 class="text-white pb-2 fw-italic">
-                 Stopped at {{ $tgl_mutasi }} 
-                <i class="fas fa-ban-circle fa-2x bg-danger text-white fw-italic"></i>
-            </h5>
-        @endif
+                            @if ($teacher != null)
+                                <h5 class="text-white pb-2 fw-italic">
+                                    Previous Teacher was {{ $teacher->name }} stopped at {{ $tgl_mutasi }}
+                                    <i class="fas fa-ban-circle fa-2x bg-danger text-white fw-italic"></i>
+                                </h5>
+                            @else
+                                <h5 class="text-white pb-2 fw-italic">
+                                    Stopped at {{ $tgl_mutasi }}
+                                    <i class="fas fa-ban-circle fa-2x bg-danger text-white fw-italic"></i>
+                                </h5>
+                            @endif
+                        @endif
+                    @endif
 
-    @endif
-@endif
 
 
-                    
                     <ul class="breadcrumbs">
                         <li class="nav-home text-white">
                             <a href="#">
@@ -263,14 +276,18 @@
 
                 <div class="col-md-12">
                     <div class="card card-body">
+                        <button type="button" class="btn btn-sm btn-warning mb-2" data-toggle="modal"
+                            data-target="#exampleModal" data-modal-type="attendance">
+                            <span class="text-bold">Detail Attendence and Agenda</span>
+                        </button>
                         <div class="table-responsive">
                             <table class="table table-sm table-bordered table-head-bg-info table-bordered-bd-info">
                                 <thead>
                                     <tr>
                                         <th width="10%" class="rowheaders">Nama</th>
-                                      
-                                        
-                                           @foreach ($attendance as $key => $item)
+
+
+                                        @foreach ($attendance as $key => $item)
                                             <th width="5%">{{ date('d/m', strtotime($item->date)) }}
                                                 @if ($key < 2)
                                                     <!-- Hanya dua item pertama yang dapat diedit -->
@@ -766,7 +783,7 @@
                         <div class="card-action mt-3">
                             <!--<a href="javascript:void(0)" onclick="confirm()" class="btn btn-success"-->
                             <!--    id="btn-success">Submit</a>-->
-                            @if (Request::segment(2) == 'edit' )
+                            @if (Request::segment(2) == 'edit')
                                 <a href="javascript:void(0)" onclick="confirm_update()" class="btn btn-success"
                                     id="btn-success">Update</a>
                             @else
@@ -788,7 +805,7 @@
                         if ($countAgenda != 0) {
                             $agenda = $agenda->whereRaw('(' . $whereRaw . ')');
                         }
-                        $agenda = $agenda->orderBy('attendances.id', 'DESC')->groupBy('attendances.id')->get();
+                        $agenda = $agenda->orderBy('attendances.id', 'DESC')->groupBy('attendances.id')->paginate(4);
                     @endphp
                     {{-- @if (Auth::guard('teacher')->check() == true) --}}
                     <div class="card">
@@ -841,6 +858,63 @@
                 </div>
             </div>
         </div>
+
+
+
+        {{-- modal detail agenda and attendance --}}
+        <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="combinedDetailModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="combinedDetailModalLabel">Detail Attendance and Agenda</h5>
+                        <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close">x</button>
+                    </div>
+                    <div class="modal-body">
+                        <nav>
+                            <div class="nav nav-tabs mb-4" id="nav-tab" role="tablist">
+                                <button class="nav-link active" id="nav-attendance-tab" data-toggle="tab"
+                                    data-target="#nav-attendance" type="button" role="tab"
+                                    aria-controls="nav-attendance" aria-selected="true">Detail Kehadiran</button>
+                                <button class="nav-link" id="nav-agenda-tab" data-toggle="tab" data-target="#nav-agenda"
+                                    type="button" role="tab" aria-controls="nav-agenda"
+                                    aria-selected="false">Detail Agenda</button>
+                            </div>
+                        </nav>
+                        <div class="tab-content" id="nav-tabContent">
+                            <div class="tab-pane fade show active" id="nav-attendance" role="tabpanel"
+                                aria-labelledby="nav-attendance-tab">
+                                {{-- <p><strong>Nama Siswa:</strong> <span id="combinedStudentName"></span></p> --}}
+                                <div class="table-responsive">
+                                    <table class="table table-bordered">
+                                        <thead>
+
+                                        </thead>
+                                        <tbody id="combinedAttendanceDetailBody">
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="tab-pane fade" id="nav-agenda" role="tabpanel" aria-labelledby="nav-agenda-tab">
+                                <div class="container-fluid px-2">
+                                    <div class="row g-3" id="agendaList">
+                                        <!-- Card agenda akan dimasukkan di sini -->
+                                    </div>
+                                </div>
+                            </div>
+
+
+
+
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        {{-- <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button> --}}
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </div>
     <script>
         $(document).ready(function() {
@@ -849,69 +923,78 @@
             var len = $('.cekBox').length;
 
             for (let i = 1; i <= len; i++) {
-    var pointDay = (parseInt({{ Request::get('day1') }}, 10) === 5 || 
-                    parseInt({{ Request::get('day1') }}, 10) === 6 || 
-                    parseInt({{ Request::get('day2') }}, 10) === 5 || 
-                    parseInt({{ Request::get('day2') }}, 10) === 6 || 
-                    parseInt({{ Request::get('day1') }}, 10) === parseInt({{ Request::get('day2') }}, 10)) ? 20 : 10;
+                var pointDay = (parseInt({{ Request::get('day1') }}, 10) === 5 ||
+                        parseInt({{ Request::get('day1') }}, 10) === 6 ||
+                        parseInt({{ Request::get('day2') }}, 10) === 5 ||
+                        parseInt({{ Request::get('day2') }}, 10) === 6 ||
+                        parseInt({{ Request::get('day1') }}, 10) === parseInt({{ Request::get('day2') }}, 10)) ?
+                    20 : 10;
 
-    var birthDayPoint = 0;
+                var birthDayPoint = 0;
 
-    var totalPoint = Number($("#totalPoint" + i).text()) || 0;
+                var totalPoint = Number($("#totalPoint" + i).text()) || 0;
 
-    $('#cbAbsent' + i).on('change', function () {
-        var conditionPoint = pointDay;
-        var tmpTotalPoint = 0;
+                $('#cbAbsent' + i).on('change', function() {
+                    var conditionPoint = pointDay;
+                    var tmpTotalPoint = 0;
 
-        var getVal = $('#categories' + i).val() || [];
-        dataCtgr.forEach(element => {
-            getVal.forEach(x => {
-                if (element.id.toString() === x.toString()) {
-                    tmpTotalPoint += Number(element.point) || 0;
-                }
-            });
-        });
+                    var getVal = $('#categories' + i).val() || [];
+                    dataCtgr.forEach(element => {
+                        getVal.forEach(x => {
+                            if (element.id.toString() === x.toString()) {
+                                tmpTotalPoint += Number(element.point) || 0;
+                            }
+                        });
+                    });
 
-        if ($(this).is(':checked')) {
-            $("#inPointAbsent" + i).text(Number(conditionPoint) || 0);
-            $("#isAbsentPoint" + i).val(Number(conditionPoint) || 0);
+                    if ($(this).is(':checked')) {
+                        $("#inPointAbsent" + i).text(Number(conditionPoint) || 0);
+                        $("#isAbsentPoint" + i).val(Number(conditionPoint) || 0);
 
-            $("#totalPoint" + i).text(tmpTotalPoint + birthDayPoint + (Number($("#inPointAbsent" + i).text()) || 0));
-            $("#inpTotalPoint" + i).val(tmpTotalPoint + birthDayPoint + (Number($("#inPointAbsent" + i).text()) || 0));
+                        $("#totalPoint" + i).text(tmpTotalPoint + birthDayPoint + (Number($(
+                            "#inPointAbsent" + i).text()) || 0));
+                        $("#inpTotalPoint" + i).val(tmpTotalPoint + birthDayPoint + (Number($(
+                            "#inPointAbsent" + i).text()) || 0));
 
-            // Reset alpha dan permission
-            $('#permissionCheckBox' + (i - 1)).next('span').removeClass('checked').val(0).prop('checked', false);
-            $('#alphaCheckBox' + (i - 1)).next('span').removeClass('checked').val(0).prop('checked', false);
+                        // Reset alpha dan permission
+                        $('#permissionCheckBox' + (i - 1)).next('span').removeClass('checked').val(0).prop(
+                            'checked', false);
+                        $('#alphaCheckBox' + (i - 1)).next('span').removeClass('checked').val(0).prop(
+                            'checked', false);
 
-        } else {
-            $("#inPointAbsent" + i).text(0);
-            $("#isAbsentPoint" + i).val(0);
+                    } else {
+                        $("#inPointAbsent" + i).text(0);
+                        $("#isAbsentPoint" + i).val(0);
 
-            $("#totalPoint" + i).text(tmpTotalPoint + birthDayPoint + (Number($("#inPointAbsent" + i).text()) || 0));
-            $("#inpTotalPoint" + i).val(tmpTotalPoint + birthDayPoint + (Number($("#inPointAbsent" + i).text()) || 0));
-        }
+                        $("#totalPoint" + i).text(tmpTotalPoint + birthDayPoint + (Number($(
+                            "#inPointAbsent" + i).text()) || 0));
+                        $("#inpTotalPoint" + i).val(tmpTotalPoint + birthDayPoint + (Number($(
+                            "#inPointAbsent" + i).text()) || 0));
+                    }
 
-        // Update cekAllAbsen
-        $('#cekAllAbsen').val($('.cekBox:checked').length > 0 ? 1 : 0);
-    });
+                    // Update cekAllAbsen
+                    $('#cekAllAbsen').val($('.cekBox:checked').length > 0 ? 1 : 0);
+                });
 
-    $('#categories' + i).change(function () {
-        var tmpTotalPoint = 0;
+                $('#categories' + i).change(function() {
+                    var tmpTotalPoint = 0;
 
-        var getVal = $('#categories' + i).val() || [];
-        dataCtgr.forEach(element => {
-            getVal.forEach(x => {
-                if (element.id.toString() === x.toString()) {
-                    tmpTotalPoint += Number(element.point) || 0;
-                }
-            });
-        });
+                    var getVal = $('#categories' + i).val() || [];
+                    dataCtgr.forEach(element => {
+                        getVal.forEach(x => {
+                            if (element.id.toString() === x.toString()) {
+                                tmpTotalPoint += Number(element.point) || 0;
+                            }
+                        });
+                    });
 
-        $("#totalPoint" + i).text(tmpTotalPoint + birthDayPoint + (Number($("#inPointAbsent" + i).text()) || 0));
-        $("#inpTotalPoint" + i).val(tmpTotalPoint + birthDayPoint + (Number($("#inPointAbsent" + i).text()) || 0));
-        console.log(tmpTotalPoint);
-    });
-}
+                    $("#totalPoint" + i).text(tmpTotalPoint + birthDayPoint + (Number($("#inPointAbsent" +
+                        i).text()) || 0));
+                    $("#inpTotalPoint" + i).val(tmpTotalPoint + birthDayPoint + (Number($("#inPointAbsent" +
+                        i).text()) || 0));
+                    console.log(tmpTotalPoint);
+                });
+            }
 
 
 
@@ -989,7 +1072,8 @@
                 $('#cekAllAbsen').val(0);
             }
         }
-                function confirm_update() {
+
+        function confirm_update() {
             swal("Are you sure ?", "Data will be updated", {
                 icon: "info",
                 buttons: {
@@ -1038,5 +1122,121 @@
         }
     </script>
 
-    <script></script>
+
 @endsection
+
+@push('js')
+    <script>
+        const allAttendanceData = <?php echo json_encode($all_attendence); ?>;
+        const students = <?php echo json_encode($student); ?>;
+
+        $('#exampleModal').on('show.bs.modal', function(event) {
+            const button = $(event.relatedTarget);
+            const modalType = button.data('modal-type');
+
+            const attendanceTab = $('#nav-attendance-tab');
+            const agendaTab = $('#nav-agenda-tab');
+            const attendancePane = $('#nav-attendance');
+            const agendaPane = $('#nav-agenda');
+
+            attendancePane.removeClass('show active');
+            agendaPane.removeClass('show active');
+            attendanceTab.removeClass('active');
+            agendaTab.removeClass('active');
+
+            if (modalType === 'attendance') {
+                attendanceTab.tab('show');
+                attendancePane.addClass('show active');
+
+                const combinedAttendanceDetailBody = $('#combinedAttendanceDetailBody');
+                combinedAttendanceDetailBody.empty();
+
+                if (allAttendanceData.length > 0 && students.length > 0) {
+                    const combinedAttendanceDetailBody = $('#combinedAttendanceDetailBody');
+                    combinedAttendanceDetailBody.empty();
+
+                    // 1. Ambil tanggal unik
+                    const uniqueDates = [...new Set(allAttendanceData.map(a => {
+                        return new Date(a.date).toISOString().split('T')[0];
+                    }))];
+
+                    // Buat header
+                    let tableHTML = '<table class="table table-bordered">';
+                    tableHTML += '<thead class="bg-info text-white rowheaders"><tr><th>Name</th>';
+                    uniqueDates.forEach(date => {
+                        tableHTML +=
+                            `<th class=" text-white">${new Date(date).toLocaleDateString()}</th>`;
+                    });
+                    tableHTML += '</tr></thead><tbody>';
+
+                    // 2. Loop setiap siswa
+                    students.forEach(student => {
+                        tableHTML += `<tr><td scope="row">${student.name}</td>`;
+
+                        // 3. Loop per tanggal
+                        uniqueDates.forEach(date => {
+                            const attendanceOnDate = allAttendanceData.find(att => {
+                                return new Date(att.date).toISOString().split('T')[
+                                    0] === date;
+                            });
+
+                            let statusCell = '<td></td>';
+                            if (attendanceOnDate) {
+                                const detail = attendanceOnDate.detail.find(d => d.student_id ==
+                                    student.id);
+                                if (detail) {
+                                    if (detail.is_absent == '1') {
+                                        statusCell = '<td><span class="fa fa-check"></span></td>';
+                                    } else if (detail.is_permission == '1') {
+                                        statusCell = "<td bgcolor='green'></td>";
+                                    } else if (detail.is_alpha == '1') {
+                                        statusCell = "<td bgcolor='red'></td>";
+                                    }
+                                }
+                            }
+                            tableHTML += statusCell;
+                        });
+
+                        tableHTML += '</tr>';
+                    });
+
+                    tableHTML += '</tbody></table>';
+                    combinedAttendanceDetailBody.append(tableHTML);
+                }
+
+            }
+            const agendaListContainer = $('#agendaList');
+            agendaListContainer.empty();
+
+            if (allAttendanceData.length > 0) {
+                allAttendanceData.forEach((agenda, i) => {
+                    const agendaHTML = `
+            <div class="col-sm-6 col-md-4 col-lg-3 mb-3">
+                <div class="agenda-card">
+                    <p class="text-center bg-info"><strong>${agenda.date ? formatTanggalIndo(agenda.date) : '-'}</strong></p>
+                    <p>${agenda.activity || '-'}</p>
+                    <p><strong>Text Book:</strong> ${agenda.text_book || '-'}</p>
+                    <p><strong>Excercise Book:</strong> ${agenda.excercise_book || '-'}</p>
+                </div>
+            </div>
+        `;
+                    agendaListContainer.append(agendaHTML);
+                });
+            } else {
+                agendaListContainer.html('<div class="col-12"><p>Tidak ada agenda untuk tanggal ini.</p></div>');
+            }
+
+
+
+        });
+
+        function formatTanggalIndo(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('id-ID', {
+                day: 'numeric',
+                month: 'long',
+                year: 'numeric',
+            });
+        }
+    </script>
+@endpush

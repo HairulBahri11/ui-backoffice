@@ -121,20 +121,20 @@ class AttendanceController extends Controller
             ->orderBy('id', 'DESC')
             ->first();
         // $agenda = [];
-        
 
-         $tgl_mutasi = '';
+
+        $tgl_mutasi = '';
         $mutasi_teacher = '';
         if ($cek != null) {
             $mutasi_teacher = $cek->mutasi_teacher;
             $tgl_mutasi = $cek->tgl_mutasi;
         }
-        
-       
+
+
 
 
         $class = Price::where('id', $priceId)->first();
-         
+
         $title = $class->level == 'Private' ? 'Private Class ' . $class->program : 'Regular';
         if ($cek) {
             $detail = AttendanceDetail::where('attendance_id', $cek->id)->get();
@@ -235,24 +235,27 @@ class AttendanceController extends Controller
                 $q->whereRaw($whereRaw);
             });
         }
-        $attendance = $attendance->get();
+        $all_attendence = $attendance->get();
+        $attendance = $attendance->paginate(3);
+
         if (count($student) != 0) {
 
             return view('attendance.form', compact(
-            'attendance',
-            'title',
-            'data',
-            'student',
-            'pointCategories',
-            'day',
-            'priceId',
-            'reqDay1',
-            'reqDay2',
-            'reqTeacher',
-            'reqTime',
-            'mutasi_teacher',
-            'tgl_mutasi'
-        ));
+                'attendance',
+                'all_attendence',
+                'title',
+                'data',
+                'student',
+                'pointCategories',
+                'day',
+                'priceId',
+                'reqDay1',
+                'reqDay2',
+                'reqTeacher',
+                'reqTime',
+                'mutasi_teacher',
+                'tgl_mutasi'
+            ));
         } else {
             $inStudent = Students::where('status', 'INACTIVE')->where('priceid', $class->id)
                 ->where("day1", $reqDay1)
@@ -448,7 +451,7 @@ class AttendanceController extends Controller
                 $day2 = DB::table('day')->where('id', (int)$request->day2)->first();
                 if ($request->date_review) {
                     foreach ($request->id_test as $keyReview => $valueReview) {
-                         $or_rev = OrderReview::create(array(
+                        $or_rev = OrderReview::create(array(
                             'id_attendance' => $attendance->id,
                             'test_id' => $valueReview,
                             'id_teacher' => $request->teacher,
@@ -463,7 +466,7 @@ class AttendanceController extends Controller
                 }
                 if ($request->date_test) {
                     foreach ($request->id_test as $keyTest => $valueTest) {
-                       $or_test = OrderReview::create(array(
+                        $or_test = OrderReview::create(array(
                             'id_attendance' => $attendance->id,
                             'test_id' => $valueTest,
                             'id_teacher' => $request->teacher,
@@ -580,7 +583,7 @@ class AttendanceController extends Controller
             ->orderBy('id', 'DESC')
             ->first();
         // $agenda = [];
-        
+
         $tgl_mutasi = '';
         $mutasi_teacher = '';
         if ($cek != null) {
@@ -682,20 +685,20 @@ class AttendanceController extends Controller
         $attendance = $attendance->get();
 
         return view('attendance.form', compact(
-                'attendance',
-                'title',
-                'data',
-                'student',
-                'pointCategories',
-                'day',
-                'priceId',
-                'reqDay1',
-                'reqDay2',
-                'reqTeacher',
-                'reqTime',
-                'mutasi_teacher',
-                'tgl_mutasi'
-            ));
+            'attendance',
+            'title',
+            'data',
+            'student',
+            'pointCategories',
+            'day',
+            'priceId',
+            'reqDay1',
+            'reqDay2',
+            'reqTeacher',
+            'reqTime',
+            'mutasi_teacher',
+            'tgl_mutasi'
+        ));
     }
 
     /**
@@ -868,7 +871,7 @@ class AttendanceController extends Controller
             $class = Price::find($request->priceId);
             $day1 = DB::table('day')->where('id', (int)$request->day1)->first();
             $day2 = DB::table('day')->where('id', (int)$request->day2)->first();
-            
+
             $dataBefore =  OrderReview::where('id_attendance', $request->attendanceId)->get();
             if (count($dataBefore) > 0) {
                 $dataBefore->each->delete();
@@ -892,7 +895,7 @@ class AttendanceController extends Controller
             if ($request->date_test) {
                 // OrderReview::where('id_attendance', $request->attendanceId)->delete();
                 foreach ($request->id_test as $keyTest => $valueTest) {
-                     $or_test =  OrderReview::create(array(
+                    $or_test =  OrderReview::create(array(
                         'id_attendance' => $request->attendanceId,
                         'test_id' => $valueTest,
                         'id_teacher' => $request->teacher,
@@ -910,7 +913,7 @@ class AttendanceController extends Controller
             //     AttendanceDetail::where('attendance_id', $request->attendanceId)->delete();
             // }
             // DB::commit();
-            
+
             // Check if either review or test was created and save them
             if ($or_rev != null || $or_test != null) {
                 $or_rev->save();
@@ -955,7 +958,7 @@ class AttendanceController extends Controller
         $arrAbsentFilter = [];
 
         $students = Students::where('status', 'ACTIVE')->get();
-    //   $students = Students::limit(500)->where('status', 'ACTIVE')->get();
+        //   $students = Students::limit(500)->where('status', 'ACTIVE')->get();
         $class = Price::get();
         $teachers = Teacher::get();
 
@@ -983,75 +986,75 @@ class AttendanceController extends Controller
 
         //echo count($students);
 
-if ($request->level == '' && $request->teacher == '' && Auth::guard('staff')->user() == true ) {
+        if ($request->level == '' && $request->teacher == '' && Auth::guard('staff')->user() == true) {
             $data = [];
         } else {
-             foreach ($students as $s) {
-            $attendance = DB::table('student as s')
-                ->join('price as p', 's.priceid', 'p.id')
-                ->join('teacher as t', 's.id_teacher', 't.id')
-                ->join('attendance_details as ad', 's.id', 'ad.student_id')
-                ->join('attendances as a', 'ad.attendance_id', 'a.id')
-                ->selectRaw('s.id AS student_id, s.name, t.name AS teacher, p.program, ad.comment_teacher, ad.comment_staff, ad.is_absent, ad.is_permission, ad.is_done, ad.is_deleted, ad.id, a.date')
-                ->where('s.id', $s->id)
-                ->where('s.status', 'ACTIVE');
-            
-            
-            if (Auth::guard('teacher')->user() != null)
-                $attendance = $attendance->where('s.id_teacher', Auth::guard('teacher')->user()->id);
+            foreach ($students as $s) {
+                $attendance = DB::table('student as s')
+                    ->join('price as p', 's.priceid', 'p.id')
+                    ->join('teacher as t', 's.id_teacher', 't.id')
+                    ->join('attendance_details as ad', 's.id', 'ad.student_id')
+                    ->join('attendances as a', 'ad.attendance_id', 'a.id')
+                    ->selectRaw('s.id AS student_id, s.name, t.name AS teacher, p.program, ad.comment_teacher, ad.comment_staff, ad.is_absent, ad.is_permission, ad.is_done, ad.is_deleted, ad.id, a.date')
+                    ->where('s.id', $s->id)
+                    ->where('s.status', 'ACTIVE');
 
 
-            if ($request->level != '')
-                $attendance = $attendance->where('s.priceid', $request->level);
-
-            if ($request->teacher != '')
-                $attendance = $attendance->where('s.id_teacher', $request->teacher);
+                if (Auth::guard('teacher')->user() != null)
+                    $attendance = $attendance->where('s.id_teacher', Auth::guard('teacher')->user()->id);
 
 
-            $date = new \DateTime(date('Y-m-d'));
-            $date->modify('-30 day');
+                if ($request->level != '')
+                    $attendance = $attendance->where('s.priceid', $request->level);
+
+                if ($request->teacher != '')
+                    $attendance = $attendance->where('s.id_teacher', $request->teacher);
 
 
-            $attendance = $attendance
-                ->where('a.date', '>=', $date->format('Y-m-d'))
-                ->orderBy('a.date', 'desc')->get();
-            //->limit(7)->get();
-
-            $temp = null;
+                $date = new \DateTime(date('Y-m-d'));
+                $date->modify('-30 day');
 
 
-            $process = true;
-            $index = 0;
-            while ($process && $index < count($attendance)) {
-                //jika hadir atau sudah dihapus maka temp kembali ke null
-                //if($attendance[$index]->is_done=='1' || $attendance[$index]->is_absent=='1'){
-                if ($attendance[$index]->is_done == '1' || $attendance[$index]->is_permission == '1' || $attendance[$index]->is_absent == '1' || $attendance[$index]->is_deleted == '1') {
-                    $temp = null;
-                } else if ($attendance[$index]->is_absent == '0' && $attendance[$index]->is_deleted == '0') {
-                    //jika absen dan belum dihapus
-                    if ($temp == null) {
-                        $attendance[$index]->absent_date = $attendance[$index]->date;
-                        $attendance[$index]->absent_id = $attendance[$index]->id;
+                $attendance = $attendance
+                    ->where('a.date', '>=', $date->format('Y-m-d'))
+                    ->orderBy('a.date', 'desc')->get();
+                //->limit(7)->get();
 
-                        $temp = $attendance[$index];
-                    } else {
-                        //jika sebelumnya sudah ada data maka masukkan ke dalam array
+                $temp = null;
 
-                        $temp->absent_date .= ', ' . $attendance[$index]->date;
-                        $temp->absent_id .= '-' . $attendance[$index]->id;
-                        array_push($data, $temp);
+
+                $process = true;
+                $index = 0;
+                while ($process && $index < count($attendance)) {
+                    //jika hadir atau sudah dihapus maka temp kembali ke null
+                    //if($attendance[$index]->is_done=='1' || $attendance[$index]->is_absent=='1'){
+                    if ($attendance[$index]->is_done == '1' || $attendance[$index]->is_permission == '1' || $attendance[$index]->is_absent == '1' || $attendance[$index]->is_deleted == '1') {
                         $temp = null;
+                    } else if ($attendance[$index]->is_absent == '0' && $attendance[$index]->is_deleted == '0') {
+                        //jika absen dan belum dihapus
+                        if ($temp == null) {
+                            $attendance[$index]->absent_date = $attendance[$index]->date;
+                            $attendance[$index]->absent_id = $attendance[$index]->id;
 
-                        $process = false;
+                            $temp = $attendance[$index];
+                        } else {
+                            //jika sebelumnya sudah ada data maka masukkan ke dalam array
+
+                            $temp->absent_date .= ', ' . $attendance[$index]->date;
+                            $temp->absent_id .= '-' . $attendance[$index]->id;
+                            array_push($data, $temp);
+                            $temp = null;
+
+                            $process = false;
+                        }
                     }
+
+                    $index++;
                 }
 
-                $index++;
-            }
-            
-            // $data = [];
+                // $data = [];
 
-            /*foreach($attendance as $r){
+                /*foreach($attendance as $r){
                 //kalau sudah done maka tidak usah diuji lagi
 
                 if($r->is_done){
@@ -1071,10 +1074,10 @@ if ($request->level == '' && $request->teacher == '' && Auth::guard('staff')->us
 
 
             }*/
-        }
+            }
         }
 
-       
+
 
         //foreach($data as $r){
         //    echo $r->student_id . '-' . $r->name . ' ' . $r->absent_date . '<br>';
@@ -1393,8 +1396,8 @@ if ($request->level == '' && $request->teacher == '' && Auth::guard('staff')->us
             ->where('id_teacher', $request->teacher)->get();
         return $student;
     }
-    
-     function mutasi_class(Request $request)
+
+    function mutasi_class(Request $request)
     // {
     //     // Get necessary data from the request
     //     $priceId = $request->input('priceid');
@@ -1461,8 +1464,8 @@ if ($request->level == '' && $request->teacher == '' && Auth::guard('staff')->us
     //         return redirect()->back()->with('message', 'Failed transfer class : ' . $e->getMessage());
     //     }
     // }
-    
-     {
+
+    {
 
         // Get necessary data from the request
         $priceId = $request->input('priceid');
@@ -1564,7 +1567,7 @@ if ($request->level == '' && $request->teacher == '' && Auth::guard('staff')->us
                         if ($attendance[0]->teacher_id != $newTeacherId) {
 
 
-                           DB::table('attendances')
+                            DB::table('attendances')
                                 ->where('price_id', $priceId)
                                 ->where('course_time', $courseTime_old)
                                 ->where('day1', $day1_old)

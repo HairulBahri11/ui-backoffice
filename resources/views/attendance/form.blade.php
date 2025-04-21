@@ -59,10 +59,10 @@
 
         /* Create the permissionCheckBox/indicator (hidden when not checked) */
         /*.permissionCheckBox:after {
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        content: "";
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        position: absolute;
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        display: none;
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    }*/
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        content: "";
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        position: absolute;
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        display: none;
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    }*/
 
 
 
@@ -74,10 +74,10 @@
 
         /* Show the permissionCheckBox when checked */
         /*.permission input[type=checkbox]:checked~.permissionCheckBox:after {
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        display: block;
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    }*.
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        display: block;
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    }*.
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    /* Style the permissionCheckBox/indicator */
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    /* Style the permissionCheckBox/indicator */
         .permission .permissionCheckBox::after {
             left: 9px;
             top: 5px;
@@ -121,10 +121,10 @@
 
         /* Create the alphaCheckBox/indicator (hidden when not checked) */
         /*.alphaCheckBox:after {
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        content: "";
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        position: absolute;
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        display: none;
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    }*/
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        content: "";
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        position: absolute;
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        display: none;
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    }*/
 
         span.alphaCheckBox.checked::after {
             content: "";
@@ -134,8 +134,8 @@
 
         /* Show the alphaCheckBox when checked */
         /*.alpha input[type=checkbox]:checked~.alphaCheckBox:after {
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        display: block;
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    }*/
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        display: block;
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    }*/
 
 
 
@@ -278,7 +278,7 @@
                     <div class="card card-body">
                         <button type="button" class="btn btn-sm btn-warning mb-2" data-toggle="modal"
                             data-target="#exampleModal" data-modal-type="attendance">
-                            <span class="text-bold">Detail Attendence and Agenda</span>
+                            <span class="text-bold">Detail of Attendence and Agenda</span>
                         </button>
                         <div class="table-responsive">
                             <table class="table table-sm table-bordered table-head-bg-info table-bordered-bd-info">
@@ -867,7 +867,7 @@
             <div class="modal-dialog modal-lg">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="combinedDetailModalLabel">Detail Attendance and Agenda</h5>
+                        <h5 class="modal-title" id="combinedDetailModalLabel">Detail of Attendance and Agenda</h5>
                         <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close">x</button>
                     </div>
                     <div class="modal-body">
@@ -875,10 +875,10 @@
                             <div class="nav nav-tabs mb-4" id="nav-tab" role="tablist">
                                 <button class="nav-link active" id="nav-attendance-tab" data-toggle="tab"
                                     data-target="#nav-attendance" type="button" role="tab"
-                                    aria-controls="nav-attendance" aria-selected="true">Detail Kehadiran</button>
+                                    aria-controls="nav-attendance" aria-selected="true">Detail of Attendance</button>
                                 <button class="nav-link" id="nav-agenda-tab" data-toggle="tab" data-target="#nav-agenda"
                                     type="button" role="tab" aria-controls="nav-agenda"
-                                    aria-selected="false">Detail Agenda</button>
+                                    aria-selected="false">Detail of Agenda</button>
                             </div>
                         </nav>
                         <div class="tab-content" id="nav-tabContent">

@@ -247,4 +247,40 @@ class StudentController extends Controller
             ], 403);
         }
     }
+
+    public function getNewMyPoint(Request $request, $studentId)
+    {
+        try {
+            // return $studentId;
+            $query = [];
+            $query = PointHistory::select('date', 'total_point', 'type', 'keterangan')
+                ->where('student_id', $studentId);
+            if ($request->start && $request->end) {
+                $query = $query->whereBetween('date',  [$request->start, $request->end]);
+            }
+
+            $data = $query->orderBy('date', 'DESC')->get();
+            $point = Students::where('id', $studentId)->select('total_point')->first();
+            $followUp = FollowUp::where('student_id', $studentId)->first();
+            if ($followUp) {
+                $class = FollowUp::where('student_id', $studentId)->join('price', 'price.id', 'follow_up.old_price_id')->select('price.program')->first();
+            } else {
+                $class = Students::join('price', 'price.id', 'student.priceid')
+                    ->select('price.program')
+                    ->where('student.id', $studentId)->first();
+            }
+            return response()->json([
+                'code' => '00',
+                'total_point' =>  $point->total_point,
+                'class' =>  $class->program,
+                'payload' => $data,
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'code' => '400',
+                'error' => 'internal server error',
+                'message' => $th,
+            ], 403);
+        }
+    }
 }

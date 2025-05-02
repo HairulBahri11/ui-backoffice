@@ -515,16 +515,15 @@ class PaymentController extends Controller
     public function billDetail($studentId)
     {
         // 1. Cek apakah student aktif
-        $student = Students::where('id', $studentId)
-            ->where('status', 'active')
-            ->first();
+        $student = Students::where('id', $studentId)->first();
 
-        if (!$student) {
+        if ($student->status != 'ACTIVE') {
             return response()->json([
                 'code' => '01',
                 'message' => 'Student tidak aktif atau tidak ditemukan',
                 'payload' => [
                     'bill' => 0,
+                    'student_data' => $student,
                     'unpaid_months' => [],
                     'last_payment' => null,
                 ],

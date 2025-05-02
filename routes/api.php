@@ -31,6 +31,7 @@ Route::group(['middleware' => ['jwt.auth']], function () {
     Route::get('agenda/{studentId}', [InfoController::class, 'getAgenda']);
     Route::get('myPoint/{studentId}', [StudentController::class, 'getMyPoint']);
     Route::get('attendace/{studentId}', [StudentController::class, 'getAttendance']);
+    Route::get('newAttendace/{studentId}', [StudentController::class, 'getNewAttendance']);
     Route::get('classItem/{studentId}', [StudentController::class, 'getClass']);
     Route::get('summaryStudent/{studentId}', [StudentController::class, 'getSummary']);
     Route::get('historyTest/{studentId}', [StudentController::class, 'getHistoryTest']);
@@ -50,7 +51,7 @@ Route::group(['middleware' => ['jwt.auth']], function () {
         Route::get('/verify/{transId}', [PaymentController::class, 'verifyPayment']);
         Route::get('/printInvoice/{paymentId}', [PaymentController::class, 'printInvoice']);
     });
-    
+
     Route::get('/e-receipt/{transId}/{phoneNumber}', [PaymentController::class, 'eReceipt']);
-    Route::post('/broadcast', [PaymentController::class, 'broadcastLatePayment'] );
+    Route::post('/broadcast', [PaymentController::class, 'broadcastLatePayment']);
 });

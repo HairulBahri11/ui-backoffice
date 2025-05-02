@@ -51,6 +51,7 @@ Route::group(['middleware' => ['jwt.auth']], function () {
         Route::post('/checkout', [PaymentController::class, 'checkout']);
         Route::get('/verify/{transId}', [PaymentController::class, 'verifyPayment']);
         Route::get('/printInvoice/{paymentId}', [PaymentController::class, 'printInvoice']);
+        Route::get('/mybill/{studentId}', [PaymentController::class, 'billDetail']);
     });
 
     Route::get('/e-receipt/{transId}/{phoneNumber}', [PaymentController::class, 'eReceipt']);

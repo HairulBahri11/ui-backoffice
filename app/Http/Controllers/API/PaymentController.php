@@ -510,4 +510,64 @@ class PaymentController extends Controller
             ], 403);
         }
     }
+
+
+    public function billDetail($studentId)
+    {
+        // 1. Cek apakah student aktif
+        $student = Students::where('id', $studentId)
+            ->where('status', 'active')
+            ->first();
+
+        if (!$student) {
+            return response()->json([
+                'code' => '01',
+                'message' => 'Student tidak aktif atau tidak ditemukan',
+                'payload' => [
+                    'bill' => 0,
+                    'unpaid_months' => [],
+                    'last_payment' => null,
+                ],
+            ]);
+        }
+
+        // 2. Ambil pembayaran terakhir
+        $lastPay = DB::table('paydetail')
+            ->where('studentid', $studentId)
+            ->where('category', 'COURSE')
+            ->orderByDesc('monthpay')
+            ->first();
+
+        $lastPaidMonth = $lastPay->monthpay ?? null;
+        $unpaidMonths = [];
+
+        // 3. Hitung bulan belum dibayar
+        if ($lastPaidMonth) {
+            $start = new DateTime($lastPaidMonth);
+            $start->modify('+1 month');
+        } else {
+            $start = new DateTime(date('Y-01-01'));
+        }
+
+        $now = new DateTime();
+
+        while ((int)$start->format('Ym') <= (int)$now->format('Ym')) {
+            $unpaidMonths[] = $start->format('F Y');
+            $start->modify('+1 month');
+        }
+
+        // 4. Batasi hanya bulan sekarang jika belum bayar ≥ 4 bulan
+        if (count($unpaidMonths) >= 4) {
+            $unpaidMonths = [date('F Y')]; // hanya bulan ini yang dibolehkan dibayar
+        }
+
+        return response()->json([
+            'code' => '00',
+            'payload' => [
+                'student_data' => $student,
+                'last_payment' => $lastPaidMonth ? date('F Y', strtotime($lastPaidMonth)) : null,
+                'unpaid_months' => $unpaidMonths,
+            ],
+        ]);
+    }
 }

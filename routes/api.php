@@ -54,7 +54,7 @@ Route::group(['middleware' => ['jwt.auth']], function () {
         Route::get('/mybill/{studentId}', [PaymentController::class, 'billDetail']);
     });
 
-    Route::get('/count-attendence', [InfoController::class, 'countAttendence']);
+    Route::get('/count-attendence/{studentId}', [InfoController::class, 'countAttendence']);
     Route::get('/e-receipt/{transId}/{phoneNumber}', [PaymentController::class, 'eReceipt']);
     Route::post('/broadcast', [PaymentController::class, 'broadcastLatePayment']);
 });

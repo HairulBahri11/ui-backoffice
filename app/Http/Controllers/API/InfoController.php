@@ -93,7 +93,7 @@ class InfoController extends Controller
             ->first();
 
         $totalPertemuan = (int) $data->total_pertemuan;
-        $totalHadir = (int) $data->total_hadir;
+        $totalHadir = (int) $data->total_pertemuan - (int) $data->total_alpha - (int) $data->total_izin;
 
         $persentaseHadir = $totalPertemuan > 0 ? round(($totalHadir / $totalPertemuan) * 100, 2) : 0;
 

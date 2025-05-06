@@ -21,7 +21,7 @@ class SertificateController extends Controller
             ->where('student_id', $studentId)
             ->groupBy('student_scores.student_id', 'student_scores.price_id')
             ->get();
-
+        new \App\Libraries\Pdf();
         $pdf = new Fpdi('L', 'mm', 'A4');
         $pdf->AddPage();
 

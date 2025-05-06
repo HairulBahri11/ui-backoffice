@@ -56,6 +56,7 @@ Route::group(['middleware' => ['jwt.auth']], function () {
     });
 
     Route::get('getMySertificate/{studentId}', [SertificateController::class, 'apiGenerateCertificate']);
+    Route::get('getNewResult/{studentId}', [SertificateController::class, 'getNewResult']);
 
     Route::get('/count-attendence/{studentId}', [InfoController::class, 'countAttendence']);
     Route::get('/e-receipt/{transId}/{phoneNumber}', [PaymentController::class, 'eReceipt']);

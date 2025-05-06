@@ -14,6 +14,55 @@ class SertificateController extends Controller
 {
     public function generateCertificate($studentId)
     {
+        $kidSeries = [
+            "Kid 1",
+            "Kid 2",
+            "Kid 3",
+            "Kid 4",
+            "Kid 5",
+            "Kid 6",
+            "Starter",
+            "Teen 1",
+            "Teen 2",
+            "Teen 3",
+            "Teen 4",
+            "Teen 5",
+            "Teen 6",
+            "Teen 7",
+            "Teen 8",
+            "Adult 1",
+            "Adult 2",
+            "Adult 3",
+            "Adult 4",
+            "Adult 5",
+            "Adult 6",
+            "Adult 7",
+            "Adult 8",
+            "Adult 9",
+            "Adult 10",
+            "Conversation 1",
+            "Conversation 2",
+            "Conversation 3",
+            "Conversation 4",
+            "Conversation 5",
+            "Conversation 6",
+            "Private",
+            "Advance",
+            "Kids Club",
+            "Semi Private",
+            "Advanced 1",
+            "Advanced 2",
+            "Advanced 3"
+        ];
+
+        $preToddleToddle = [
+            "Pre Toddle 1",
+            "Pre Toddle 2",
+            "Toddle 1",
+            "Toddle 2",
+            "Toddle 3",
+            "Toddle 4"
+        ];
         $student = Students::with('teacher')->findOrFail($studentId);
         $countClass = DB::table('student_scores')
             ->join('price', 'student_scores.price_id', '=', 'price.id')
@@ -23,10 +72,10 @@ class SertificateController extends Controller
             ->get();
         new \App\Libraries\Pdf();
         $pdf = new Fpdi('L', 'mm', 'A4');
-
+        $pdf->AddPage();
 
         foreach ($countClass as $class) {
-            $pdf->AddPage();
+
             $score = StudentScore::where('student_id', $studentId)
                 ->where('price_id', $class->id)
                 ->first();
@@ -37,9 +86,9 @@ class SertificateController extends Controller
 
             $averageScores = $this->calculateAverageScorePerItem($studentId, $class->id);
 
-            if (in_array($class->program, ['Pre-TOD', 'TOD'])) {
+            if (in_array($class->program, $preToddleToddle)) {
                 $this->renderTodTemplate($pdf, $student, $score, $class, $averageScores);
-            } elseif (in_array($class->program, ['K1', 'K2', 'ADVANCED'])) {
+            } elseif (in_array($class->program, $kidSeries)) {
                 $this->renderKidTemplate($pdf, $student, $score, $class, $averageScores);
             }
         }

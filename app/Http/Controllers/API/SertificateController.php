@@ -43,8 +43,9 @@ class SertificateController extends Controller
             }
         }
 
-        $filename = time() . '.pdf';
-        return $pdf->Output($filename, 'I');
+        // $filename = time() . '.pdf';
+        $pdfContent = $pdf->Output('', 'S'); // 'S' = return as string
+        return $pdfContent;
     }
 
     private function calculateAverageScorePerItem($studentId, $priceId)
@@ -174,9 +175,10 @@ class SertificateController extends Controller
 
     public function apiGenerateCertificate($studentId)
     {
-        $pdf = $this->generateCertificate($studentId);
+        $pdfContent = $this->generateCertificate($studentId);
 
-        return response($pdf, 200)
-            ->header('Content-Type', 'application/pdf');
+        return response($pdfContent, 200)
+            ->header('Content-Type', 'application/pdf')
+            ->header('Content-Disposition', 'inline; filename="certificate.pdf"');
     }
 }

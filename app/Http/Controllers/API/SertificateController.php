@@ -23,9 +23,10 @@ class SertificateController extends Controller
             ->get();
         new \App\Libraries\Pdf();
         $pdf = new Fpdi('L', 'mm', 'A4');
-        $pdf->AddPage();
+
 
         foreach ($countClass as $class) {
+            $pdf->AddPage();
             $score = StudentScore::where('student_id', $studentId)
                 ->where('price_id', $class->id)
                 ->first();
@@ -44,7 +45,10 @@ class SertificateController extends Controller
         }
 
         // $filename = time() . '.pdf';
-        $pdfContent = $pdf->Output('', 'S'); // 'S' = return as string
+        // $pdfContent = $pdf->Output('', 'S'); // 'S' = return as string
+        ob_clean();
+        flush();
+        $pdfContent = $pdf->Output('', 'S');
         return $pdfContent;
     }
 

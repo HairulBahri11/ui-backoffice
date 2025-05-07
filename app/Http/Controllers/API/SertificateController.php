@@ -405,7 +405,7 @@ class SertificateController extends Controller
     {
         try {
 
-            $classId = $request->class;
+            $classId = $request->input('class');
 
             if (!$classId) {
                 return response()->json([

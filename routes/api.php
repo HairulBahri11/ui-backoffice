@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\API\InfoController;
 use App\Http\Controllers\API\PaymentController;
+use App\Http\Controllers\API\SertificateController;
 use App\Http\Controllers\API\StudentController;
 use App\Http\Controllers\API\UsersController;
 use App\Http\Controllers\API\ScoreController;
@@ -53,6 +54,9 @@ Route::group(['middleware' => ['jwt.auth']], function () {
         Route::get('/printInvoice/{paymentId}', [PaymentController::class, 'printInvoice']);
         Route::get('/mybill/{studentId}', [PaymentController::class, 'billDetail']);
     });
+
+    Route::get('getMySertificate/{studentId}', [SertificateController::class, 'apiGenerateCertificate']);
+    Route::get('getNewResult/{studentId}', [SertificateController::class, 'getNewResult']);
 
     Route::get('/count-attendence/{studentId}', [InfoController::class, 'countAttendence']);
     Route::get('/e-receipt/{transId}/{phoneNumber}', [PaymentController::class, 'eReceipt']);

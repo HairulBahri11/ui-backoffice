@@ -86,14 +86,14 @@ class InfoController extends Controller
             ->where('attendance_details.student_id', $studentId)
             ->selectRaw('
                 COUNT(*) as total_pertemuan,
-                SUM(CASE WHEN is_absent = 1 THEN 1 ELSE 0 END) as total_hadir,
-                SUM(CASE WHEN is_alpha = 1 THEN 1 ELSE 0 END) as total_alpha,
-                SUM(CASE WHEN is_permission = 1 THEN 1 ELSE 0 END) as total_izin
+                SUM(CASE WHEN is_absent = 0 THEN 1 ELSE 0 END) as total_hadir,
+                SUM(CASE WHEN is_absent = 1 AND is_alpha = 1 THEN 1 ELSE 0 END) as total_alpha,
+                SUM(CASE WHEN is_absent = 1 AND is_permission = 1 THEN 1 ELSE 0 END) as total_izin
             ')
             ->first();
 
         $totalPertemuan = (int) $data->total_pertemuan;
-        $totalHadir = (int) $data->total_hadir;
+        $totalHadir = (int) $data->total_pertemuan - (int) $data->total_alpha - (int) $data->total_izin;
 
         $persentaseHadir = $totalPertemuan > 0 ? round(($totalHadir / $totalPertemuan) * 100, 2) : 0;
 

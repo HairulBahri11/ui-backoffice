@@ -238,26 +238,200 @@ class SertificateController extends Controller
     }
 
 
+    // public function getNewResult($studentId, Request $request)
+    // {
+    //     try {
+    //         $followUp = FollowUp::where('student_id', $studentId)->first();
+
+    //         if ($followUp) {
+    //             $class = FollowUp::where('student_id', $studentId)
+    //                 ->join('price', 'price.id', 'follow_up.old_price_id')
+    //                 ->join('student', 'student.id', 'follow_up.student_id')
+    //                 ->select('price.program', 'student.is_certificate', 'student.date_certificate', 'follow_up.old_price_id as priceid')
+    //                 ->first();
+    //         } else {
+    //             $class = Students::join('price', 'price.id', 'student.priceid')
+    //                 ->select('price.program', 'student.is_certificate', 'student.date_certificate', 'student.priceid')
+    //                 ->where('student.id', $studentId)->first();
+    //         }
+
+    //         $getStudent = $followUp ? FollowUp::where('student_id', $studentId)->first() : Students::with('teacher')->findOrFail($studentId);
+    //         $getStudent->priceid = $class->priceid;
+
+    //         $score = StudentScore::join('tests as t', 't.id', 'student_scores.test_id')
+    //             ->join('price as p', 'p.id', 'student_scores.price_id')
+    //             ->select(
+    //                 'p.program',
+    //                 't.name',
+    //                 'student_scores.average_score',
+    //                 'student_scores.id as scoreId',
+    //                 'student_scores.comment',
+    //                 'student_scores.date',
+    //                 'student_scores.price_id'
+    //             )
+    //             ->where('student_scores.price_id', $request->class ?? $getStudent->priceid)
+    //             ->where('student_scores.student_id', $studentId)
+    //             ->first();
+
+    //         if (!$score) {
+    //             return response()->json([
+    //                 'code' => '404',
+    //                 'message' => 'Nilai tidak ditemukan.'
+    //             ], 404);
+    //         }
+
+    //         // Mulai generate PDF
+    //         new \App\Libraries\Pdf();
+    //         $pdf = new \setasign\Fpdi\Fpdi();
+    //         $pdf->SetTitle('Certificate');
+    //         $pdf->SetAutoPageBreak(false, 5);
+    //         $pdf->AddPage('L');
+
+    //         $template = in_array($score->price_id, [1, 2, 3, 4, 5, 6])
+    //             ? 'certificate/template/pretod-tod.jpg'
+    //             : 'certificate/template/kid-advanced.jpg';
+
+    //         $pdf->Image(public_path($template), 0, 0, 297, 210);
+    //         $pdf->SetFont('Arial', 'B', 35);
+    //         $pdf->SetXY(87, 65);
+    //         $pdf->Cell(120, 20, $getStudent->name, '', 0, 'C');
+
+    //         $pdf->SetFont('Arial', 'B', 20);
+    //         $pdf->SetXY(87, 82);
+    //         $pdf->Cell(120, 10, $score->program, '', 0, 'C');
+
+    //         $pdf->SetFont('Arial', 'B', 15);
+    //         $pdf->SetXY(75, 92);
+    //         $pdf->Cell(60, 10, $class->date_certificate ? \Carbon\Carbon::parse($class->date_certificate)->format('j F Y') : \Carbon\Carbon::now()->format('j F Y'), 0, 'L');
+
+    //         $score_total = 0;
+    //         $items = TestItems::get();
+    //         $jumlah_items = count($items);
+
+    //         foreach ($items as $item) {
+    //             $score_test = collect([1, 2, 3])->map(function ($test_id) use ($getStudent, $score, $item) {
+    //                 return DB::table('student_scores')
+    //                     ->join('student_score_details', 'student_score_details.student_score_id', 'student_scores.id')
+    //                     ->where('student_id', $getStudent->id)
+    //                     ->where('price_id', $score->price_id)
+    //                     ->where('test_id', $test_id)
+    //                     ->where('student_score_details.test_item_id', $item->id)
+    //                     ->value('student_score_details.score') ?? 0;
+    //             })->filter(function ($val) {
+    //                 return $val > 0;
+    //             });
+
+    //             $average = $score_test->count() > 0 ? round($score_test->avg()) : 0;
+    //             $score_total += $average;
+
+    //             // Posisi XY bisa diatur sesuai kebutuhan template Anda
+    //             // Ini contoh sederhana untuk dua template
+    //             $pdf->SetFont('Arial', 'B', 20);
+    //             if (in_array($score->price_id, [1, 2, 3, 4, 5, 6])) {
+    //                 // Pretod-Tod (4 item)
+    //                 switch ($item->id) {
+    //                     case 1:
+    //                         $pdf->SetXY(123, 119);
+    //                         break;
+    //                     case 2:
+    //                         $pdf->SetXY(123, 128);
+    //                         break;
+    //                     case 3:
+    //                         $pdf->SetXY(197, 119);
+    //                         break;
+    //                     case 4:
+    //                         $pdf->SetXY(197, 128);
+    //                         break;
+    //                 }
+    //             } else {
+    //                 // Kids-Advanced (6 item)
+    //                 switch ($item->id) {
+    //                     case 1:
+    //                         $pdf->SetXY(73, 119);
+    //                         break;
+    //                     case 2:
+    //                         $pdf->SetXY(73, 128);
+    //                         break;
+    //                     case 3:
+    //                         $pdf->SetXY(147, 119);
+    //                         break;
+    //                     case 4:
+    //                         $pdf->SetXY(147, 128);
+    //                         break;
+    //                     case 5:
+    //                         $pdf->SetXY(231, 119);
+    //                         break;
+    //                     case 6:
+    //                         $pdf->SetXY(231, 128);
+    //                         break;
+    //                 }
+    //             }
+
+    //             $pdf->Cell(40, 10, $average . '/' . Helper::getGrade($average), '', 0, 'L');
+    //         }
+
+    //         $score_average = round($score_total / $jumlah_items);
+
+    //         $pdf->SetFont('Arial', 'B', 45);
+    //         $pdf->SetXY(133, 130);
+    //         $pdf->Cell(40, 70, $score_average . '/' . Helper::getGrade($score_average), '', 0, 'C');
+
+    //         $pdf->SetFont('Arial', 'B', 20);
+    //         $pdf->SetXY(200, 187);
+    //         $pdf->Cell(40, 10, $getStudent->teacher->name ?? '', '', 0, 'L');
+
+    //         if ($getStudent->teacher) {
+    //             $pdf->Image('https://ui-payment.primtechdev.com/upload/signature/' . $getStudent->teacher->signature, 215, 170, 19.2, 12.6);
+    //         }
+
+    //         $pdf->Image('https://ui-payment.primtechdev.com/upload/signature/principal.png', 70, 170, 19.2, 12.6);
+
+    //         $pdfContent = $pdf->Output('', 'S');
+    //         return response($pdfContent, 200)
+    //             ->header('Content-Type', 'application/pdf')
+    //             ->header('Content-Disposition', 'inline; filename="certificate.pdf"');
+    //     } catch (\Throwable $th) {
+    //         return response()->json([
+    //             'code' => '400',
+    //             'error' => 'internal server error',
+    //             'message' => $th->getMessage(),
+    //         ], 500);
+    //     }
+    // }
+
+
     public function getNewResult($studentId, Request $request)
+
     {
         try {
-            $followUp = FollowUp::where('student_id', $studentId)->first();
 
-            if ($followUp) {
-                $class = FollowUp::where('student_id', $studentId)
-                    ->join('price', 'price.id', 'follow_up.old_price_id')
-                    ->join('student', 'student.id', 'follow_up.student_id')
-                    ->select('price.program', 'student.is_certificate', 'student.date_certificate', 'follow_up.old_price_id as priceid')
-                    ->first();
-            } else {
-                $class = Students::join('price', 'price.id', 'student.priceid')
-                    ->select('price.program', 'student.is_certificate', 'student.date_certificate', 'student.priceid')
-                    ->where('student.id', $studentId)->first();
+            $classId = $request->class;
+
+            if (!$classId) {
+                return response()->json([
+                    'code' => '400',
+                    'message' => 'Class ID is required.',
+                ], 400);
             }
 
-            $getStudent = $followUp ? FollowUp::where('student_id', $studentId)->first() : Students::with('teacher')->findOrFail($studentId);
-            $getStudent->priceid = $class->priceid;
+            // Ambil data student & teacher
+            $getStudent = Students::with('teacher')->findOrFail($studentId);
 
+            // Ambil informasi class berdasarkan classId (price_id)
+            $class = DB::table('price')
+                ->join('student', 'student.id', '=', $studentId)
+                ->select(
+                    'price.program',
+                    'student.is_certificate',
+                    'student.date_certificate',
+                    DB::raw("$classId as priceid")
+                )
+                ->where('price.id', $classId)
+                ->first();
+
+            $getStudent->priceid = $classId;
+
+            // Ambil score utama
             $score = StudentScore::join('tests as t', 't.id', 'student_scores.test_id')
                 ->join('price as p', 'p.id', 'student_scores.price_id')
                 ->select(
@@ -269,18 +443,18 @@ class SertificateController extends Controller
                     'student_scores.date',
                     'student_scores.price_id'
                 )
-                ->where('student_scores.price_id', $request->class ?? $getStudent->priceid)
+                ->where('student_scores.price_id', $classId)
                 ->where('student_scores.student_id', $studentId)
                 ->first();
 
             if (!$score) {
                 return response()->json([
                     'code' => '404',
-                    'message' => 'Nilai tidak ditemukan.'
+                    'message' => 'Score not found for this class.',
                 ], 404);
             }
 
-            // Mulai generate PDF
+            // Start generate PDF
             new \App\Libraries\Pdf();
             $pdf = new \setasign\Fpdi\Fpdi();
             $pdf->SetTitle('Certificate');
@@ -304,6 +478,7 @@ class SertificateController extends Controller
             $pdf->SetXY(75, 92);
             $pdf->Cell(60, 10, $class->date_certificate ? \Carbon\Carbon::parse($class->date_certificate)->format('j F Y') : \Carbon\Carbon::now()->format('j F Y'), 0, 'L');
 
+            // Hitung skor detail
             $score_total = 0;
             $items = TestItems::get();
             $jumlah_items = count($items);
@@ -324,11 +499,8 @@ class SertificateController extends Controller
                 $average = $score_test->count() > 0 ? round($score_test->avg()) : 0;
                 $score_total += $average;
 
-                // Posisi XY bisa diatur sesuai kebutuhan template Anda
-                // Ini contoh sederhana untuk dua template
                 $pdf->SetFont('Arial', 'B', 20);
                 if (in_array($score->price_id, [1, 2, 3, 4, 5, 6])) {
-                    // Pretod-Tod (4 item)
                     switch ($item->id) {
                         case 1:
                             $pdf->SetXY(123, 119);
@@ -344,7 +516,6 @@ class SertificateController extends Controller
                             break;
                     }
                 } else {
-                    // Kids-Advanced (6 item)
                     switch ($item->id) {
                         case 1:
                             $pdf->SetXY(73, 119);
@@ -371,7 +542,6 @@ class SertificateController extends Controller
             }
 
             $score_average = round($score_total / $jumlah_items);
-
             $pdf->SetFont('Arial', 'B', 45);
             $pdf->SetXY(133, 130);
             $pdf->Cell(40, 70, $score_average . '/' . Helper::getGrade($score_average), '', 0, 'C');
@@ -389,11 +559,11 @@ class SertificateController extends Controller
             $pdfContent = $pdf->Output('', 'S');
             return response($pdfContent, 200)
                 ->header('Content-Type', 'application/pdf')
-                ->header('Content-Disposition', 'inline; filename="certificate.pdf"');
+                ->header('Content-Disposition', 'inline; filename=\"certificate.pdf\"');
         } catch (\Throwable $th) {
             return response()->json([
-                'code' => '400',
-                'error' => 'internal server error',
+                'code' => '500',
+                'error' => 'Internal Server Error',
                 'message' => $th->getMessage(),
             ], 500);
         }

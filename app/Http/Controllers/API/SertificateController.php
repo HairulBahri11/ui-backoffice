@@ -8,9 +8,9 @@ use App\Models\FollowUp;
 use App\Models\Students;
 use App\Models\TestItems;
 use App\Models\StudentScore;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Request;
 
 class SertificateController extends Controller
 {

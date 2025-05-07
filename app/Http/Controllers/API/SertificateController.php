@@ -565,6 +565,184 @@ class SertificateController extends Controller
     //     }
     // }
 
+    // public function getNewResult($studentId, Request $request)
+    // {
+    //     try {
+
+    //         $classId = $request->input('class');
+
+    //         if (!$classId) {
+    //             return response()->json([
+    //                 'code' => '400',
+    //                 'message' => 'Class ID is required.',
+    //             ], 400);
+    //         }
+
+    //         // Ambil data student & teacher
+    //         $getStudent = Students::with('teacher')->findOrFail($studentId);
+
+    //         // Ambil informasi class berdasarkan classId (price_id)
+    //         $class = DB::table('price')
+    //             ->where('id', $classId)
+    //             ->select('program')
+    //             ->first();
+
+    //         $getStudent->priceid = $classId;
+    //         $getStudent->program = $class->program ?? '';
+
+    //         // Ambil score utama
+    //         $score = StudentScore::join('tests as t', 't.id', 'student_scores.test_id')
+    //             ->join('price as p', 'p.id', 'student_scores.price_id')
+    //             ->select(
+    //                 'p.program',
+    //                 't.name',
+    //                 'student_scores.average_score',
+    //                 'student_scores.id as scoreId',
+    //                 'student_scores.comment',
+    //                 'student_scores.date',
+    //                 'student_scores.price_id'
+    //             )
+    //             ->where('student_scores.price_id', $classId)
+    //             ->where('student_scores.student_id', $studentId)
+    //             ->first();
+
+    //         if (!$score) {
+    //             return response()->json([
+    //                 'code' => '404',
+    //                 'message' => 'Score not found for this class.',
+    //             ], 404);
+    //         }
+
+    //         // Start generate PDF
+    //         new \App\Libraries\Pdf();
+    //         $pdf = new \setasign\Fpdi\Fpdi();
+    //         $pdf->SetTitle('Certificate');
+    //         $pdf->SetAutoPageBreak(false, 5);
+    //         $pdf->AddPage('L');
+
+    //         $template = in_array($score->price_id, [1, 2, 3, 4, 5, 6])
+    //             ? 'certificate/template/pretod-tod.jpg'
+    //             : 'certificate/template/kid-advanced.jpg';
+
+    //         $pdf->Image(public_path($template), 0, 0, 297, 210);
+    //         $pdf->SetFont('Arial', 'B', 35);
+    //         $pdf->SetXY(87, 65);
+    //         $pdf->Cell(120, 20, $getStudent->name, '', 0, 'C');
+
+    //         $pdf->SetFont('Arial', 'B', 20);
+    //         $pdf->SetXY(87, 82);
+    //         $pdf->Cell(120, 10, $score->program, '', 0, 'C');
+
+    //         $pdf->SetFont('Arial', 'B', 15);
+    //         $pdf->SetXY(75, 92);
+    //         $pdf->Cell(60, 10, $getStudent->date_certificate ? \Carbon\Carbon::parse($getStudent->date_certificate)->format('j F Y') : \Carbon\Carbon::now()->format('j F Y'), 0, 'L');
+
+    //         $pdf->SetFont('Arial', 'B', 20);
+    //         if (in_array($score->price_id, [1, 2, 3, 4, 5, 6])) {
+    //             $testItemsTOD = TestItems::whereIn('name', ['Writing', 'Speaking', 'Reading', 'Listening'])
+    //                 ->orderByRaw("FIELD(name, 'Writing', 'Speaking', 'Reading', 'Listening')")
+    //                 ->get()
+    //                 ->keyBy('name');
+
+    //             $writingScore = DB::table('student_scores')
+    //                 ->join('student_score_details', 'student_score_details.student_score_id', 'student_scores.id')
+    //                 ->where('student_id', $getStudent->id)
+    //                 ->where('price_id', $score->price_id)
+    //                 ->where('student_score_details.test_item_id', $testItemsTOD['Writing']->id ?? null)
+    //                 ->value('student_score_details.score') ?? '';
+    //             $pdf->SetXY(123, 119);
+    //             $pdf->Cell(40, 10, $writingScore . '/' . Helper::getGrade($writingScore), '', 0, 'L');
+
+    //             $speakingScore = DB::table('student_scores')
+    //                 ->join('student_score_details', 'student_score_details.student_score_id', 'student_scores.id')
+    //                 ->where('student_id', $getStudent->id)
+    //                 ->where('price_id', $score->price_id)
+    //                 ->where('student_score_details.test_item_id', $testItemsTOD['Speaking']->id ?? null)
+    //                 ->value('student_score_details.score') ?? '';
+    //             $pdf->SetXY(123, 128);
+    //             $pdf->Cell(40, 10, $speakingScore . '/' . Helper::getGrade($speakingScore), '', 0, 'L');
+
+    //             $readingScore = DB::table('student_scores')
+    //                 ->join('student_score_details', 'student_score_details.student_score_id', 'student_scores.id')
+    //                 ->where('student_id', $getStudent->id)
+    //                 ->where('price_id', $score->price_id)
+    //                 ->where('student_score_details.test_item_id', $testItemsTOD['Reading']->id ?? null)
+    //                 ->value('student_score_details.score') ?? '';
+    //             $pdf->SetXY(197, 119);
+    //             $pdf->Cell(40, 10, $readingScore . '/' . Helper::getGrade($readingScore), '', 0, 'L');
+
+    //             $listeningScore = DB::table('student_scores')
+    //                 ->join('student_score_details', 'student_score_details.student_score_id', 'student_scores.id')
+    //                 ->where('student_id', $getStudent->id)
+    //                 ->where('price_id', $score->price_id)
+    //                 ->where('student_score_details.test_item_id', $testItemsTOD['Listening']->id ?? null)
+    //                 ->value('student_score_details.score') ?? '';
+    //             $pdf->SetXY(197, 128);
+    //             $pdf->Cell(40, 10, $listeningScore . '/' . Helper::getGrade($listeningScore), '', 0, 'L');
+
+    //             $overallScore = round(collect([$writingScore, $speakingScore, $readingScore, $listeningScore])->avg());
+    //             $pdf->SetFont('Arial', 'B', 45);
+    //             $pdf->SetXY(133, 130);
+    //             $pdf->Cell(40, 70, $overallScore . '/' . Helper::getGrade($overallScore), '', 0, 'C');
+    //         } else {
+    //             // Logika untuk template kid-advanced (dibagi 6 items)
+    //             $items = TestItems::get();
+    //             $score_total = 0;
+    //             $jumlah_items = count($items);
+    //             $itemCoordinates = [
+    //                 1 => [73, 119],
+    //                 2 => [73, 128],
+    //                 3 => [147, 119],
+    //                 4 => [147, 128],
+    //                 5 => [231, 119],
+    //                 6 => [231, 128],
+    //             ];
+
+    //             foreach ($items as $item) {
+    //                 $studentScoreDetail = DB::table('student_scores')
+    //                     ->join('student_score_details', 'student_score_details.student_score_id', 'student_scores.id')
+    //                     ->where('student_id', $getStudent->id)
+    //                     ->where('price_id', $score->price_id)
+    //                     ->where('student_score_details.test_item_id', $item->id)
+    //                     ->value('student_score_details.score') ?? 0;
+
+    //                 $average = round($studentScoreDetail);
+    //                 $score_total += $average;
+
+    //                 if (isset($itemCoordinates[$item->id])) {
+    //                     $pdf->SetXY($itemCoordinates[$item->id][0], $itemCoordinates[$item->id][1]);
+    //                     $pdf->Cell(40, 10, $average . '/' . Helper::getGrade($average), '', 0, 'L');
+    //                 }
+    //             }
+
+    //             $score_average = $jumlah_items > 0 ? round($score_total / $jumlah_items) : 0;
+    //             $pdf->SetFont('Arial', 'B', 45);
+    //             $pdf->SetXY(133, 130);
+    //             $pdf->Cell(40, 70, $score_average . '/' . Helper::getGrade($score_average), '', 0, 'C');
+    //         }
+
+    //         $pdf->SetFont('Arial', 'B', 20);
+    //         $pdf->SetXY(200, 187);
+    //         $pdf->Cell(40, 10, $getStudent->teacher->name ?? '', '', 0, 'L');
+
+    //         if ($getStudent->teacher && $getStudent->teacher->signature) {
+    //             $pdf->Image('https://ui-payment.primtechdev.com/upload/signature/' . $getStudent->teacher->signature, 215, 170, 19.2, 12.6);
+    //         }
+
+    //         $pdf->Image('https://ui-payment.primtechdev.com/upload/signature/principal.png', 70, 170, 19.2, 12.6);
+
+    //         $pdfContent = $pdf->Output('', 'S');
+    //         return response($pdfContent, 200)
+    //             ->header('Content-Type', 'application/pdf')
+    //             ->header('Content-Disposition', 'inline; filename=\"certificate.pdf\"');
+    //     } catch (\Throwable $th) {
+    //         return response()->json([
+    //             'code' => '500',
+    //             'error' => 'Internal Server Error',
+    //             'message' => $th->getMessage(),
+    //         ], 500);
+    //     }
+    // }
     public function getNewResult($studentId, Request $request)
     {
         try {
@@ -639,48 +817,38 @@ class SertificateController extends Controller
 
             $pdf->SetFont('Arial', 'B', 20);
             if (in_array($score->price_id, [1, 2, 3, 4, 5, 6])) {
-                $testItemsTOD = TestItems::whereIn('name', ['Writing', 'Speaking', 'Reading', 'Listening'])
+                $testItems = TestItems::whereIn('name', ['Writing', 'Speaking', 'Reading', 'Listening'])
                     ->orderByRaw("FIELD(name, 'Writing', 'Speaking', 'Reading', 'Listening')")
-                    ->get()
-                    ->keyBy('name');
+                    ->get();
 
-                $writingScore = DB::table('student_scores')
-                    ->join('student_score_details', 'student_score_details.student_score_id', 'student_scores.id')
-                    ->where('student_id', $getStudent->id)
-                    ->where('price_id', $score->price_id)
-                    ->where('student_score_details.test_item_id', $testItemsTOD['Writing']->id ?? null)
-                    ->value('student_score_details.score') ?? '';
+                $skillScores = [];
+                foreach ($testItems as $item) {
+                    $scores = DB::table('student_scores')
+                        ->join('student_score_details', 'student_score_details.student_score_id', 'student_scores.id')
+                        ->where('student_id', $getStudent->id)
+                        ->where('price_id', $score->price_id)
+                        ->where('student_score_details.test_item_id', $item->id)
+                        ->whereIn('student_scores.test_id', [1, 2, 3])
+                        ->pluck('student_score_details.score')
+                        ->toArray();
+
+                    $averageScore = count($scores) > 0 ? round(collect($scores)->avg()) : '';
+                    $skillScores[$item->name] = $averageScore;
+                }
+
                 $pdf->SetXY(123, 119);
-                $pdf->Cell(40, 10, $writingScore . '/' . Helper::getGrade($writingScore), '', 0, 'L');
+                $pdf->Cell(40, 10, $skillScores['Writing'] . '/' . Helper::getGrade($skillScores['Writing']), '', 0, 'L');
 
-                $speakingScore = DB::table('student_scores')
-                    ->join('student_score_details', 'student_score_details.student_score_id', 'student_scores.id')
-                    ->where('student_id', $getStudent->id)
-                    ->where('price_id', $score->price_id)
-                    ->where('student_score_details.test_item_id', $testItemsTOD['Speaking']->id ?? null)
-                    ->value('student_score_details.score') ?? '';
                 $pdf->SetXY(123, 128);
-                $pdf->Cell(40, 10, $speakingScore . '/' . Helper::getGrade($speakingScore), '', 0, 'L');
+                $pdf->Cell(40, 10, $skillScores['Speaking'] . '/' . Helper::getGrade($skillScores['Speaking']), '', 0, 'L');
 
-                $readingScore = DB::table('student_scores')
-                    ->join('student_score_details', 'student_score_details.student_score_id', 'student_scores.id')
-                    ->where('student_id', $getStudent->id)
-                    ->where('price_id', $score->price_id)
-                    ->where('student_score_details.test_item_id', $testItemsTOD['Reading']->id ?? null)
-                    ->value('student_score_details.score') ?? '';
                 $pdf->SetXY(197, 119);
-                $pdf->Cell(40, 10, $readingScore . '/' . Helper::getGrade($readingScore), '', 0, 'L');
+                $pdf->Cell(40, 10, $skillScores['Reading'] . '/' . Helper::getGrade($skillScores['Reading']), '', 0, 'L');
 
-                $listeningScore = DB::table('student_scores')
-                    ->join('student_score_details', 'student_score_details.student_score_id', 'student_scores.id')
-                    ->where('student_id', $getStudent->id)
-                    ->where('price_id', $score->price_id)
-                    ->where('student_score_details.test_item_id', $testItemsTOD['Listening']->id ?? null)
-                    ->value('student_score_details.score') ?? '';
                 $pdf->SetXY(197, 128);
-                $pdf->Cell(40, 10, $listeningScore . '/' . Helper::getGrade($listeningScore), '', 0, 'L');
+                $pdf->Cell(40, 10, $skillScores['Listening'] . '/' . Helper::getGrade($skillScores['Listening']), '', 0, 'L');
 
-                $overallScore = round(collect([$writingScore, $speakingScore, $readingScore, $listeningScore])->avg());
+                $overallScore = round(collect($skillScores)->avg());
                 $pdf->SetFont('Arial', 'B', 45);
                 $pdf->SetXY(133, 130);
                 $pdf->Cell(40, 70, $overallScore . '/' . Helper::getGrade($overallScore), '', 0, 'C');

@@ -746,7 +746,6 @@ class SertificateController extends Controller
     public function getNewResult($studentId, Request $request)
     {
         try {
-
             $classId = $request->input('class');
 
             if (!$classId) {
@@ -756,10 +755,8 @@ class SertificateController extends Controller
                 ], 400);
             }
 
-            // Ambil data student & teacher
             $getStudent = Students::with('teacher')->findOrFail($studentId);
 
-            // Ambil informasi class berdasarkan classId (price_id)
             $class = DB::table('price')
                 ->where('id', $classId)
                 ->select('program')
@@ -768,18 +765,9 @@ class SertificateController extends Controller
             $getStudent->priceid = $classId;
             $getStudent->program = $class->program ?? '';
 
-            // Ambil score utama
             $score = StudentScore::join('tests as t', 't.id', 'student_scores.test_id')
                 ->join('price as p', 'p.id', 'student_scores.price_id')
-                ->select(
-                    'p.program',
-                    't.name',
-                    'student_scores.average_score',
-                    'student_scores.id as scoreId',
-                    'student_scores.comment',
-                    'student_scores.date',
-                    'student_scores.price_id'
-                )
+                ->select('p.program', 'student_scores.price_id')
                 ->where('student_scores.price_id', $classId)
                 ->where('student_scores.student_id', $studentId)
                 ->first();
@@ -791,7 +779,6 @@ class SertificateController extends Controller
                 ], 404);
             }
 
-            // Start generate PDF
             new \App\Libraries\Pdf();
             $pdf = new \setasign\Fpdi\Fpdi();
             $pdf->SetTitle('Certificate');
@@ -817,46 +804,79 @@ class SertificateController extends Controller
 
             $pdf->SetFont('Arial', 'B', 20);
             if (in_array($score->price_id, [1, 2, 3, 4, 5, 6])) {
-                $testItems = TestItems::whereIn('name', ['Writing', 'Speaking', 'Reading', 'Listening'])
-                    ->orderByRaw("FIELD(name, 'Writing', 'Speaking', 'Reading', 'Listening')")
-                    ->get();
+                $testItems = TestItems::get();
+                $score_total = 0;
 
-                $skillScores = [];
                 foreach ($testItems as $item) {
-                    $scores = DB::table('student_scores')
+                    $score1 = DB::table('student_scores')
                         ->join('student_score_details', 'student_score_details.student_score_id', 'student_scores.id')
+                        ->select('student_score_details.score as score_test')
                         ->where('student_id', $getStudent->id)
                         ->where('price_id', $score->price_id)
+                        ->where('student_scores.test_id', 1)
                         ->where('student_score_details.test_item_id', $item->id)
-                        ->whereIn('student_scores.test_id', [1, 2, 3])
-                        ->pluck('student_score_details.score')
-                        ->toArray();
+                        ->value('score_test') ?? 0;
 
-                    $averageScore = count($scores) > 0 ? round(collect($scores)->avg()) : '';
-                    $skillScores[$item->name] = $averageScore;
+                    $score2 = DB::table('student_scores')
+                        ->join('student_score_details', 'student_score_details.student_score_id', 'student_scores.id')
+                        ->select('student_score_details.score as score_test')
+                        ->where('student_id', $getStudent->id)
+                        ->where('price_id', $score->price_id)
+                        ->where('student_scores.test_id', 2)
+                        ->where('student_score_details.test_item_id', $item->id)
+                        ->value('score_test') ?? 0;
+
+                    $score3 = DB::table('student_scores')
+                        ->join('student_score_details', 'student_score_details.student_score_id', 'student_scores.id')
+                        ->select('student_score_details.score as score_test')
+                        ->where('student_id', $getStudent->id)
+                        ->where('price_id', $score->price_id)
+                        ->where('student_scores.test_id', 3)
+                        ->where('student_score_details.test_item_id', $item->id)
+                        ->value('score_test') ?? 0;
+
+                    $divider = 0;
+                    $sum_score = 0;
+
+                    if ($score1 != 0) {
+                        $sum_score += $score1;
+                        $divider++;
+                    }
+                    if ($score2 != 0) {
+                        $sum_score += $score2;
+                        $divider++;
+                    }
+                    if ($score3 != 0) {
+                        $sum_score += $score3;
+                        $divider++;
+                    }
+
+                    $score_test = $divider > 0 ? round($sum_score / $divider) : 0;
+                    $score_total += $score_test;
+
+                    if ($item->id == 1) {
+                        $pdf->SetXY(123, 119);
+                        $pdf->Cell(40, 10, $score_test . '/' . Helper::getGrade($score_test), '', 0, 'L');
+                    } else if ($item->id == 2) {
+                        $pdf->SetXY(123, 128);
+                        $pdf->Cell(40, 10, $score_test . '/' . Helper::getGrade($score_test), '', 0, 'L');
+                    } else if ($item->id == 3) {
+                        $pdf->SetXY(197, 119);
+                        $pdf->Cell(40, 10, $score_test . '/' . Helper::getGrade($score_test), '', 0, 'L');
+                    } else if ($item->id == 4) {
+                        $pdf->SetXY(197, 128);
+                        $pdf->Cell(40, 10, $score_test . '/' . Helper::getGrade($score_test), '', 0, 'L');
+                    }
                 }
 
-                $pdf->SetXY(123, 119);
-                $pdf->Cell(40, 10, $skillScores['Writing'] . '/' . Helper::getGrade($skillScores['Writing']), '', 0, 'L');
-
-                $pdf->SetXY(123, 128);
-                $pdf->Cell(40, 10, $skillScores['Speaking'] . '/' . Helper::getGrade($skillScores['Speaking']), '', 0, 'L');
-
-                $pdf->SetXY(197, 119);
-                $pdf->Cell(40, 10, $skillScores['Reading'] . '/' . Helper::getGrade($skillScores['Reading']), '', 0, 'L');
-
-                $pdf->SetXY(197, 128);
-                $pdf->Cell(40, 10, $skillScores['Listening'] . '/' . Helper::getGrade($skillScores['Listening']), '', 0, 'L');
-
-                $overallScore = round(collect($skillScores)->avg());
                 $pdf->SetFont('Arial', 'B', 45);
+                $score_average = round($score_total / 4);
                 $pdf->SetXY(133, 130);
-                $pdf->Cell(40, 70, $overallScore . '/' . Helper::getGrade($overallScore), '', 0, 'C');
+                $pdf->Cell(40, 70, $score_average . '/' . Helper::getGrade($score_average), '', 0, 'C');
             } else {
-                // Logika untuk template kid-advanced (dibagi 6 items)
+                // Logika untuk template kid-advanced (sesuai dengan getResult)
                 $items = TestItems::get();
                 $score_total = 0;
-                $jumlah_items = count($items);
                 $itemCoordinates = [
                     1 => [73, 119],
                     2 => [73, 128],
@@ -867,26 +887,62 @@ class SertificateController extends Controller
                 ];
 
                 foreach ($items as $item) {
-                    $studentScoreDetail = DB::table('student_scores')
+                    $score1 = DB::table('student_scores')
                         ->join('student_score_details', 'student_score_details.student_score_id', 'student_scores.id')
+                        ->select('student_score_details.score as score_test')
                         ->where('student_id', $getStudent->id)
                         ->where('price_id', $score->price_id)
+                        ->where('student_scores.test_id', 1)
                         ->where('student_score_details.test_item_id', $item->id)
-                        ->value('student_score_details.score') ?? 0;
+                        ->value('score_test') ?? 0;
 
-                    $average = round($studentScoreDetail);
-                    $score_total += $average;
+                    $score2 = DB::table('student_scores')
+                        ->join('student_score_details', 'student_score_details.student_score_id', 'student_scores.id')
+                        ->select('student_score_details.score as score_test')
+                        ->where('student_id', $getStudent->id)
+                        ->where('price_id', $score->price_id)
+                        ->where('student_scores.test_id', 2)
+                        ->where('student_score_details.test_item_id', $item->id)
+                        ->value('score_test') ?? 0;
+
+                    $score3 = DB::table('student_scores')
+                        ->join('student_score_details', 'student_score_details.student_score_id', 'student_scores.id')
+                        ->select('student_score_details.score as score_test')
+                        ->where('student_id', $getStudent->id)
+                        ->where('price_id', $score->price_id)
+                        ->where('student_scores.test_id', 3)
+                        ->where('student_score_details.test_item_id', $item->id)
+                        ->value('score_test') ?? 0;
+
+                    $divider = 0;
+                    $sum_score = 0;
+
+                    if ($score1 != 0) {
+                        $sum_score += $score1;
+                        $divider++;
+                    }
+                    if ($score2 != 0) {
+                        $sum_score += $score2;
+                        $divider++;
+                    }
+                    if ($score3 != 0) {
+                        $sum_score += $score3;
+                        $divider++;
+                    }
+
+                    $score_test = $divider > 0 ? round($sum_score / $divider) : 0;
+                    $score_total += $score_test;
 
                     if (isset($itemCoordinates[$item->id])) {
                         $pdf->SetXY($itemCoordinates[$item->id][0], $itemCoordinates[$item->id][1]);
-                        $pdf->Cell(40, 10, $average . '/' . Helper::getGrade($average), '', 0, 'L');
+                        $pdf->Cell(40, 10, $score_test . '/' . Helper::getGrade($score_test), '', 0, 'L');
                     }
                 }
 
-                $score_average = $jumlah_items > 0 ? round($score_total / $jumlah_items) : 0;
                 $pdf->SetFont('Arial', 'B', 45);
-                $pdf->SetXY(133, 130);
-                $pdf->Cell(40, 70, $score_average . '/' . Helper::getGrade($score_average), '', 0, 'C');
+                $score_average = round($score_total / 6);
+                $pdf->SetXY(87, 155);
+                $pdf->Cell(120, 20, $score_average . '/' . Helper::getGrade($score_average), '', 0, 'C');
             }
 
             $pdf->SetFont('Arial', 'B', 20);

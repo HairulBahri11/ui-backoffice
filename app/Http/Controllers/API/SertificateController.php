@@ -639,30 +639,48 @@ class SertificateController extends Controller
 
             $pdf->SetFont('Arial', 'B', 20);
             if (in_array($score->price_id, [1, 2, 3, 4, 5, 6])) {
-                // Skor Productive Skills (Writing & Speaking)
-                $productiveSkillsScore = DB::table('student_scores')
+                $testItemsTOD = TestItems::whereIn('name', ['Writing', 'Speaking', 'Reading', 'Listening'])
+                    ->orderByRaw("FIELD(name, 'Writing', 'Speaking', 'Reading', 'Listening')")
+                    ->get()
+                    ->keyBy('name');
+
+                $writingScore = DB::table('student_scores')
                     ->join('student_score_details', 'student_score_details.student_score_id', 'student_scores.id')
-                    ->join('test_items', 'test_items.id', 'student_score_details.test_item_id')
                     ->where('student_id', $getStudent->id)
                     ->where('price_id', $score->price_id)
-                    ->whereIn('test_items.name', ['Writing', 'Speaking'])
-                    ->avg('student_score_details.score') ?? 0;
+                    ->where('student_score_details.test_item_id', $testItemsTOD['Writing']->id ?? null)
+                    ->value('student_score_details.score') ?? '';
                 $pdf->SetXY(123, 119);
-                $pdf->Cell(40, 10, round($productiveSkillsScore, 0) . '/' . Helper::getGrade(round($productiveSkillsScore, 0)), '', 0, 'L');
+                $pdf->Cell(40, 10, $writingScore . '/' . Helper::getGrade($writingScore), '', 0, 'L');
 
-                // Skor Receptive Skills (Reading & Listening)
-                $receptiveSkillsScore = DB::table('student_scores')
+                $speakingScore = DB::table('student_scores')
                     ->join('student_score_details', 'student_score_details.student_score_id', 'student_scores.id')
-                    ->join('test_items', 'test_items.id', 'student_score_details.test_item_id')
                     ->where('student_id', $getStudent->id)
                     ->where('price_id', $score->price_id)
-                    ->whereIn('test_items.name', ['Reading', 'Listening'])
-                    ->avg('student_score_details.score') ?? 0;
-                $pdf->SetXY(197, 119);
-                $pdf->Cell(40, 10, round($receptiveSkillsScore, 0) . '/' . Helper::getGrade(round($receptiveSkillsScore, 0)), '', 0, 'L');
+                    ->where('student_score_details.test_item_id', $testItemsTOD['Speaking']->id ?? null)
+                    ->value('student_score_details.score') ?? '';
+                $pdf->SetXY(123, 128);
+                $pdf->Cell(40, 10, $speakingScore . '/' . Helper::getGrade($speakingScore), '', 0, 'L');
 
-                // Rata-rata Keseluruhan
-                $overallScore = round(($productiveSkillsScore + $receptiveSkillsScore) / 2);
+                $readingScore = DB::table('student_scores')
+                    ->join('student_score_details', 'student_score_details.student_score_id', 'student_scores.id')
+                    ->where('student_id', $getStudent->id)
+                    ->where('price_id', $score->price_id)
+                    ->where('student_score_details.test_item_id', $testItemsTOD['Reading']->id ?? null)
+                    ->value('student_score_details.score') ?? '';
+                $pdf->SetXY(197, 119);
+                $pdf->Cell(40, 10, $readingScore . '/' . Helper::getGrade($readingScore), '', 0, 'L');
+
+                $listeningScore = DB::table('student_scores')
+                    ->join('student_score_details', 'student_score_details.student_score_id', 'student_scores.id')
+                    ->where('student_id', $getStudent->id)
+                    ->where('price_id', $score->price_id)
+                    ->where('student_score_details.test_item_id', $testItemsTOD['Listening']->id ?? null)
+                    ->value('student_score_details.score') ?? '';
+                $pdf->SetXY(197, 128);
+                $pdf->Cell(40, 10, $listeningScore . '/' . Helper::getGrade($listeningScore), '', 0, 'L');
+
+                $overallScore = round(collect([$writingScore, $speakingScore, $readingScore, $listeningScore])->avg());
                 $pdf->SetFont('Arial', 'B', 45);
                 $pdf->SetXY(133, 130);
                 $pdf->Cell(40, 70, $overallScore . '/' . Helper::getGrade($overallScore), '', 0, 'C');

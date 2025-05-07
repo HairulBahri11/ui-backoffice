@@ -419,15 +419,11 @@ class SertificateController extends Controller
 
             // Ambil informasi class berdasarkan classId (price_id)
             $class = DB::table('price')
-                ->join('student', 'student.id', '=', $studentId)
-                ->select(
-                    'price.program',
-                    'student.is_certificate',
-                    'student.date_certificate',
-                    DB::raw("$classId as priceid")
-                )
+                ->join('student', 'student.id', '=', DB::raw($studentId))
+                ->select('price.program', 'student.is_certificate', 'student.date_certificate', DB::raw("'$classId' as priceid"))
                 ->where('price.id', $classId)
                 ->first();
+
 
             $getStudent->priceid = $classId;
 

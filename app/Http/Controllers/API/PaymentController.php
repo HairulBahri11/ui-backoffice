@@ -474,16 +474,38 @@ class PaymentController extends Controller
                     continue;
                 }
 
-                $message = "*📢 Pengumuman 📢*\n\n" .
-                    "*Yth: Orang tua murid " . $datanya['name'] . ",*\n\n" .
-                    "Mohon segera melakukan pembayaran *SPP* untuk bulan berikut:\n\n" .
+                // $message = "*📢 Pengumuman 📢*\n\n" .
+                //     "*Yth: Orang tua murid " . $datanya['name'] . ",*\n\n" .
+                //     "Mohon segera melakukan pembayaran *SPP* untuk bulan berikut:\n\n" .
+                //     implode(", ", $monthsUnpaid) . "\n\n" .
+                //     "Total yang harus dibayar: *Rp" . number_format($totalAmount, 0, ',', '.') . "*.\n\n" .
+                //     "● Pembayaran bisa dilakukan langsung di *front desk U&I* atau transfer ke *BCA (Lie Citro Dewi Ruslie) 464 1327 187* hingga akhir bulan ini.\n\n" .
+                //     "● Pembayaran lewat batas waktu akan dikenakan *biaya keterlambatan 10%*.\n\n" .
+                //     "Terima kasih.\n\n" .
+                //     "*U&I ENGLISH COURSE*\n\n" .
+                //     "*NB: Abaikan pesan ini jika telah melakukan pembayaran.*";
+
+                $message = "*📢 PENGUMUMAN PEMBAYARAN 📢*\n\n" .
+                    "*Yth. Bapak/Ibu Orang Tua/Wali Murid " . $datanya['name'] . ",*\n\n" .
+                    "Mohon segera melakukan pembayaran *SPP* untuk bulan berikut:\n" .
                     implode(", ", $monthsUnpaid) . "\n\n" .
-                    "Total yang harus dibayar: *Rp" . number_format($totalAmount, 0, ',', '.') . "*.\n\n" .
-                    "● Pembayaran bisa dilakukan langsung di *front desk U&I* atau transfer ke *BCA (Lie Citro Dewi Ruslie) 464 1327 187* hingga akhir bulan ini.\n\n" .
-                    "● Pembayaran lewat batas waktu akan dikenakan *biaya keterlambatan 10%*.\n\n" .
-                    "Terima kasih.\n\n" .
-                    "*U&I ENGLISH COURSE*\n\n" .
-                    "*NB: Abaikan pesan ini jika telah melakukan pembayaran.*";
+                    "*Total yang harus dibayar: Rp" . number_format($totalAmount, 0, ',', '.') . "*\n\n" .
+                    "📌 *Pembayaran dapat dilakukan melalui:*\n" .
+                    "• Front desk *U&I* (tunai/kartu)\n" .
+                    "• Transfer ke *BCA a.n. Lie Citro Dewi Ruslie*\n" .
+                    "  No. Rek: *464 1327 187*\n\n" .
+                    "*Batas waktu pembayaran adalah sampai akhir bulan ini.*\n" .
+                    "Pembayaran lewat batas waktu tersebut akan dikenakan *biaya keterlambatan 10%*.\n\n" .
+                    "📌 *Konfirmasi Pembayaran:*\n" .
+                    "Jika Bapak/Ibu telah membayar namun belum menerima e-struk/nota, mohon kirimkan:\n" .
+                    "• Bukti transfer\n" .
+                    "• Nama siswa/No. ID\n" .
+                    "• Program/Kelas\n" .
+                    "Agar pembayaran dapat diproses dengan tepat.\n\n" .
+                    "Terima kasih atas kerjasamanya. 🙏\n\n" .
+                    "*U&I English Course*\n\n" .
+                    "_NB: Abaikan pesan ini jika pembayaran sudah dilakukan dan dikonfirmasi._";
+
 
                 // 🟢 Perbaikan jumlah argumen di Helper::sendBroadCast
                 $send = Helper::sendBroadCast($datanya['phone'], $message); // Pastikan hanya mengirim argumen yang dibutuhkan

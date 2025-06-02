@@ -59,10 +59,10 @@
 
         /* Create the permissionCheckBox/indicator (hidden when not checked) */
         /*.permissionCheckBox:after {
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        content: "";
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        position: absolute;
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        display: none;
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    }*/
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            content: "";
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            position: absolute;
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            display: none;
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        }*/
 
 
 
@@ -74,10 +74,10 @@
 
         /* Show the permissionCheckBox when checked */
         /*.permission input[type=checkbox]:checked~.permissionCheckBox:after {
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        display: block;
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    }*.
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            display: block;
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        }*.
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    /* Style the permissionCheckBox/indicator */
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        /* Style the permissionCheckBox/indicator */
         .permission .permissionCheckBox::after {
             left: 9px;
             top: 5px;
@@ -121,10 +121,10 @@
 
         /* Create the alphaCheckBox/indicator (hidden when not checked) */
         /*.alphaCheckBox:after {
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        content: "";
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        position: absolute;
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        display: none;
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    }*/
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            content: "";
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            position: absolute;
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            display: none;
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        }*/
 
         span.alphaCheckBox.checked::after {
             content: "";
@@ -134,8 +134,8 @@
 
         /* Show the alphaCheckBox when checked */
         /*.alpha input[type=checkbox]:checked~.alphaCheckBox:after {
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        display: block;
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    }*/
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            display: block;
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        }*/
 
 
 
@@ -1073,7 +1073,67 @@
             }
         }
 
+        // function confirm_update() {
+        //     swal("Are you sure ?", "Data will be updated", {
+        //         icon: "info",
+        //         buttons: {
+        //             confirm: {
+        //                 className: 'btn btn-success',
+        //                 text: 'Ok'
+        //             },
+        //             dismiss: {
+        //                 className: 'btn btn-secondary',
+        //                 text: 'Cancel'
+        //             },
+        //         },
+        //     }).then((result) => {
+        //         /* Read more about isConfirmed, isDenied below */
+        //         if (result == true) {
+        //             $('#form-submit').submit();
+        //         }
+        //     });
+        //     $('#form-submit').submit(function() {
+        //         $('#btn-success').addClass('disabled');
+        //     });
+        // }
+
+        // function confirm_submit() {
+        //     swal("Are you sure ?", "Data will be submitted", {
+        //         icon: "info",
+        //         buttons: {
+        //             confirm: {
+        //                 className: 'btn btn-success',
+        //                 text: 'Ok'
+        //             },
+        //             dismiss: {
+        //                 className: 'btn btn-secondary',
+        //                 text: 'Cancel'
+        //             },
+        //         },
+        //     }).then((result) => {
+        //         /* Read more about isConfirmed, isDenied below */
+        //         if (result == true) {
+        //             $('#form-submit').submit();
+        //         }
+        //     });
+        //     $('#form-submit').submit(function() {
+        //         $('#btn-success').addClass('disabled');
+        //     });
+        // }
+
         function confirm_update() {
+            // 1. Dapatkan elemen form native DOM
+            const form = $('#form-submit')[0];
+
+            // 2. Lakukan validasi HTML5 bawaan browser
+            // Jika form tidak valid (ada input 'required' yang kosong, dll.),
+            // reportValidity() akan menampilkan pesan kesalahan browser.
+            if (!form.checkValidity()) {
+                form.reportValidity(); // Ini akan menampilkan pesan validasi
+                return; // Hentikan fungsi jika form tidak valid
+            }
+
+            // 3. Jika form valid, tampilkan SweetAlert untuk konfirmasi update
             swal("Are you sure ?", "Data will be updated", {
                 icon: "info",
                 buttons: {
@@ -1081,23 +1141,43 @@
                         className: 'btn btn-success',
                         text: 'Ok'
                     },
-                    dismiss: {
+                    dismiss: { // Gunakan 'cancel' jika Anda menggunakan SweetAlert2
                         className: 'btn btn-secondary',
                         text: 'Cancel'
                     },
                 },
             }).then((result) => {
-                /* Read more about isConfirmed, isDenied below */
+                // 4. Jika pengguna mengklik 'Ok' (confirm)
                 if (result == true) {
+                    // Kirimkan formulir secara programatis
+                    // Form sudah divalidasi di awal, jadi aman untuk dikirim
                     $('#form-submit').submit();
                 }
+                // Jika pengguna mengklik 'Cancel', tidak ada yang dilakukan
             });
+
+            // Ini adalah handler yang akan berjalan setelah formulir benar-benar disubmit (setelah konfirmasi)
             $('#form-submit').submit(function() {
-                $('#btn-success').addClass('disabled');
+                $('#btn-success').addClass('disabled'); // Pastikan ID ini sesuai dengan tombol submit Anda
+                // Anda juga bisa menonaktifkan semua tombol submit
+                // $('button[type="submit"]').addClass('disabled');
             });
         }
 
         function confirm_submit() {
+            // 1. Dapatkan elemen form native DOM
+            // Menggunakan [0] untuk mendapatkan elemen DOM dari objek jQuery
+            const form = $('#form-submit')[0];
+
+            // 2. Lakukan validasi HTML5 bawaan browser
+            // checkValidity() akan mengembalikan false jika ada input 'required' yang kosong atau invalid.
+            // Jika tidak valid, reportValidity() akan menampilkan pesan error browser.
+            if (!form.checkValidity()) {
+                form.reportValidity(); // Ini akan menampilkan pesan validasi di browser
+                return; // Hentikan fungsi jika form tidak valid
+            }
+
+            // 3. Jika form valid, tampilkan SweetAlert untuk konfirmasi
             swal("Are you sure ?", "Data will be submitted", {
                 icon: "info",
                 buttons: {
@@ -1105,19 +1185,27 @@
                         className: 'btn btn-success',
                         text: 'Ok'
                     },
-                    dismiss: {
+                    dismiss: { // Gunakan 'cancel' jika Anda menggunakan SweetAlert2
                         className: 'btn btn-secondary',
                         text: 'Cancel'
                     },
                 },
             }).then((result) => {
-                /* Read more about isConfirmed, isDenied below */
+                // 4. Jika pengguna mengklik 'Ok' (confirm)
                 if (result == true) {
+                    // Kirimkan formulir secara programatis
+                    // Kali ini, form sudah divalidasi, jadi aman untuk dikirim
                     $('#form-submit').submit();
                 }
+                // Jika pengguna mengklik 'Cancel', tidak ada yang dilakukan
             });
+
+            // Ini adalah handler yang akan berjalan setelah formulir berhasil disubmit
+            // Baik melalui tombol submit normal atau $('#form-submit').submit() di atas
             $('#form-submit').submit(function() {
-                $('#btn-success').addClass('disabled');
+                $('#btn-success').addClass('disabled'); // Pastikan ID ini sesuai dengan tombol submit Anda
+                // Anda juga bisa menonaktifkan semua tombol submit untuk mencegah klik ganda
+                // $('button[type="submit"]').addClass('disabled');
             });
         }
     </script>
@@ -1238,5 +1326,56 @@
                 year: 'numeric',
             });
         }
+
+        function updateDateRequiredStatus() {
+            let hasValueAfterInteraction = false; // Flag untuk mengecek apakah ada input 'id_test[]' yang memiliki nilai
+
+            // Loop melalui semua input dengan name 'id_test[]'
+            $('input[name="id_test[]"]').each(function() {
+                if ($(this).val() !==
+                    '') { // MEMERIKSA: Apakah input id_test[] saat ini memiliki nilai (tidak kosong)?
+                    hasValueAfterInteraction = true; // Jika ya, set flag menjadi true
+                    return false; // Hentikan loop karena kita sudah menemukan setidaknya satu nilai
+                }
+            });
+
+            // Anda bisa menghapus bagian ini jika tidak lagi perlu mencetak semua nilai di konsol
+            // let allIdTestValues = [];
+            // $('input[name="id_test[]"]').each(function() {
+            //     allIdTestValues.push($(this).val());
+            // });
+            // console.log("Current id_test[] values:", allIdTestValues);
+
+
+            if (hasValueAfterInteraction) { // KONDISI: JIKA ada 'id_test[]' yang memiliki nilai (setelah interaksi pengguna)
+                // Maka, buat date_review dan date_test menjadi required
+                $('input[name="date_review"]').prop('required', true);
+                $('input[name="date_test"]').prop('required', true);
+                console.log("id_test[] ada nilai setelah interaksi. date_review & date_test: REQUIRED.");
+            } else { // KONDISI: JIKA TIDAK ADA 'id_test[]' yang memiliki nilai (setelah interaksi pengguna)
+                // Maka, buat date_review dan date_test TIDAK required
+                $('input[name="date_review"]').prop('required', false);
+                $('input[name="date_test"]').prop('required', false);
+                console.log("id_test[] kosong setelah interaksi. date_review & date_test: TIDAK REQUIRED.");
+            }
+        }
+
+        $(document).ready(function() {
+            // *** PENTING: HAPUS BARIS INI ***
+            // updateDateRequiredStatus(); // Ini yang membuat required aktif saat page load, meskipun tidak ada interaksi
+
+            // Jalankan fungsi updateDateRequiredStatus hanya ketika ada perubahan (interaksi) pada input 'id_test[]'
+            $('input[name="id_test[]"]').on('change keyup', function() {
+                updateDateRequiredStatus();
+            });
+
+            // Opsional: Anda bisa tambahkan trigger on 'focus' jika Anda ingin required aktif bahkan hanya dengan mengklik/memfokuskan input tanpa mengubah nilainya.
+            // Tapi berdasarkan penjelasan "ketika di klik baru required" dan "change keyup", ini mungkin sudah cukup.
+            // $('input[name="id_test[]"]').on('focus', function() {
+            //     // Anda mungkin perlu logika yang lebih halus di sini
+            //     // atau simply memanggil updateDateRequiredStatus() jika fokus saja sudah cukup sebagai trigger.
+            //     // Namun, biasanya 'change' dan 'keyup' lebih akurat untuk "memiliki value".
+            // });
+        });
     </script>
 @endpush

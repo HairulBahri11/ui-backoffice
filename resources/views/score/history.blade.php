@@ -124,7 +124,7 @@
                                                             <td>{{ $item->average_score }}</td>
                                                             <td>{{ Helper::getGrade($item->average_score) }}</td>
                                                             <td>{{ $item->comment }}</td>
-                                                            <td>{{ $item->created_at ? Carbon\Carbon::parse($item->created_at)->format('d M Y h:i A') : '-' }}
+                                                            <td>{{ $item->date ? Carbon\Carbon::parse($item->date)->format('d M Y') : '-' }}
                                                             </td>
                                                         </tr>
                                                     @endforeach

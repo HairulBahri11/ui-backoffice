@@ -143,7 +143,7 @@
                                             <tbody>
                                                 <tr>
                                                     <td colspan="5" class="text-center">
-                                                        <h1>Pilih siswa untuk melihat histori sertifikat.</h1>
+                                                        <h1>Please select a student.</h1>
                                                     </td>
                                                 </tr>
                                             </tbody>

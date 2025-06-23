@@ -9,6 +9,7 @@ use App\Models\Students;
 use App\Models\TestItems;
 use App\Models\StudentScore;
 use Illuminate\Http\Request;
+use App\Models\HistoryCertificate;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 
@@ -757,6 +758,9 @@ class SertificateController extends Controller
 
             $getStudent = Students::with('teacher')->findOrFail($studentId);
 
+            // cek history certificate
+            $history_certificate = HistoryCertificate::where('student_id', $studentId)->where('price_id', $classId)->first();
+
             $class = DB::table('price')
                 ->where('id', $classId)
                 ->select('program')
@@ -800,7 +804,7 @@ class SertificateController extends Controller
 
             $pdf->SetFont('Arial', 'B', 15);
             $pdf->SetXY(75, 92);
-            $pdf->Cell(60, 10, $getStudent->date_certificate ? \Carbon\Carbon::parse($getStudent->date_certificate)->format('j F Y') : \Carbon\Carbon::now()->format('j F Y'), 0, 'L');
+            $pdf->Cell(60, 10, $history_certificate->date_certificate ? \Carbon\Carbon::parse($history_certificate->date_certificate)->format('j F Y') : \Carbon\Carbon::now()->format('j F Y'), 0, 'L');
 
             $pdf->SetFont('Arial', 'B', 20);
             if (in_array($score->price_id, [1, 2, 3, 4, 5, 6])) {

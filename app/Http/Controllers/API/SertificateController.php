@@ -768,8 +768,7 @@ class SertificateController extends Controller
             $getStudent->program = $class->program ?? '';
 
 
-            // cek history certificate
-            $history_certificate = HistoryCertificate::where('student_id', $studentId)->where('price_id', $getStudent->priceid)->first();
+
 
             $score = StudentScore::join('tests as t', 't.id', 'student_scores.test_id')
                 ->join('price as p', 'p.id', 'student_scores.price_id')
@@ -783,6 +782,15 @@ class SertificateController extends Controller
                     'code' => '404',
                     'message' => 'Score not found for this class.',
                 ], 404);
+            }
+
+            // cek history certificate
+            $history_certificate = HistoryCertificate::where('student_id', $studentId)->where('price_id', $classId)->first();
+            if ($history_certificate) {
+                return response()->json([
+                    'code' => '400',
+                    'message' => 'Certificate already issued.',
+                ], 400);
             }
 
             new \App\Libraries\Pdf();

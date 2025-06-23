@@ -206,6 +206,13 @@
                             </a>
 
                         </li>
+                        <li class="nav-item {{ Request::segment(1) == 'history-certificate' ? 'active' : '' }}">
+                            <a href="{{ url('/history-certificate') }}" class="collapsed">
+                                <i class="fas fa-certificate"></i>
+                                <p>History Certificate</p>
+                            </a>
+
+                        </li>
                     @endif
                     <li class="nav-item {{ Request::segment(1) == 'follow-up' ? 'active' : '' }}">
                         <a href="{{ url('/follow-up') }}" class="collapsed">

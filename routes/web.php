@@ -18,6 +18,7 @@ use App\Http\Controllers\ReedemItemsController;
 use App\Http\Controllers\ReedemPointController;
 use App\Http\Controllers\birthdayPoinController;
 use App\Http\Controllers\EcertificateController;
+use App\Http\Controllers\historyCertificateController;
 use App\Http\Controllers\ScheduleClassController;
 use App\Http\Controllers\ParentStudentsController;
 use App\Http\Controllers\PointCategoriesController;
@@ -133,4 +134,6 @@ Route::middleware(['web'])->group(function () {
 
     Route::get('/extra-point', [ExamPointController::class, 'index']);
     Route::post('/extra-point/store', [ExamPointController::class, 'store'])->name('extra-point.store');
+
+    Route::get('/history-certificate', [historyCertificateController::class, 'index'])->name('history-certificate.index');
 });

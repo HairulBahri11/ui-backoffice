@@ -2,15 +2,16 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\FollowUp;
+use Carbon\Carbon;
 use App\Models\Price;
+use App\Models\Tests;
+use App\Models\FollowUp;
 use App\Models\Students;
 use App\Models\TestItems;
-use App\Models\Tests;
-use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
+use App\Models\HistoryCertificate;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 
 class EcertificateController extends Controller
 {
@@ -107,9 +108,19 @@ class EcertificateController extends Controller
                         'date_certificate' => $request->date_certificate,
                         'is_certificate' => true,
                     ]);
+
+                    // create history_certificate
+                    $history_certificate = new HistoryCertificate();
+                    $history_certificate->student_id = $request->student_id;
+                    $history_certificate->day_1 = $followUp->old_day_1;
+                    $history_certificate->day_2 = $followUp->old_day_2;
+                    $history_certificate->course_time = $followUp->course_time;
+                    $history_certificate->price_id = $followUp->old_price_id;
+                    $history_certificate->teacher_id = $followUp->old_teacher_id;
+                    $history_certificate->date_certificate = $request->date_certificate;
+                    $history_certificate->save();
                     // Delete Follow Up
                     $followUp->delete();
-                } else {
                 }
             } else {
                 foreach ($request->student_id as $key => $value) {
@@ -126,6 +137,17 @@ class EcertificateController extends Controller
                             'date_certificate' => $request->date_certificate,
                             'is_certificate' => true,
                         ]);
+
+                        // create history_certificate
+                        $history_certificate = new HistoryCertificate();
+                        $history_certificate->student_id = $value;
+                        $history_certificate->day_1 = $students->day1;
+                        $history_certificate->day_2 = $students->day2;
+                        $history_certificate->course_time = $students->course_time;
+                        $history_certificate->price_id = $students->priceid;
+                        $history_certificate->teacher_id = $students->id_teacher;
+                        $history_certificate->date_certificate = $request->date_certificate;
+                        $history_certificate->save();
                     } else {
                         // Follow Up
                         $followUp = new FollowUp();

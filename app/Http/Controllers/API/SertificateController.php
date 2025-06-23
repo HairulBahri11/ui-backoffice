@@ -758,8 +758,6 @@ class SertificateController extends Controller
 
             $getStudent = Students::with('teacher')->findOrFail($studentId);
 
-            // cek history certificate
-            $history_certificate = HistoryCertificate::where('student_id', $studentId)->where('price_id', $classId)->first();
 
             $class = DB::table('price')
                 ->where('id', $classId)
@@ -768,6 +766,10 @@ class SertificateController extends Controller
 
             $getStudent->priceid = $classId;
             $getStudent->program = $class->program ?? '';
+
+
+            // cek history certificate
+            $history_certificate = HistoryCertificate::where('student_id', $studentId)->where('price_id', $getStudent->priceid)->first();
 
             $score = StudentScore::join('tests as t', 't.id', 'student_scores.test_id')
                 ->join('price as p', 'p.id', 'student_scores.price_id')

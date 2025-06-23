@@ -785,13 +785,25 @@ class SertificateController extends Controller
             }
 
             // cek history certificate
-            $history_certificate = HistoryCertificate::where('student_id', $studentId)->where('price_id', $classId)->first();
+            $history_certificate = HistoryCertificate::where('student_id', $studentId)
+                ->where('price_id', $getStudent->priceid)
+                ->first();
+
+            // Lakukan pengecekan sebelum menggunakan $history_certificate
             if ($history_certificate) {
-                return response()->json([
-                    'code' => '400',
-                    'message' => 'Certificate already issued.',
-                ], 400);
+                // Jika $history_certificate ditemukan (bukan null), gunakan nilainya
+                $dateToDisplay = $history_certificate->date_certificate ? \Carbon\Carbon::parse($history_certificate->date_certificate)->format('j F Y') : \Carbon\Carbon::now()->format('j F Y');
+            } else {
+                // Jika $history_certificate tidak ditemukan (null), gunakan tanggal saat ini atau default lainnya
+                // Atau Anda bisa menangani kasus ini dengan cara lain, misalnya:
+                // - Memberikan pesan error kepada pengguna
+                // - Melewatkan pembuatan sel ini
+                // - Mengatur nilai default yang berbeda
+                $dateToDisplay = \Carbon\Carbon::now()->format('j F Y'); // Default jika tidak ada history
+                // Atau jika Anda tidak ingin mencetak apa-apa jika tidak ada history:
+                // return redirect()->back()->with('error', 'History certificate not found for this student and class.');
             }
+
 
             new \App\Libraries\Pdf();
             $pdf = new \setasign\Fpdi\Fpdi();
@@ -814,8 +826,8 @@ class SertificateController extends Controller
 
             $pdf->SetFont('Arial', 'B', 15);
             $pdf->SetXY(75, 92);
-            $pdf->Cell(60, 10, $history_certificate->date_certificate ? \Carbon\Carbon::parse($history_certificate->date_certificate)->format('j F Y') : \Carbon\Carbon::now()->format('j F Y'), 0, 'L');
-
+            // $pdf->Cell(60, 10, $dateToDisplay ? \Carbon\Carbon::parse($dateToDisplay)->format('j F Y') : \Carbon\Carbon::now()->format('j F Y'), 0, 'L');
+            $pdf->Cell(60, 10, $dateToDisplay, 0, 'L');
             $pdf->SetFont('Arial', 'B', 20);
             if (in_array($score->price_id, [1, 2, 3, 4, 5, 6])) {
                 $testItems = TestItems::get();

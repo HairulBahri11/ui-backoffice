@@ -64,7 +64,13 @@
                             @php
                                 $testItem = DB::table('test_items')->get();
                                 $studentScore = DB::table('student_scores')
-                                    ->select('student_scores.*', 'student.name', 'tests.name as test_name', 'price.program as class', 'teacher.name as teacher_name')
+                                    ->select(
+                                        'student_scores.*',
+                                        'student.name',
+                                        'tests.name as test_name',
+                                        'price.program as class',
+                                        'teacher.name as teacher_name',
+                                    )
                                     ->join('student', 'student.id', 'student_scores.student_id')
                                     ->join('tests', 'tests.id', 'student_scores.test_id')
                                     ->join('price', 'price.id', 'student_scores.price_id')
@@ -92,6 +98,7 @@
                                                         <th class="text-center">Average</th>
                                                         <th class="text-center">Grade</th>
                                                         <th class="text-center">Comment For Student</th>
+                                                        <th class="text-center">Created At</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
@@ -117,6 +124,8 @@
                                                             <td>{{ $item->average_score }}</td>
                                                             <td>{{ Helper::getGrade($item->average_score) }}</td>
                                                             <td>{{ $item->comment }}</td>
+                                                            <td>{{ $item->created_at ? Carbon\Carbon::parse($item->created_at)->format('d M Y h:i A') : '-' }}
+                                                            </td>
                                                         </tr>
                                                     @endforeach
                                                 </tbody>

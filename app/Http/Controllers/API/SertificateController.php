@@ -784,6 +784,26 @@ class SertificateController extends Controller
                 ], 404);
             }
 
+            // cek 
+            $available_score = StudentScore::join('tests as t', 't.id', 'student_scores.test_id')
+                ->join('price as p', 'p.id', 'student_scores.price_id')
+                ->select('p.program', 'student_scores.price_id', 'student_scores.date')
+                ->where('student_scores.price_id', $classId)
+                ->where('student_scores.student_id', $studentId)
+                ->where('student_scores.test_id', 3) // Coba ambil test_id 3 dulu
+                ->first();
+
+            // Jika tidak ditemukan test_id 3, baru cari test_id 2
+            if (is_null($available_score)) {
+                $available_score = StudentScore::join('tests as t', 't.id', 'student_scores.test_id')
+                    ->join('price as p', 'p.id', 'student_scores.price_id')
+                    ->select('p.program', 'student_scores.price_id', 'student_scores.date')
+                    ->where('student_scores.price_id', $classId)
+                    ->where('student_scores.student_id', $studentId)
+                    ->where('student_scores.test_id', 2) // Cari test_id 2
+                    ->first();
+            }
+
             // cek history certificate
             $history_certificate = HistoryCertificate::where('student_id', $studentId)
                 ->where('price_id', $getStudent->priceid)
@@ -794,14 +814,17 @@ class SertificateController extends Controller
                 // Jika $history_certificate ditemukan (bukan null), gunakan nilainya
                 $dateToDisplay = $history_certificate->date_certificate ? \Carbon\Carbon::parse($history_certificate->date_certificate)->format('j F Y') : \Carbon\Carbon::now()->format('j F Y');
             } else {
-                // Jika $history_certificate tidak ditemukan (null), gunakan tanggal saat ini atau default lainnya
-                // Atau Anda bisa menangani kasus ini dengan cara lain, misalnya:
-                // - Memberikan pesan error kepada pengguna
-                // - Melewatkan pembuatan sel ini
-                // - Mengatur nilai default yang berbeda
-                $dateToDisplay = \Carbon\Carbon::now()->format('j F Y'); // Default jika tidak ada history
-                // Atau jika Anda tidak ingin mencetak apa-apa jika tidak ada history:
-                // return redirect()->back()->with('error', 'History certificate not found for this student and class.');
+                $dateToDisplay = \Carbon\Carbon::now()->format('j F Y');
+                // insert history certificate
+                HistoryCertificate::create([
+                    'student_id' => $studentId,
+                    'price_id' => $getStudent->priceid,
+                    'day_1' => $getStudent->day1,
+                    'day_2' => $getStudent->day2,
+                    'course_time' => $getStudent->course_time,
+                    'teacher_id' => $getStudent->id_teacher,
+                    'date_certificate' => $getStudent->date_certificate != null ? $getStudent->date_certificate : $available_score->date,
+                ]);
             }
 
 

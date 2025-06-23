@@ -814,9 +814,9 @@ class SertificateController extends Controller
                 // Jika $history_certificate ditemukan (bukan null), gunakan nilainya
                 $dateToDisplay = $history_certificate->date_certificate ? \Carbon\Carbon::parse($history_certificate->date_certificate)->format('j F Y') : \Carbon\Carbon::now()->format('j F Y');
             } else {
-                $dateToDisplay = \Carbon\Carbon::now()->format('j F Y');
+
                 // insert history certificate
-                HistoryCertificate::create([
+                $data = HistoryCertificate::create([
                     'student_id' => $studentId,
                     'price_id' => $getStudent->priceid,
                     'day_1' => $getStudent->day1,
@@ -825,6 +825,7 @@ class SertificateController extends Controller
                     'teacher_id' => $getStudent->id_teacher,
                     'date_certificate' => $getStudent->date_certificate != null ? $getStudent->date_certificate : $available_score->date,
                 ]);
+                $dateToDisplay = $data->date_certificate ? \Carbon\Carbon::parse($data->date_certificate)->format('j F Y') : \Carbon\Carbon::now()->format('j F Y');
             }
 
 

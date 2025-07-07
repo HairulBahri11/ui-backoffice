@@ -215,7 +215,7 @@
                                         <div class="col-md-12">
                                             @if ($data->announces)
                                                 <!--<img style="width: 100%"
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            src="{{ url('/storage') . '/' . $data->announces->banner }}" alt="">-->
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                src="{{ url('/storage') . '/' . $data->announces->banner }}" alt="">-->
                                                 <img style="width: 100%" src="{{ url($data->announces->banner) }}"
                                                     alt="">
                                             @endif
@@ -240,6 +240,8 @@
                             {{-- <small class="text-white text-center text-danger">*Ignore if the birthday field has already
                                 been
                                 filled in</small> --}}
+
+                            {{-- {{ $student_birthday_notification }} --}}
 
                             <ul class="list-group list-group-flush">
                                 @php
@@ -289,8 +291,8 @@
                                     // dd($birthday_points);
 
                                 @endphp
-                                @if (!empty($birthday_points))
-                                    @foreach ($birthday_points as $student)
+                                @if (!empty($student_birthday_notification))
+                                    @foreach ($student_birthday_notification as $student)
                                         <li
                                             class="list-group-item mt-2 bg-white rounded shadow-sm p-3 d-flex justify-content-between align-items-center">
                                             <div>

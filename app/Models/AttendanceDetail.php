@@ -11,4 +11,10 @@ class AttendanceDetail extends Model
     use HasFactory;
     protected $table = 'attendance_details';
     protected $fillable = ['attendance_id', 'student_id', 'is_absent', 'total_point', 'is_permission', 'is_alpha'];
+
+
+    public function points()
+    {
+        return $this->hasMany(AttendanceDetailPoint::class, 'attendance_detail_id');
+    }
 }

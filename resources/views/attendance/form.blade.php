@@ -59,10 +59,10 @@
 
         /* Create the permissionCheckBox/indicator (hidden when not checked) */
         /*.permissionCheckBox:after {
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            content: "";
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            position: absolute;
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            display: none;
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        }*/
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    content: "";
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    position: absolute;
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    display: none;
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                }*/
 
 
 
@@ -74,10 +74,10 @@
 
         /* Show the permissionCheckBox when checked */
         /*.permission input[type=checkbox]:checked~.permissionCheckBox:after {
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            display: block;
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        }*.
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    display: block;
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                }*.
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        /* Style the permissionCheckBox/indicator */
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                /* Style the permissionCheckBox/indicator */
         .permission .permissionCheckBox::after {
             left: 9px;
             top: 5px;
@@ -121,10 +121,10 @@
 
         /* Create the alphaCheckBox/indicator (hidden when not checked) */
         /*.alphaCheckBox:after {
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            content: "";
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            position: absolute;
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            display: none;
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        }*/
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    content: "";
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    position: absolute;
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    display: none;
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                }*/
 
         span.alphaCheckBox.checked::after {
             content: "";
@@ -134,8 +134,8 @@
 
         /* Show the alphaCheckBox when checked */
         /*.alpha input[type=checkbox]:checked~.alphaCheckBox:after {
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            display: block;
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        }*/
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    display: block;
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                }*/
 
 
 
@@ -304,7 +304,7 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach ($student as $item)
+                                    {{-- @foreach ($student as $item)
                                         <tr>
                                             <th width="10%" scope="row">{{ $item->name }}</th>
                                             @if (Request::segment(2) == 'edit')
@@ -358,6 +358,78 @@
                                                     @else
                                                         <td width="5%"></td>
                                                     @endif
+                                                @endforeach
+                                            @endif
+                                        </tr>
+                                    @endforeach --}}
+
+                                    @php
+                                        // It's best to prepare this data in your controller or service provider
+// and pass it to the view, rather than doing it directly in the Blade file.
+// Assuming $student_birthday_notification is the array you provided.
+
+$birthdayStudentNames = collect($student_birthday_notification)
+    ->pluck('name')
+                                            ->toArray();
+                                    @endphp
+
+                                    @foreach ($student as $item)
+                                        <tr>
+                                            <th width="10%" scope="row">
+                                                {{ $item->name }}
+                                                @if (in_array($item->name, $birthdayStudentNames))
+                                                    <span class="badge badge-pill badge-primary"
+                                                        style="background-color: #ff69b4; margin-left: 5px;">
+                                                        <i class="fas fa-birthday-cake" style="color: white;"
+                                                            title="Happy Birthday!"></i>
+                                                        <span class="sr-only">Birthday Student!</span> {{-- For accessibility --}}
+                                                    </span>
+                                                @endif
+                                            </th>
+                                            @if (Request::segment(2) == 'edit')
+                                                @foreach ($attendance as $i)
+                                                    @php
+                                                        $cek = App\Models\AttendanceDetail::where(
+                                                            'attendance_id',
+                                                            $i->id,
+                                                        )->where('student_id', $item->id);
+                                                        $count = $cek->count();
+                                                        $attendanceDetail = $cek->first(); // Get the first result if it exists
+                                                    @endphp
+                                                    <td width="5%">
+                                                        @if ($count == 1 && $attendanceDetail->is_absent == '1')
+                                                            <span class="fa fa-check"></span>
+                                                        @elseif ($count == 1 && $attendanceDetail->is_permission == true)
+                                                            <span class="fas fa-hand-paper" style="color: green;"
+                                                                title="Permission"></span> {{-- Example: Permission icon --}}
+                                                        @elseif ($count == 1 && $attendanceDetail->is_alpha == true)
+                                                            <span class="fas fa-times" style="color: red;"
+                                                                title="Alpha"></span> {{-- Example: Absent icon --}}
+                                                        @endif
+                                                    </td>
+                                                @endforeach
+                                            @else
+                                                {{-- This block is identical to the 'edit' block, consider consolidating if possible --}}
+                                                @foreach ($attendance as $i)
+                                                    @php
+                                                        $cek = App\Models\AttendanceDetail::where(
+                                                            'attendance_id',
+                                                            $i->id,
+                                                        )->where('student_id', $item->id);
+                                                        $count = $cek->count();
+                                                        $attendanceDetail = $cek->first();
+                                                    @endphp
+                                                    <td width="5%">
+                                                        @if ($count == 1 && $attendanceDetail->is_absent == '1')
+                                                            <span class="fa fa-check"></span>
+                                                        @elseif ($count == 1 && $attendanceDetail->is_permission == true)
+                                                            <span class="fas fa-hand-paper" style="color: green;"
+                                                                title="Permission"></span>
+                                                        @elseif ($count == 1 && $attendanceDetail->is_alpha == true)
+                                                            <span class="fas fa-times" style="color: red;"
+                                                                title="Alpha"></span>
+                                                        @endif
+                                                    </td>
                                                 @endforeach
                                             @endif
                                         </tr>
@@ -439,11 +511,25 @@
                                                         if ($it->birthday == date('M d')) {
                                                             $birthDayPoint = 30;
                                                         }
+
+                                                        $birthdayStudentNames = collect($student_birthday_notification)
+                                                            ->pluck('name')
+                                                            ->toArray();
                                                     @endphp
                                                     <tr style="height: 40px!important">
                                                         <td class="text-center" style="">{{ $no }}
                                                         </td>
-                                                        <td style="">{{ ucwords($it->name) }}
+                                                        <td style="">
+                                                            {{ $it->name }}
+                                                            @if (in_array($it->name, $birthdayStudentNames))
+                                                                <span class="badge badge-pill badge-primary"
+                                                                    style="background-color: #ff69b4; margin-left: 5px;">
+                                                                    <i class="fas fa-birthday-cake" style="color: white;"
+                                                                        title="Happy Birthday!"></i>
+                                                                    <span class="sr-only">Birthday Student!</span>
+                                                                    {{-- For accessibility --}}
+                                                                </span>
+                                                            @endif
                                                         </td>
                                                         <input type="hidden" readonly name="studentId[]"
                                                             value="{{ $it->id }}">

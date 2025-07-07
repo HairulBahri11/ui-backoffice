@@ -51,6 +51,52 @@
             margin-left: 0.5rem !important;
             font-size: 1rem !important;
         }
+
+        /* If you're using Bootstrap 4/5 and not just Tailwind for positioning */
+        .position-relative {
+            position: relative !important;
+            /* Ensure the icon is the positioning context */
+        }
+
+        .birthday-notification-badge {
+            position: absolute;
+            top: -5px;
+            /* Adjust as needed */
+            right: -8px;
+            /* Adjust as needed */
+            font-size: 0.7em;
+            /* Make the font size smaller for the badge */
+            padding: 0.3em 0.5em;
+            /* Adjust padding to make it a neat pill */
+            border-radius: 50%;
+            /* Make it perfectly round */
+            line-height: 1;
+            /* Adjust line height to prevent vertical stretching */
+            min-width: 20px;
+            /* Ensure it's wide enough for double digits */
+            text-align: center;
+        }
+
+        /* Optional: Add a subtle bounce animation for attention */
+        @keyframes bounce-in {
+            0% {
+                transform: scale(0);
+                opacity: 0;
+            }
+
+            50% {
+                transform: scale(1.2);
+                opacity: 1;
+            }
+
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        .birthday-notification-badge.animate {
+            animation: bounce-in 0.5s ease-out;
+        }
     </style>
 
 
@@ -67,23 +113,23 @@
 
 
     <!-- CSS Frameworks -->
-<link rel="stylesheet" href="{{ url('/') }}/assets/css/bootstrap.min.css">
-<link rel="stylesheet" href="{{ url('/') }}/assets/css/atlantis.min.css">
+    <link rel="stylesheet" href="{{ url('/') }}/assets/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{{ url('/') }}/assets/css/atlantis.min.css">
 
-<!-- CSS Plugin Styles -->
-<link rel="stylesheet" href="{{ url('/') }}/assets/dropify/dist/css/dropify.min.css">
-<link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-bs4.min.css" rel="stylesheet">
-<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet">
+    <!-- CSS Plugin Styles -->
+    <link rel="stylesheet" href="{{ url('/') }}/assets/dropify/dist/css/dropify.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-bs4.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet">
 
-<!-- CSS Just for demo purpose (Optional) -->
-<link rel="stylesheet" href="{{ url('/') }}/assets/css/demo.css">
+    <!-- CSS Just for demo purpose (Optional) -->
+    <link rel="stylesheet" href="{{ url('/') }}/assets/css/demo.css">
 
-<!-- JS Core Libraries -->
-<script src="{{ url('/') }}/assets/js/core/jquery.3.2.1.min.js"></script>
+    <!-- JS Core Libraries -->
+    <script src="{{ url('/') }}/assets/js/core/jquery.3.2.1.min.js"></script>
 
-<!-- JS Plugins -->
-<script src="{{ url('/') }}/assets/js/plugin/sweetalert/sweetalert.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-bs4.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <!-- JS Plugins -->
+    <script src="{{ url('/') }}/assets/js/plugin/sweetalert/sweetalert.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-bs4.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
 </head>

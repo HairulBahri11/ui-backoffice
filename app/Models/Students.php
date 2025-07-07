@@ -29,4 +29,9 @@ class Students extends Model
     {
         return $this->belongsTo(Price::class, 'priceid');
     }
+
+    public function attendanceDetails()
+    {
+        return $this->hasMany(AttendanceDetail::class, 'student_id');
+    }
 }

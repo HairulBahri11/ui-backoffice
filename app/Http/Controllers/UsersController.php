@@ -344,4 +344,88 @@ class UsersController extends Controller
             return false;
         }
     }
+
+
+    // kirim birthday ke header page
+    public function birthday()
+    {
+        // Cek student_birthday
+        $teacherId = Auth::guard('teacher')->id(); // Ambil ID guru jika login
+
+        // Ambil siswa aktif
+        $query = Students::where('status', 'ACTIVE')
+            ->whereNotNull('course_time')
+            ->whereNotNull('priceid')
+            ->with(['class', 'teacher'])
+            ->join('day as day_one', 'day_one.id', '=', 'student.day1')
+            ->join('day as day_two', 'day_two.id', '=', 'student.day2')
+            ->select('student.*', 'day_one.day as day1_name', 'day_two.day as day2_name')
+            ->orderBy('student.name', 'asc');
+
+        // Jika login sebagai teacher, filter berdasarkan id_teacher
+        if ($teacherId) {
+            $query->where('id_teacher', $teacherId);
+        }
+
+        $student_list_active = $query->get();
+
+        $student_birthday = [];
+
+        // Dapatkan nama hari saat ini dalam bahasa Inggris (e.g., 'Monday')
+        // Ini akan dibandingkan dengan day1_name dan day2_name dari database
+        $todayDayName = now()->format('l'); // 'l' gives full day name, e.g., "Monday"
+        $currentMonth = now()->format('m'); // Dapatkan bulan saat ini
+
+        foreach ($student_list_active as $item) {
+            $birthdayString = trim($item->birthday); // Hapus spasi ekstra
+
+            // Pastikan format tanggal valid sebelum diproses
+            if (preg_match('/^\d{4} [A-Za-z]+ \d{1,2}$/', $birthdayString)) {
+                // Format "2019 November 24" → "2019-11-24"
+                $date = Carbon::createFromFormat('Y F d', $birthdayString);
+            } elseif (preg_match('/^[A-Za-z]+ \d{1,2}$/', $birthdayString)) {
+                // Format "November 24" → "2025-11-24" (asumsi tahun ini)
+                $birthdayString .= ' ' . now()->year;
+                $date = Carbon::createFromFormat('F d Y', $birthdayString);
+            } else {
+                continue; // Lewati jika format salah
+            }
+
+            // Hitung umur hanya jika tahun ada
+            // Carbon::diffInYears secara otomatis menghitung dengan benar
+            $age = now()->diffInYears($date);
+
+            // Cek apakah ulang tahun bulan ini
+            $isThisMonthBirthday = ($date->format('m') == $currentMonth);
+
+            // Cek apakah ulang tahun hari ini
+            $isTodayBirthday = ($date->format('m-d') == now()->format('m-d'));
+
+            // Pastikan data `class` dan `teacher` tersedia sebelum mengaksesnya
+            $className = $item->class->program ?? 'Unknown';
+            $teacherName = $item->teacher->name ?? 'Unknown';
+            // Pastikan day1_name dan day2_name dari database
+            $day1Name = $item->day1_name ?? null; // Gunakan null jika tidak ada
+            $day2Name = $item->day2_name ?? null; // Gunakan null jika tidak ada
+
+            // Logika utama: Tambahkan hanya siswa yang ulang tahun bulan ini
+            // DAN memiliki jadwal hari ini
+            if ($isThisMonthBirthday && ($day1Name == $todayDayName || $day2Name == $todayDayName)) {
+                $student_birthday[] = [
+                    'id' => $item->id,
+                    'name' => $item->name,
+                    'birthday' => $date->format('Y-m-d'), // Format "YYYY-MM-DD"
+                    'class' => $className,
+                    'teacher' => $teacherName,
+                    'age' => $age,
+                    'is_today_birthday' => $isTodayBirthday,
+                    'day1' => $day1Name,
+                    'day2' => $day2Name,
+                    'course_time' => $item->course_time
+                ];
+            }
+        }
+
+        return view('template.navbar', compact('student_birthday'));
+    }
 }

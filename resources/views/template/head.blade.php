@@ -32,49 +32,31 @@
     <link rel="stylesheet" href="{{ url('/') }}/assets/css/atlantis.min.css">
     <script src="{{ url('/') }}/assets/js/core/jquery.3.2.1.min.js"></script> --}}
     <style>
-        .custom-checkbox-size::before,
-        .custom-checkbox-size::after {
-            top: 200px !important;
-            width: 200px !important;
-            height: 200px !important;
-        }
-
-        .custom-control-lg .custom-control-label::before,
-        .custom-control-lg .custom-control-label::after {
-            top: 0.1rem !important;
-            left: -2rem !important;
-            width: 1.75rem !important;
-            height: 1.75rem !important;
-        }
-
-        .custom-control-lg .custom-control-label {
-            margin-left: 0.5rem !important;
-            font-size: 1rem !important;
-        }
-
-        /* If you're using Bootstrap 4/5 and not just Tailwind for positioning */
+        /* Ensure the icon is the positioning context for the badge */
         .position-relative {
             position: relative !important;
-            /* Ensure the icon is the positioning context */
         }
 
         .birthday-notification-badge {
             position: absolute;
             top: -5px;
-            /* Adjust as needed */
+            /* Adjust as needed for vertical position */
             right: -8px;
-            /* Adjust as needed */
+            /* Adjust as needed for horizontal position */
             font-size: 0.7em;
-            /* Make the font size smaller for the badge */
+            /* Smaller font size for the badge number */
             padding: 0.3em 0.5em;
-            /* Adjust padding to make it a neat pill */
+            /* Padding around the number */
             border-radius: 50%;
-            /* Make it perfectly round */
+            /* Makes it round */
             line-height: 1;
-            /* Adjust line height to prevent vertical stretching */
+            /* Prevents stretching if digits are tall */
             min-width: 20px;
-            /* Ensure it's wide enough for double digits */
+            /* Ensures it's wide enough for double digits */
             text-align: center;
+            /* Centers the text */
+            z-index: 100;
+            /* Ensure it appears above other elements if overlaps */
         }
 
         /* Optional: Add a subtle bounce animation for attention */
@@ -96,6 +78,16 @@
 
         .birthday-notification-badge.animate {
             animation: bounce-in 0.5s ease-out;
+        }
+
+        /* --- Styles for Scrollable Dropdown --- */
+        .scrollable-dropdown-menu {
+            max-height: 300px;
+            /* Adjust this value as needed (e.g., 250px, 400px) */
+            overflow-y: auto;
+            /* Enables vertical scrolling */
+            -webkit-overflow-scrolling: touch;
+            /* Improves scrolling performance on touch devices */
         }
     </style>
 

@@ -40,46 +40,49 @@
                             @if (count($student_birthday_notification) > 0)
                                 <span class="badge badge-pill badge-danger birthday-notification-badge">
                                     {{ count($student_birthday_notification) }}
-                                    {{-- Optional: Add a small dot if you prefer a subtle indicator --}}
-                                    {{-- <span class="sr-only">New birthdays</span> --}}
                                 </span>
                             @endif
                         </a>
-                        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarBirthdayDropdown">
-                            <h6 class="dropdown-header">Students' Birthdays Point</h6>
+                        {{-- Add 'scrollable-dropdown-menu' class here --}}
+                        <div class="dropdown-menu dropdown-menu-right scrollable-dropdown-menu"
+                            aria-labelledby="navbarBirthdayDropdown">
+                            <h6 class="dropdown-header">Students' Birthdays Point!</h6> {{-- Changed header for clarity --}}
 
                             <div class="dropdown-divider"></div>
-                            @foreach ($student_birthday_notification as $student)
+                            @forelse ($student_birthday_notification as $student)
+                                {{-- Use @forelse for empty state handling --}}
                                 {{-- Highlight today's birthdays --}}
                                 @if ($student['is_today_birthday'])
                                     <a class="dropdown-item text-primary font-weight-bold" href="#">
                                         🎉 Happy Birthday, {{ $student['name'] }}! 🎉
                                         <br><small class="text-muted">Today!
-                                            ({{ $student['age'] == 0 ? '-' : $student['age'] }} years old)
+                                            ({{ $student['age'] == 0 ? 'unknown' : $student['age'] }} years old)
+                                            {{-- Changed 0 to unknown for age --}}
                                         </small>
                                         <br><small class="text-muted">{{ $student['teacher'] }}
-                                            |{{ $student['day1'] . '' . $student['day2'] }} |{{ $student['class'] }} |
-                                            {{ $student['course_time'] }}</small>
+                                            | {{ $student['day1'] }} {{ $student['day2'] }} | {{ $student['class'] }} |
+                                            {{ $student['course_time'] }}</small> {{-- Added space between day1 and day2 --}}
                                     </a>
                                 @else
                                     <a class="dropdown-item" href="#">
                                         🎈 {{ $student['name'] }}
                                         <br><small class="text-muted">Birthday on:
                                             {{ \Carbon\Carbon::parse($student['birthday'])->format('F d') }}
-                                            ({{ $student['age'] == 0 ? '-' : $student['age'] }} years old)
+                                            ({{ $student['age'] == 0 ? 'unknown' : $student['age'] }} years old)
                                         </small>
                                         <br><small class="text-muted">{{ $student['teacher'] }}
-                                            |{{ $student['day1'] . '' . $student['day2'] }} |{{ $student['class'] }} |
+                                            | {{ $student['day1'] }} {{ $student['day2'] }} | {{ $student['class'] }}
+                                            |
                                             {{ $student['course_time'] }}</small>
                                     </a>
                                 @endif
                                 @if (!$loop->last)
                                     <div class="dropdown-divider"></div>
                                 @endif
-                            @endforeach
+                            @empty {{-- This block runs if $student_birthday_notification is empty --}}
+                                <span class="dropdown-item text-center text-muted">No birthdays this week.</span>
+                            @endforelse
                             <div class="dropdown-divider"></div>
-                            {{-- <a class="dropdown-item text-center text-primary" href="#">View All Student List --}}
-                            {{-- &raquo;</a> --}}
                         </div>
                     </li>
                 @endif

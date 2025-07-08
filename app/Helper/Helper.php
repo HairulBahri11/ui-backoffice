@@ -76,11 +76,11 @@ class Helper
             $urlGateway = env('URL_GATEWAY_BROADCAST');
 
             // Log informasi sebelum mengirim request
-            Log::info('Mencoba mengirim broadcast.', [
-                'phone' => $phone,
-                'url' => $urlGateway,
-                'api_key_status' => !empty($apiKey) ? 'Set' : 'Not Set', // Cek apakah API Key terisi
-            ]);
+            // Log::info('Mencoba mengirim broadcast.', [
+            //     'phone' => $phone,
+            //     'url' => $urlGateway,
+            //     'api_key_status' => !empty($apiKey) ? 'Set' : 'Not Set', // Cek apakah API Key terisi
+            // ]);
 
             // Melakukan request POST ke API gateway
             $response = Http::withHeaders([
@@ -95,23 +95,23 @@ class Helper
             ]);
 
             // Log respons lengkap dari API gateway
-            Log::info('Respons API Broadcast untuk ' . $phone . ':', [
-                'status' => $response->status(), // Kode status HTTP (e.g., 200, 400, 500)
-                'body' => $response->body(),     // Body respons dari API
-                'successful' => $response->successful(), // Apakah respons berstatus 2xx
-                'ok' => $response->ok(),         // Apakah respons berstatus 200
-            ]);
+            // Log::info('Respons API Broadcast untuk ' . $phone . ':', [
+            //     'status' => $response->status(), // Kode status HTTP (e.g., 200, 400, 500)
+            //     'body' => $response->body(),     // Body respons dari API
+            //     'successful' => $response->successful(), // Apakah respons berstatus 2xx
+            //     'ok' => $response->ok(),         // Apakah respons berstatus 200
+            // ]);
 
             // Mengembalikan true jika respons HTTP adalah 2xx (berhasil), selain itu false
             return $response->successful();
         } catch (Throwable $th) {
             // Menangkap setiap pengecualian yang terjadi selama proses HTTP request
-            Log::error('Terjadi kesalahan saat mengirim broadcast untuk ' . $phone . ':', [
-                'error_message' => $th->getMessage(),
-                'file' => $th->getFile(),
-                'line' => $th->getLine(),
-                'trace' => $th->getTraceAsString(),
-            ]);
+            // Log::error('Terjadi kesalahan saat mengirim broadcast untuk ' . $phone . ':', [
+            //     'error_message' => $th->getMessage(),
+            //     'file' => $th->getFile(),
+            //     'line' => $th->getLine(),
+            //     'trace' => $th->getTraceAsString(),
+            // ]);
 
             // Mengembalikan false karena terjadi exception (kegagalan)
             return false;

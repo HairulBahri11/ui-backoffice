@@ -548,11 +548,11 @@ class PaymentController extends Controller
             $decodedData = is_array($data) ? $data : json_decode($data, true);
 
             // Log data yang diterima untuk debugging
-            Log::info('Data diterima untuk pengingat pembayaran:', ['data' => $decodedData]);
+            // Log::info('Data diterima untuk pengingat pembayaran:', ['data' => $decodedData]);
 
             // Validasi format data utama
             if (!is_array($decodedData)) {
-                Log::warning('Format data tidak valid: Bukan array.', ['received_data' => $data]);
+                // Log::warning('Format data tidak valid: Bukan array.', ['received_data' => $data]);
                 return response()->json([
                     'code' => '400',
                     'error' => 'Invalid data format',
@@ -570,7 +570,7 @@ class PaymentController extends Controller
                 // Validasi kelengkapan data siswa yang dibutuhkan
                 if (!isset($datanya['name'], $datanya['phone'], $datanya['lastpaydate'])) {
                     $failed[] = $datanya['phone'] ?? 'Unknown Phone (missing name, phone, or lastpaydate)';
-                    Log::warning('Data siswa tidak lengkap, dilewati.', ['student_data' => $datanya]);
+                    // Log::warning('Data siswa tidak lengkap, dilewati.', ['student_data' => $datanya]);
                     continue; // Lanjutkan ke data siswa berikutnya
                 }
 
@@ -578,7 +578,7 @@ class PaymentController extends Controller
                 $lastPayDate = DateTime::createFromFormat('Y-m-d', $datanya['lastpaydate']);
                 if (!$lastPayDate) {
                     $failed[] = $datanya['phone'] . ' (Invalid lastpaydate format)';
-                    Log::warning('Format tanggal pembayaran terakhir tidak valid, dilewati.', ['phone' => $datanya['phone'], 'lastpaydate' => $datanya['lastpaydate']]);
+                    // Log::warning('Format tanggal pembayaran terakhir tidak valid, dilewati.', ['phone' => $datanya['phone'], 'lastpaydate' => $datanya['lastpaydate']]);
                     continue; // Lanjutkan ke data siswa berikutnya
                 }
 
@@ -597,7 +597,7 @@ class PaymentController extends Controller
 
                 // Jika tidak ada bulan yang belum dibayar, lewati siswa ini
                 if (empty($monthsUnpaid)) {
-                    Log::info('Tidak ada tunggakan pembayaran untuk ' . $datanya['name'], ['phone' => $datanya['phone']]);
+                    // Log::info('Tidak ada tunggakan pembayaran untuk ' . $datanya['name'], ['phone' => $datanya['phone']]);
                     continue; // Lanjutkan ke data siswa berikutnya
                 }
 
@@ -628,7 +628,7 @@ class PaymentController extends Controller
                 $send = Helper::sendBroadCast($datanya['phone'], $message);
 
                 // Log hasil dari Helper::sendBroadCast untuk debugging
-                Log::info('Hasil pengiriman broadcast untuk ' . $datanya['phone'] . ':', ['status' => $send]);
+                // Log::info('Hasil pengiriman broadcast untuk ' . $datanya['phone'] . ':', ['status' => $send]);
 
                 // Memeriksa apakah pengiriman berhasil
                 if ($send) {
@@ -648,12 +648,12 @@ class PaymentController extends Controller
             ], 200);
         } catch (Throwable $th) {
             // Menangkap dan mencatat setiap pengecualian yang terjadi
-            Log::error('Terjadi kesalahan internal server saat memproses pengingat pembayaran:', [
-                'error_message' => $th->getMessage(),
-                'file' => $th->getFile(),
-                'line' => $th->getLine(),
-                'trace' => $th->getTraceAsString(),
-            ]);
+            // Log::error('Terjadi kesalahan internal server saat memproses pengingat pembayaran:', [
+            //     'error_message' => $th->getMessage(),
+            //     'file' => $th->getFile(),
+            //     'line' => $th->getLine(),
+            //     'trace' => $th->getTraceAsString(),
+            // ]);
 
             // Mengembalikan respons JSON untuk kesalahan internal server
             return response()->json([

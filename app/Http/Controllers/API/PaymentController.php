@@ -19,6 +19,7 @@ use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use App\Models\PaymentFromAppDetail;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class PaymentController extends Controller
 {
@@ -509,6 +510,7 @@ class PaymentController extends Controller
 
                 // 🟢 Perbaikan jumlah argumen di Helper::sendBroadCast
                 $send = Helper::sendBroadCast($datanya['phone'], $message); // Pastikan hanya mengirim argumen yang dibutuhkan
+                Log::info($send);
 
                 if ($send) {
                     $success[] = $datanya['phone'];

@@ -433,6 +433,7 @@ class PaymentController extends Controller
         try {
             $data = $request->input();
             $decodedData = is_array($data) ? $data : json_decode($data, true);
+            Log::info($decodedData);
 
             if (!is_array($decodedData)) {
                 return response()->json([

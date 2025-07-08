@@ -575,7 +575,7 @@ class PaymentController extends Controller
                 }
 
                 // Membuat objek DateTime dari tanggal pembayaran terakhir
-                $lastPayDate = DateTime::createFromFormat('M Y', $datanya['lastpaydate']);
+                $lastPayDate = DateTime::createFromFormat('Y-m-d', $datanya['lastpaydate']);
                 if (!$lastPayDate) {
                     $failed[] = $datanya['phone'] . ' (Invalid lastpaydate format)';
                     Log::warning('Format tanggal pembayaran terakhir tidak valid, dilewati.', ['phone' => $datanya['phone'], 'lastpaydate' => $datanya['lastpaydate']]);

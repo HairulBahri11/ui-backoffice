@@ -383,159 +383,159 @@ class PaymentController extends Controller
         }
     }
 
-    function broadcastLatePayment(Request $request)
-    {
-        // try{
-        //     // Ambil data dari body request
-        // $data = $request->input(); // Jika data dikirim sebagai JSON
+    // function broadcastLatePayment(Request $request)
+    // {
+    //     // try{
+    //     //     // Ambil data dari body request
+    //     // $data = $request->input(); // Jika data dikirim sebagai JSON
 
-        // // Jika data dalam format JSON, langsung decode jika diperlukan
-        // $decodedData = is_array($data) ? $data : json_decode($data, true);
-        //     // $data = urldecode($data);
-        //     foreach($decodedData as $datanya){
-        //         $message = sprintf(
-        //             "*📢 Announcement 📢*\n\n" .
-        //                 "Dear parents of *%s*,\n\n" .
-        //                 "We would like to kindly remind you that the latest course payment was for *%s*. " .
-        //                 "Please ensure to complete the payment for this month's course at your earliest convenience.\n\n" .
-        //                 "Thank you for your prompt attention to this matter.\n\n" .
-        //                 "This WhatsApp number (0823-3890-5700) is the official contact number of *U&I English Course* and is used exclusively for:\n" .
-        //                 "1. Sending the E-Receipt link for any payments.\n" .
-        //                 "2. Delivering OTP codes for U&I's App Member.\n\n" .
-        //                 "Please save this number in your contacts to activate the E-Receipt Link feature.\n\n" .
-        //                 "Thank you, and have a great day!\n\n" .
-        //                 "- U&I English Course -"
-        //             ,
-        //             $datanya['name'],
-        //             $datanya['lastpaydate']
-        //         );
-        //     $send = Helper::sendMessage($datanya['phone'], $message);
-        //     if ($send) {
-        //         return response()->json([
-        //             'code' => '00',
-        //             'payload' => 'Success',
-        //         ], 200);
-        //     } else {
-        //         return response()->json([
-        //             'code' => '10',
-        //             'message' => 'Failed verify payment, please try again later',
-        //         ], 200);
-        //     }
-        // }
-        // } catch (\Throwable $th) {
-        //     return response()->json([
-        //         'code' => '400',
-        //         'error' => 'internal server error',
-        //         'message' => $th,
-        //     ], 403);
-        // }
-
-
-        try {
-            $data = $request->input();
-            $decodedData = is_array($data) ? $data : json_decode($data, true);
-            Log::info($decodedData);
-
-            if (!is_array($decodedData)) {
-                return response()->json([
-                    'code' => '400',
-                    'error' => 'Invalid data format',
-                    'message' => 'Data should be an array',
-                ], 400);
-            }
-
-            $success = [];
-            $failed = [];
-            $currentDate = new DateTime();
-            $monthlyFee = 300000;
-
-            foreach ($decodedData as $datanya) {
-                if (!isset($datanya['name'], $datanya['phone'], $datanya['lastpaydate'])) {
-                    $failed[] = $datanya['phone'] ?? 'Unknown Phone';
-                    continue;
-                }
-
-                $lastPayDate = DateTime::createFromFormat('Y-m-d', $datanya['lastpaydate']);
-                if (!$lastPayDate) {
-                    $failed[] = $datanya['phone'];
-                    continue;
-                }
-
-                // 🟢 Perbaikan LOOP bulan yang belum dibayar
-                $monthsUnpaid = [];
-                $totalAmount = 0;
-                $monthIterator = clone $lastPayDate;
-                $monthIterator->modify('+1 month');
-
-                while ((int)$monthIterator->format('Ym') <= (int)$currentDate->format('Ym')) {
-                    $monthsUnpaid[] = $monthIterator->format('F Y');
-                    $totalAmount += $monthlyFee;
-                    $monthIterator->modify('+1 month');
-                }
-
-                if (empty($monthsUnpaid)) {
-                    continue;
-                }
-
-                // $message = "*📢 Pengumuman 📢*\n\n" .
-                //     "*Yth: Orang tua murid " . $datanya['name'] . ",*\n\n" .
-                //     "Mohon segera melakukan pembayaran *SPP* untuk bulan berikut:\n\n" .
-                //     implode(", ", $monthsUnpaid) . "\n\n" .
-                //     "Total yang harus dibayar: *Rp" . number_format($totalAmount, 0, ',', '.') . "*.\n\n" .
-                //     "● Pembayaran bisa dilakukan langsung di *front desk U&I* atau transfer ke *BCA (Lie Citro Dewi Ruslie) 464 1327 187* hingga akhir bulan ini.\n\n" .
-                //     "● Pembayaran lewat batas waktu akan dikenakan *biaya keterlambatan 10%*.\n\n" .
-                //     "Terima kasih.\n\n" .
-                //     "*U&I ENGLISH COURSE*\n\n" .
-                //     "*NB: Abaikan pesan ini jika telah melakukan pembayaran.*";
-
-                $message = "*📢 PENGUMUMAN PEMBAYARAN 📢*\n\n" .
-                    "*Yth. Bapak/Ibu Orang Tua/Wali Murid " . $datanya['name'] . ",*\n\n" .
-                    "Mohon segera melakukan pembayaran *SPP* untuk bulan berikut:\n" .
-                    implode(", ", $monthsUnpaid) . "\n\n" .
-                    "*Total yang harus dibayar: Rp" . number_format($totalAmount, 0, ',', '.') . "*\n\n" .
-                    "📌 *Pembayaran dapat dilakukan melalui:*\n" .
-                    "• Front desk *U&I* (tunai/kartu)\n" .
-                    "• Transfer ke *BCA a.n. Lie Citro Dewi Ruslie*\n" .
-                    "  No. Rek: *464 1327 187*\n\n" .
-                    "*Batas waktu pembayaran adalah sampai akhir bulan ini.*\n" .
-                    "Pembayaran lewat batas waktu tersebut akan dikenakan *biaya keterlambatan 10%*.\n\n" .
-                    "📌 *Konfirmasi Pembayaran:*\n" .
-                    "Jika Bapak/Ibu telah membayar namun belum menerima e-struk/nota, mohon kirimkan:\n" .
-                    "• Bukti transfer\n" .
-                    "• Nama siswa/No. ID\n" .
-                    "• Program/Kelas\n" .
-                    "Agar pembayaran dapat diproses dengan tepat.\n\n" .
-                    "Terima kasih atas kerjasamanya. 🙏\n\n" .
-                    "*U&I English Course*\n\n" .
-                    "_NB: Abaikan pesan ini jika pembayaran sudah dilakukan dan dikonfirmasi._";
+    //     // // Jika data dalam format JSON, langsung decode jika diperlukan
+    //     // $decodedData = is_array($data) ? $data : json_decode($data, true);
+    //     //     // $data = urldecode($data);
+    //     //     foreach($decodedData as $datanya){
+    //     //         $message = sprintf(
+    //     //             "*📢 Announcement 📢*\n\n" .
+    //     //                 "Dear parents of *%s*,\n\n" .
+    //     //                 "We would like to kindly remind you that the latest course payment was for *%s*. " .
+    //     //                 "Please ensure to complete the payment for this month's course at your earliest convenience.\n\n" .
+    //     //                 "Thank you for your prompt attention to this matter.\n\n" .
+    //     //                 "This WhatsApp number (0823-3890-5700) is the official contact number of *U&I English Course* and is used exclusively for:\n" .
+    //     //                 "1. Sending the E-Receipt link for any payments.\n" .
+    //     //                 "2. Delivering OTP codes for U&I's App Member.\n\n" .
+    //     //                 "Please save this number in your contacts to activate the E-Receipt Link feature.\n\n" .
+    //     //                 "Thank you, and have a great day!\n\n" .
+    //     //                 "- U&I English Course -"
+    //     //             ,
+    //     //             $datanya['name'],
+    //     //             $datanya['lastpaydate']
+    //     //         );
+    //     //     $send = Helper::sendMessage($datanya['phone'], $message);
+    //     //     if ($send) {
+    //     //         return response()->json([
+    //     //             'code' => '00',
+    //     //             'payload' => 'Success',
+    //     //         ], 200);
+    //     //     } else {
+    //     //         return response()->json([
+    //     //             'code' => '10',
+    //     //             'message' => 'Failed verify payment, please try again later',
+    //     //         ], 200);
+    //     //     }
+    //     // }
+    //     // } catch (\Throwable $th) {
+    //     //     return response()->json([
+    //     //         'code' => '400',
+    //     //         'error' => 'internal server error',
+    //     //         'message' => $th,
+    //     //     ], 403);
+    //     // }
 
 
-                // 🟢 Perbaikan jumlah argumen di Helper::sendBroadCast
-                $send = Helper::sendBroadCast($datanya['phone'], $message); // Pastikan hanya mengirim argumen yang dibutuhkan
-                Log::info($send);
+    //     try {
+    //         $data = $request->input();
+    //         $decodedData = is_array($data) ? $data : json_decode($data, true);
+    //         Log::info($decodedData);
 
-                if ($send) {
-                    $success[] = $datanya['phone'];
-                } else {
-                    $failed[] = $datanya['phone'];
-                }
-            }
+    //         if (!is_array($decodedData)) {
+    //             return response()->json([
+    //                 'code' => '400',
+    //                 'error' => 'Invalid data format',
+    //                 'message' => 'Data should be an array',
+    //             ], 400);
+    //         }
 
-            return response()->json([
-                'code' => '00',
-                'payload' => [
-                    'success' => $success,
-                    'failed' => $failed,
-                ],
-            ], 200);
-        } catch (\Throwable $th) {
-            return response()->json([
-                'code' => '400',
-                'error' => 'internal server error',
-                'message' => $th->getMessage(),
-            ], 403);
-        }
-    }
+    //         $success = [];
+    //         $failed = [];
+    //         $currentDate = new DateTime();
+    //         $monthlyFee = 300000;
+
+    //         foreach ($decodedData as $datanya) {
+    //             if (!isset($datanya['name'], $datanya['phone'], $datanya['lastpaydate'])) {
+    //                 $failed[] = $datanya['phone'] ?? 'Unknown Phone';
+    //                 continue;
+    //             }
+
+    //             $lastPayDate = DateTime::createFromFormat('M Y', $datanya['lastpaydate']);
+    //             if (!$lastPayDate) {
+    //                 $failed[] = $datanya['phone'];
+    //                 continue;
+    //             }
+
+    //             // 🟢 Perbaikan LOOP bulan yang belum dibayar
+    //             $monthsUnpaid = [];
+    //             $totalAmount = 0;
+    //             $monthIterator = clone $lastPayDate;
+    //             $monthIterator->modify('+1 month');
+
+    //             while ((int)$monthIterator->format('Ym') <= (int)$currentDate->format('Ym')) {
+    //                 $monthsUnpaid[] = $monthIterator->format('F Y');
+    //                 $totalAmount += $monthlyFee;
+    //                 $monthIterator->modify('+1 month');
+    //             }
+
+    //             if (empty($monthsUnpaid)) {
+    //                 continue;
+    //             }
+
+    //             // $message = "*📢 Pengumuman 📢*\n\n" .
+    //             //     "*Yth: Orang tua murid " . $datanya['name'] . ",*\n\n" .
+    //             //     "Mohon segera melakukan pembayaran *SPP* untuk bulan berikut:\n\n" .
+    //             //     implode(", ", $monthsUnpaid) . "\n\n" .
+    //             //     "Total yang harus dibayar: *Rp" . number_format($totalAmount, 0, ',', '.') . "*.\n\n" .
+    //             //     "● Pembayaran bisa dilakukan langsung di *front desk U&I* atau transfer ke *BCA (Lie Citro Dewi Ruslie) 464 1327 187* hingga akhir bulan ini.\n\n" .
+    //             //     "● Pembayaran lewat batas waktu akan dikenakan *biaya keterlambatan 10%*.\n\n" .
+    //             //     "Terima kasih.\n\n" .
+    //             //     "*U&I ENGLISH COURSE*\n\n" .
+    //             //     "*NB: Abaikan pesan ini jika telah melakukan pembayaran.*";
+
+    //             $message = "*📢 PENGUMUMAN PEMBAYARAN 📢*\n\n" .
+    //                 "*Yth. Bapak/Ibu Orang Tua/Wali Murid " . $datanya['name'] . ",*\n\n" .
+    //                 "Mohon segera melakukan pembayaran *SPP* untuk bulan berikut:\n" .
+    //                 implode(", ", $monthsUnpaid) . "\n\n" .
+    //                 "*Total yang harus dibayar: Rp" . number_format($totalAmount, 0, ',', '.') . "*\n\n" .
+    //                 "📌 *Pembayaran dapat dilakukan melalui:*\n" .
+    //                 "• Front desk *U&I* (tunai/kartu)\n" .
+    //                 "• Transfer ke *BCA a.n. Lie Citro Dewi Ruslie*\n" .
+    //                 "  No. Rek: *464 1327 187*\n\n" .
+    //                 "*Batas waktu pembayaran adalah sampai akhir bulan ini.*\n" .
+    //                 "Pembayaran lewat batas waktu tersebut akan dikenakan *biaya keterlambatan 10%*.\n\n" .
+    //                 "📌 *Konfirmasi Pembayaran:*\n" .
+    //                 "Jika Bapak/Ibu telah membayar namun belum menerima e-struk/nota, mohon kirimkan:\n" .
+    //                 "• Bukti transfer\n" .
+    //                 "• Nama siswa/No. ID\n" .
+    //                 "• Program/Kelas\n" .
+    //                 "Agar pembayaran dapat diproses dengan tepat.\n\n" .
+    //                 "Terima kasih atas kerjasamanya. 🙏\n\n" .
+    //                 "*U&I English Course*\n\n" .
+    //                 "_NB: Abaikan pesan ini jika pembayaran sudah dilakukan dan dikonfirmasi._";
+
+
+    //             // 🟢 Perbaikan jumlah argumen di Helper::sendBroadCast
+    //             $send = Helper::sendBroadCast($datanya['phone'], $message); // Pastikan hanya mengirim argumen yang dibutuhkan
+    //             Log::info($send);
+
+    //             if ($send) {
+    //                 $success[] = $datanya['phone'];
+    //             } else {
+    //                 $failed[] = $datanya['phone'];
+    //             }
+    //         }
+
+    //         return response()->json([
+    //             'code' => '00',
+    //             'payload' => [
+    //                 'success' => $success,
+    //                 'failed' => $failed,
+    //             ],
+    //         ], 200);
+    //     } catch (\Throwable $th) {
+    //         return response()->json([
+    //             'code' => '400',
+    //             'error' => 'internal server error',
+    //             'message' => $th->getMessage(),
+    //         ], 403);
+    //     }
+    // }
 
     public function sendPaymentReminders(Request $request)
     {
@@ -575,7 +575,7 @@ class PaymentController extends Controller
                 }
 
                 // Membuat objek DateTime dari tanggal pembayaran terakhir
-                $lastPayDate = DateTime::createFromFormat('Y-m-d', $datanya['lastpaydate']);
+                $lastPayDate = DateTime::createFromFormat('M Y', $datanya['lastpaydate']);
                 if (!$lastPayDate) {
                     $failed[] = $datanya['phone'] . ' (Invalid lastpaydate format)';
                     // Log::warning('Format tanggal pembayaran terakhir tidak valid, dilewati.', ['phone' => $datanya['phone'], 'lastpaydate' => $datanya['lastpaydate']]);

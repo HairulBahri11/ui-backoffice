@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
 class Helper
 {
@@ -59,8 +60,10 @@ class Helper
                     'body' => $message
                 ]
             ]);
+            Log::info($response);
             return $response;
         } catch (\Throwable $th) {
+            Log::info($th);
             return $th;
         }
     }

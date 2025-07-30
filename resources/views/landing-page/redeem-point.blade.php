@@ -65,9 +65,16 @@
                     </div>
                     <ul class="nav nav-primary">
                         <li class="nav-item {{ Request::segment(2) == 'redeem-point' ? 'active' : '' }}">
-                            <a href="#" class="collapsed">
+                            <a href="{{ url('/landing-page/redeem-point') }}" class="collapsed">
                                 <i class="fas fa-download"></i>
                                 <p>Redeem Point</p>
+                            </a>
+
+                        </li>
+                        <li class="nav-item {{ Request::segment(2) == 'extra-point' ? 'active' : '' }}">
+                            <a href="{{ url('/landing-page/extra-point') }}" class="collapsed">
+                                <i class="fas fa-star"></i>
+                                <p>Extra Point</p>
                             </a>
 
                         </li>

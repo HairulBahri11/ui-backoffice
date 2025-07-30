@@ -49,6 +49,8 @@ Route::prefix('landing-page')->group(
         Route::get('/redeem-point/{studentId}', [LandingPageController::class, 'redeemPointStudent']);
         Route::post('/store-redeem-point', [LandingPageController::class, 'storeReedemPoint']);
         Route::get('/e-certificate/{id}', [LandingPageController::class, 'eCertificate']);
+        Route::get('/extra-point', [LandingPageController::class, 'extraPoint']);
+        Route::post('/extra-point/store', [LandingPageController::class, 'storeExtraPoint'])->name('landing-page.extra-point.store');
     }
 );
 

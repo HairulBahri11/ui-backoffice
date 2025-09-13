@@ -602,44 +602,26 @@ class PaymentController extends Controller
                 }
 
                 // Membuat pesan pengingat pembayaran
-                // $message = "*📢 PENGUMUMAN PEMBAYARAN 📢*\n\n" .
-                //     "*Yth. Bapak/Ibu Orang Tua/Wali Murid " . $datanya['name'] . ",*\n\n" .
-                //     "Mohon segera melakukan pembayaran *SPP* untuk bulan berikut:\n" .
-                //     implode(", ", $monthsUnpaid) . "\n\n" .
-                //     "*Total yang harus dibayar: Rp" . number_format($totalAmount, 0, ',', '.') . "*\n\n" .
-                //     "📌 *Pembayaran dapat dilakukan melalui:*\n" .
-                //     "• Front desk *U&I* (tunai/kartu)\n" .
-                //     "• Transfer ke *BCA a.n. Lie Citro Dewi Ruslie*\n" .
-                //     " No. Rek: *464 1327 187*\n\n" .
-                //     "*Batas waktu pembayaran adalah sampai akhir bulan ini.*\n" .
-                //     "Pembayaran lewat batas waktu tersebut akan dikenakan *biaya keterlambatan 10%*.\n\n" .
-                //     "📌 *Konfirmasi Pembayaran:*\n" .
-                //     "Jika Bapak/Ibu telah membayar namun belum menerima e-struk/nota, mohon kirimkan:\n" .
-                //     "• Bukti transfer\n" .
-                //     "• Nama siswa/No. ID\n" .
-                //     "• Program/Kelas\n" .
-                //     "Agar pembayaran dapat diproses dengan tepat.\n\n" .
-                //     "Terima kasih atas kerjasamanya. 🙏\n\n" .
-                //     "*U&I English Course*\n\n" .
-                //     "_NB: Abaikan pesan ini jika pembayaran sudah dilakukan dan dikonfirmasi._";
-
-                $message = "*📢 PEMBERITAHUAN PERUBAHAN KELAS SEMENTARA (2-4 Sept 2025)*\n\n" .
-                    "*Kepada Orangtua/Wali & Murid U&I,*\n\n" .
-                    "Menyesuaikan dengan kondisi saat ini, demi keamanan dan kenyamanan para siswa, maka kelas offline dialihkan menjadi kelas online pada:\n" .
-                    "*Selasa, 2 September - Kamis, 4 September 2025.*\n" .
-                    "Jadwal dan durasi kelas tetap sama, hanya platformnya yang berubah.\n\n" .
-                    "Kelas online dapat di akses melalui link Google Sheets yang kami berikan. Tinggal klik link Google Meet di kolom yang tersedia, sesuai dengan guru dan jam kelas siswa.\n\n" .
-                    "*Link Daftar Guru & Google Meet:*\n" .
-                    "https://docs.google.com/spreadsheets/d/1xzZMF2LI_ffgoMm6TogBTifjycPusojNKUdG9-5schs/edit?usp=sharing\n\n" .
-                    "*Catatan untuk Siswa:*\n" .
-                    "• Join kelas online tepat waktu.\n" .
-                    "• Gunakan nama lengkap saat masuk Google Meet.\n" .
-                    "• Pastikan koneksi internet stabil\n" .
-                    "• Siapkan buku/worksheet & alat tulis.\n" .
-                    "• Kehadiran dan tugas tetap dihitung seperti biasa.\n\n" .
-                    "Terima kasih atas pengertian dan kerja samanya.\n" .
-                    "Jika ada kendala teknis, silakan hubungi admin kami.\n\n" .
-                    "*U&I Administration*";
+                $message = "*📢 PENGUMUMAN PEMBAYARAN 📢*\n\n" .
+                    "*Yth. Bapak/Ibu Orang Tua/Wali Murid " . $datanya['name'] . ",*\n\n" .
+                    "Mohon segera melakukan pembayaran *SPP* untuk bulan berikut:\n" .
+                    implode(", ", $monthsUnpaid) . "\n\n" .
+                    "*Total yang harus dibayar: Rp" . number_format($totalAmount, 0, ',', '.') . "*\n\n" .
+                    "📌 *Pembayaran dapat dilakukan melalui:*\n" .
+                    "• Front desk *U&I* (tunai/kartu)\n" .
+                    "• Transfer ke *BCA a.n. Lie Citro Dewi Ruslie*\n" .
+                    " No. Rek: *464 1327 187*\n\n" .
+                    "*Batas waktu pembayaran adalah sampai akhir bulan ini.*\n" .
+                    "Pembayaran lewat batas waktu tersebut akan dikenakan *biaya keterlambatan 10%*.\n\n" .
+                    "📌 *Konfirmasi Pembayaran:*\n" .
+                    "Jika Bapak/Ibu telah membayar namun belum menerima e-struk/nota, mohon kirimkan:\n" .
+                    "• Bukti transfer\n" .
+                    "• Nama siswa/No. ID\n" .
+                    "• Program/Kelas\n" .
+                    "Agar pembayaran dapat diproses dengan tepat.\n\n" .
+                    "Terima kasih atas kerjasamanya. 🙏\n\n" .
+                    "*U&I English Course*\n\n" .
+                    "_NB: Abaikan pesan ini jika pembayaran sudah dilakukan dan dikonfirmasi._";
 
                 // Memanggil Helper untuk mengirim broadcast
                 // Pastikan Helper::sendBroadCast menerima argumen sesuai urutan: (phone, message)

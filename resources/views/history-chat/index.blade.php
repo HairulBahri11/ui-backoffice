@@ -19,7 +19,6 @@
             align-items: flex-start;
             gap: 10px;
             animation: fadeIn 0.5s ease-in-out;
-            width: 50%;
         }
 
         .my-message-row {

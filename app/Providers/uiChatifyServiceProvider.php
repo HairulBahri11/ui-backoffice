@@ -28,17 +28,25 @@ class uiChatifyServiceProvider extends ServiceProvider
     {
         View::composer(['template.navbar'], function ($view) {
             // $user = Auth::user();
-            $user =  (Auth::guard('teacher')->user() != null ? Auth::guard('teacher')->user()->username : Auth::guard('staff')->user()->username) ?? '';
+            $user = null;
+
+            if (Auth::guard('teacher')->check()) {
+                $user = Auth::guard('teacher')->user();
+            } elseif (Auth::guard('staff')->check()) {
+                $user = Auth::guard('staff')->user();
+            }
+
+            $username = $user ? $user->username : 'Guest'; // Atau string default lainnya
             // dd($user);
             $unreadMessageCount = 0;
             $unreadMessages = [];
 
-            if ($user) {
+            if ($username) {
                 // Menggunakan Query Builder untuk join tabel 'messages' dan 'users'
                 $unreadMessages = DB::table('ch_messages')
                     ->join('users', 'ch_messages.to_id', '=', 'users.id')
                     ->join('users as sender', 'ch_messages.from_id', '=', 'sender.id')
-                    ->where('users.email', $user)
+                    ->where('users.email', $username)
                     ->where('ch_messages.seen', 0)
                     ->select('ch_messages.*', 'sender.name as sender_name')
                     ->get();

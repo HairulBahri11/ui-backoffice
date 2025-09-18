@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\UiChatifyController;
 use App\Models\Attendance;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ScoreController;
@@ -138,4 +139,9 @@ Route::middleware(['web'])->group(function () {
     Route::post('/extra-point/store', [ExamPointController::class, 'store'])->name('extra-point.store');
 
     Route::get('/history-certificate', [historyCertificateController::class, 'index'])->name('history-certificate.index');
+
+    Route::prefix('history-chat')->group(function () {
+        Route::get('/', [UiChatifyController::class, 'index'])->name('history-chat.index');
+        Route::get('/{id}', [UiChatifyController::class, 'show'])->name('history-chat.show');
+    });
 });

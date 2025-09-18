@@ -89,6 +89,25 @@
             -webkit-overflow-scrolling: touch;
             /* Improves scrolling performance on touch devices */
         }
+
+        .message-notification-badge {
+            /* Posisi di kanan atas */
+            position: absolute;
+            top: -5px;
+            /* Adjust as needed for vertical position */
+            right: -8px;
+            /* Sesuaikan nilai ini untuk mengontrol posisi horizontal */
+
+            /* Ukuran dan gaya visual */
+            font-size: 0.75rem;
+            padding: 2px 6px;
+            border-radius: 50%;
+        }
+
+        .position-relative {
+            /* Pastikan elemen induk memiliki posisi relatif */
+            position: relative;
+        }
     </style>
 
 

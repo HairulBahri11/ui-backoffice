@@ -213,6 +213,13 @@
                             </a>
 
                         </li>
+                        {{-- history chat --}}
+                        <li class="nav-item {{ Request::segment(1) == 'history-chat' ? 'active' : '' }}">
+                            <a href="{{ url('/history-chat') }}" class="collapsed">
+                                <i class="fas fa-comments"></i>
+                                <p>History Chat</p>
+                            </a>
+                        </li>
                     @endif
                     <li class="nav-item {{ Request::segment(1) == 'follow-up' ? 'active' : '' }}">
                         <a href="{{ url('/follow-up') }}" class="collapsed">

@@ -27,10 +27,67 @@
 
             <ul class="navbar-nav topbar-nav ml-md-auto align-items-center">
 
-                {{-- {{ dd($student_birthday_notification) }} --}}
+                {{-- {{ dd($unreadMessageCount) }} --}}
+
+                @if (!empty($unreadMessages))
+                    <li class="nav-item dropdown mr-2">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarMessageDropdown" role="button"
+                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            {{-- Main Message Icon --}}
+                            <i class="fas fa-envelope position-relative"></i>
+
+                            {{-- Conditional Badge for Notification Count --}}
+                            @if ($unreadMessageCount > 0)
+                                <span class="badge badge-pill badge-danger message-notification-badge">
+                                    {{ $unreadMessageCount }}
+                                </span>
+                            @endif
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-right scrollable-dropdown-menu"
+                            aria-labelledby="navbarMessageDropdown">
+                            <h6 class="dropdown-header">New Messages</h6>
+
+                            <div class="dropdown-divider"></div>
+                            @forelse ($unreadMessages as $message)
+                                <a class="dropdown-item d-flex align-items-center"
+                                    href="https://ui-chatify.primtechdev.com" target="_blank">
+                                    {{-- Avatar Icon --}}
+                                    <div class="mr-3">
+
+                                        <i class="fas fa-user-circle fa-2x text-secondary"></i>
+
+                                    </div>
+                                    {{-- Message Body and Details --}}
+                                    <div>
+                                        <div class="font-weight-bold">
+                                            <div class="text-truncate" style="max-width: 200px;">{{ $message->body }}
+                                            </div>
+                                            <div class="small text-gray-500">From: {{ $message->sender_name }}</div>
+                                            <div class="small text-gray-500">
+                                                {{ \Carbon\Carbon::parse($message->created_at)->diffForHumans() }}</div>
+                                        </div>
+                                    </div>
+                                </a>
+                                @if (!$loop->last)
+                                    <div class="dropdown-divider"></div>
+                                @endif
+                            @empty
+                                <span class="dropdown-item text-center text-muted">No new messages.</span>
+                            @endforelse
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item text-center small text-gray-500"
+                                href="https://ui-chatify.primtechdev.com" target="_blank">View All Messages</a>
+                        </div>
+                    </li>
+                @endif
+
+
+
+
+
                 {{-- Notifikasi Ulang Tahun --}}
                 @if (!empty($student_birthday_notification))
-                    <li class="nav-item dropdown">
+                    <li class="nav-item dropdown mr-2">
                         <a class="nav-link dropdown-toggle" href="#" id="navbarBirthdayDropdown" role="button"
                             data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             {{-- Main Gift Icon --}}
@@ -60,7 +117,8 @@
                                             {{-- Changed 0 to unknown for age --}}
                                         </small>
                                         <br><small class="text-muted">{{ $student['teacher'] }}
-                                            | {{ $student['day1'] }} {{ $student['day2'] }} | {{ $student['class'] }} |
+                                            | {{ $student['day1'] }} {{ $student['day2'] }} | {{ $student['class'] }}
+                                            |
                                             {{ $student['course_time'] }}</small> {{-- Added space between day1 and day2 --}}
                                     </a>
                                 @else
@@ -87,7 +145,7 @@
                     </li>
                 @endif
 
-                <li class="nav-item dropdown hidden-caret">
+                <li class="nav-item dropdown hidden-caret mr-2">
                     <a class="dropdown-toggle profile-pic" data-toggle="dropdown" href="#" aria-expanded="false">
                         <div class="avatar-sm">
                             <img src="{{ asset('assets/img/profile.png') }}" class="avatar-img rounded-circle">

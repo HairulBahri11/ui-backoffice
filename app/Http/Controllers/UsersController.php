@@ -155,10 +155,21 @@ class UsersController extends Controller
             }
         }
 
+        if (Auth::guard('teacher')->check()) {
+            // this is teacher reminder
+            $teacher_reminders = \App\Models\TeacherReminder::with(['teacher', 'staff'])
+                ->where('teacher_id', auth()->guard('teacher')->user()->id)
+                ->whereDate('created_at', Carbon::today())
+                ->orderBy('created_at', 'DESC')
+                ->get();
+        } else {
+            $teacher_reminders = [];
+        }
+
 
         // dd($student_birthday);
 
-        return view('dashboard.index', compact('data', 'arr', 'parent', 'student_birthday'));
+        return view('dashboard.index', compact('data', 'arr', 'parent', 'student_birthday', 'teacher_reminders'));
     }
 
     public function viewLogin()

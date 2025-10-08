@@ -144,4 +144,14 @@ Route::middleware(['web'])->group(function () {
         Route::get('/', [UiChatifyController::class, 'index'])->name('history-chat.index');
         Route::get('/{id}', [UiChatifyController::class, 'show'])->name('history-chat.show');
     });
+
+    Route::prefix('teacher-reminder')->group(function () {
+        Route::get('/', [\App\Http\Controllers\TeacherReminderController::class, 'index'])->name('teacher-reminder.index');
+        Route::get('/create', [\App\Http\Controllers\TeacherReminderController::class, 'create'])->name('teacher-reminder.create');
+        Route::post('/store', [\App\Http\Controllers\TeacherReminderController::class, 'store'])->name('teacher-reminder.store');
+        Route::get('/{id}/edit', [\App\Http\Controllers\TeacherReminderController::class, 'edit'])->name('teacher-reminder.edit');
+        Route::post('/{id}/update', [\App\Http\Controllers\TeacherReminderController::class, 'update'])->name('teacher-reminder.update');
+        Route::delete('/{id}/delete', [\App\Http\Controllers\TeacherReminderController::class, 'destroy'])->name('teacher-reminder.destroy');
+        Route::put('/update_status/{id}', [\App\Http\Controllers\TeacherReminderController::class, 'updateStatus'])->name('teacher-reminder.update_status');
+    });
 });

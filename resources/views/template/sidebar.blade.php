@@ -149,6 +149,14 @@
                         </a>
 
                     </li>
+                     @if (Auth::guard('staff')->check() == true)
+                            <li class="nav-item {{ Request::segment(1) == 'teacher-reminder' ? 'active' : '' }}">
+                                <a href="{{ url('/teacher-reminder') }}" class="collapsed">
+                                    <i class="fas fa-user-clock"></i>
+                                    <p>Teacher Reminder</p>
+                                </a>
+                            </li>
+                        @endif
                     @if (Auth::guard('staff')->check() == true)
                         <li class="nav-item {{ Request::segment(1) == 'saldo-awal' ? 'active' : '' }}">
                             <a href="{{ url('/saldo-awal') }}" class="collapsed">

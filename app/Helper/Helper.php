@@ -71,9 +71,12 @@ class Helper
     public static function sendBroadCast($phone, $message): bool
     {
         try {
-            // Mengambil API Key dan URL Gateway dari environment variables
-            $apiKey = env('API_KEY_BROADCAST');
-            $urlGateway = env('URL_GATEWAY_BROADCAST');
+            // Mengambil API Key dan URL Gateway dari environment variables #v5
+            // $apiKey = env('API_KEY_BROADCAST');
+            // $urlGateway = env('URL_GATEWAY_BROADCAST');
+
+            $apiKey = env('API_KEY');
+            $urlGateway = env('URL_GATEWAY');
 
             // Log informasi sebelum mengirim request
             // Log::info('Mencoba mengirim broadcast.', [

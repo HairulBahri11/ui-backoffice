@@ -17,7 +17,7 @@ class TeacherReminderController extends Controller
         // $data = \App\Models\TeacherReminder::all();
         // return view('teacher-reminder.index', compact('data'));
 
-        if(auth()->guard('staff')->user()->id == 7){
+        if(auth()->guard('staff')->user()->id == 7 || auth()->guard('staff')->user()->id == 10){
             $data = \App\Models\TeacherReminder::with(['teacher', 'staff'])->get();
         } else {
             $data = \App\Models\TeacherReminder::with(['teacher', 'staff'])

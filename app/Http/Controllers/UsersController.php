@@ -159,17 +159,26 @@ class UsersController extends Controller
             // this is teacher reminder
             $teacher_reminders = \App\Models\TeacherReminder::with(['teacher', 'staff'])
                 ->where('teacher_id', auth()->guard('teacher')->user()->id)
-                ->whereDate('created_at', Carbon::today())
+                ->where('type_announce', 'reminder')
+                // ->whereDate('created_at', Carbon::today())
+                ->orderBy('created_at', 'DESC')
+                ->get();
+
+            $teacher_notes = \App\Models\TeacherReminder::with(['teacher', 'staff'])
+                ->where('teacher_id', auth()->guard('teacher')->user()->id)
+                // ->whereDate('created_at', Carbon::today())
+                ->where('type_announce', 'note')
                 ->orderBy('created_at', 'DESC')
                 ->get();
         } else {
             $teacher_reminders = [];
+            $teacher_notes = [];
         }
 
 
         // dd($student_birthday);
 
-        return view('dashboard.index', compact('data', 'arr', 'parent', 'student_birthday', 'teacher_reminders'));
+        return view('dashboard.index', compact('data', 'arr', 'parent', 'student_birthday', 'teacher_reminders', 'teacher_notes'));
     }
 
     public function viewLogin()

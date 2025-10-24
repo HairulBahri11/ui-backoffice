@@ -805,7 +805,7 @@ $birthdayStudentNames = collect($student_birthday_notification)
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        <label for="">Excercise Book</label>
+                                        <label for="">Exercise Book</label>
                                         <input type="text" class="form-control"
                                             value="{{ $data->type == 'update' ? $data->excerciseBook : '' }}"
                                             name="excerciseBook">
@@ -908,7 +908,7 @@ $birthdayStudentNames = collect($student_birthday_notification)
                                                 <p>{{ $item->date }}
                                                     <br>{{ $item->activity }}
                                                     <br>Text Book : {{ $item->text_book }}
-                                                    <br>Excercise Book :
+                                                    <br>Exercise Book :
                                                     {{ $item->excercise_book != null ? $item->excercise_book : '-' }}
                                                 </p>
 
@@ -1390,7 +1390,7 @@ $birthdayStudentNames = collect($student_birthday_notification)
                     <p class="text-center bg-info"><strong>${agenda.date ? formatTanggalIndo(agenda.date) : '-'}</strong></p>
                     <p>${agenda.activity || '-'}</p>
                     <p><strong>Text Book:</strong> ${agenda.text_book || '-'}</p>
-                    <p><strong>Excercise Book:</strong> ${agenda.excercise_book || '-'}</p>
+                    <p><strong>Exercise Book:</strong> ${agenda.excercise_book || '-'}</p>
                 </div>
             </div>
         `;

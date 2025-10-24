@@ -156,6 +156,13 @@
                                     <p>Teacher Reminder</p>
                                 </a>
                             </li>
+                            <!-- teacher notes -->
+                            <li class="nav-item {{ Request::segment(1) == 'teacher-notes' ? 'active' : '' }}">
+                                <a href="{{ url('/teacher-notes') }}" class="collapsed">
+                                    <i class="fas fa-address-book"></i>
+                                    <p>Teacher Notes</p>
+                                </a>
+                            </li>
                         @endif
                     @if (Auth::guard('staff')->check() == true)
                         <li class="nav-item {{ Request::segment(1) == 'saldo-awal' ? 'active' : '' }}">

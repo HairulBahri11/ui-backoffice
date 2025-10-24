@@ -154,4 +154,14 @@ Route::middleware(['web'])->group(function () {
         Route::delete('/{id}/delete', [\App\Http\Controllers\TeacherReminderController::class, 'destroy'])->name('teacher-reminder.destroy');
         Route::put('/update_status/{id}', [\App\Http\Controllers\TeacherReminderController::class, 'updateStatus'])->name('teacher-reminder.update_status');
     });
+
+    // teacher-notes
+    Route::prefix('teacher-notes')->group(function () {
+        Route::get('/', [\App\Http\Controllers\TeacherNotesController::class, 'index'])->name('teacher-notes.index');
+        Route::get('/create', [\App\Http\Controllers\TeacherNotesController::class, 'create'])->name('teacher-notes.create');
+        Route::post('/store', [\App\Http\Controllers\TeacherNotesController::class, 'store'])->name('teacher-notes.store');
+        Route::get('/{id}/edit', [\App\Http\Controllers\TeacherNotesController::class, 'edit'])->name('teacher-notes.edit');
+        Route::post('/{id}/update', [\App\Http\Controllers\TeacherNotesController::class, 'update'])->name('teacher-notes.update');
+        Route::delete('/{id}/delete', [\App\Http\Controllers\TeacherNotesController::class, 'destroy'])->name('teacher-notes.destroy');
+    });
 });

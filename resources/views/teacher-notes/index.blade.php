@@ -6,11 +6,11 @@
             <div class="page-inner py-5">
                 <div class="d-flex align-items-left align-items-md-center flex-column flex-md-row">
                     <div>
-                        <h2 class="text-white pb-2 fw-bold">Teacher Reminders</h2>
+                        <h2 class="text-white pb-2 fw-bold">Teacher Notes</h2>
                     </div>
                     <div class="ml-md-auto py-2 py-md-0">
-                        {{-- Assuming the route for creating a reminder is 'teacher-reminder/create' --}}
-                        <a href="{{ url('/teacher-reminder/create') }}" class="btn btn-secondary btn-round">Tambah Data</a>
+                        {{-- Assuming the route for creating a reminder is 'teacher-notes/create' --}}
+                        <a href="{{ url('/teacher-notes/create') }}" class="btn btn-secondary btn-round">Tambah Data</a>
                     </div>
                 </div>
             </div>
@@ -44,7 +44,7 @@
                 <div class="col-md-12">
                     <div class="card">
                         <div class="card-header">
-                            <h4 class="card-title">Data Teacher Reminders</h4>
+                            <h4 class="card-title">Data Teacher Notes</h4>
                         </div>
                         <div class="card-body">
                             <div class="table-responsive">
@@ -56,7 +56,7 @@
                                             <th>Staff</th>
                                             <th>Category</th>
                                             <th>Description</th>
-                                            <!-- <th>Status</th> -->
+                                            <th>Status</th>
                                             <th>Created At</th>
                                             <th>Aksi</th>
                                         </tr>
@@ -71,7 +71,7 @@
                                                 <td>{{ $item->category }}</td>
                                                 <td>{{ $item->description }}</td>
                                                 <!-- <td>{{ $item->status }}</td> -->
-                                                <!-- <td>
+                                                <td>
                                                     @if ($item->status == 'pending')
                                                         <span class="badge badge-warning">Pending</span>
                                                     @elseif ($item->status == 'completed')
@@ -79,15 +79,15 @@
                                                     @else
                                                         <span class="badge badge-secondary">{{ $item->status }}</span>
                                                     @endif
-                                                </td> -->
+                                                </td>
                                                 <td>{{ $item->created_at }}</td>
                                                 <td class=" d-flex">
-                                                    {{-- Update the route names from 'tests' to 'teacher-reminder' or your actual resource name --}}
-                                                    <form action="{{ route('teacher-reminder.destroy', $item->id) }}" method="POST"
+                                                    {{-- Update the route names from 'tests' to 'teacher-notes' or your actual resource name --}}
+                                                    <form action="{{ route('teacher-notes.destroy', $item->id) }}" method="POST"
                                                         class="form-inline">
                                                         @method('delete')
                                                         @csrf
-                                                        <a href="{{ url('/teacher-reminder/' . $item->id . '/edit') }}"
+                                                        <a href="{{ url('/teacher-notes/' . $item->id . '/edit') }}"
                                                             class="btn btn-xs btn-info mr-2 "><i
                                                                 class="fas fa-edit"></i></a>
                                                         <input type="hidden" name="id" value="{{ $item->id }}">

@@ -6,82 +6,66 @@
    ENHANCED FLOATING STICKY NOTE STYLES
    ======================================= */
 
-    /* 1. Define the Blinking Animation (More subtle flash) */
-    @keyframes blinker {
+/* 1. Define the Blinking Animation (More subtle flash) */
+@keyframes blinker {
+    0%, 100% { box-shadow: 0 6px 15px rgba(0, 72, 255, 0.6); } /* Stronger shadow/glow at start/end */
+    50% { box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4); } /* Softer shadow in the middle */
+}
 
-        0%,
-        100% {
-            box-shadow: 0 6px 15px rgba(0, 72, 255, 0.6);
-        }
+/* 2. Floating Container (Positioning remains the same) */
+.floating-reminder-container {
+    position: fixed; 
+    bottom: 20px;
+    right: 20px;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column; 
+    align-items: flex-end; 
+}
 
-        /* Stronger shadow/glow at start/end */
-        50% {
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
-        }
+/* 3. Style for Each Notifcation (The Note Card itself) */
+.blinking-note {
+    /* Applying Animation */
+    animation: blinker 2s ease-in-out infinite; /* Slower, smoother animation */
+    
+    /* Card Aesthetics */
+    background: linear-gradient(135deg, #6aa0feff, #a58fffff); /* Soft gradient background */
+    color: #333; /* Darker text for readability */
+    padding: 15px;
+    border-radius: 10px;
+    margin-top: 15px; /* Increased spacing */
+    width: 280px; /* Slightly wider card */
+    font-size: 14px;
+    font-family: 'Arial', sans-serif;
+    transition: transform 0.2s ease-in-out; /* Smooth transition */
+}
 
-        /* Softer shadow in the middle */
-    }
+/* Hover Effect: Lifts the card and stops the blinking */
+.blinking-note:hover {
+    animation: none; 
+    transform: translateY(-5px); /* Lift effect */
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3); /* Stronger shadow on hover */
+    background: linear-gradient(135deg, #6aa0feff, #a58fffff); /* Slightly darker on hover */
+}
 
-    /* 2. Floating Container (Positioning remains the same) */
-    .floating-reminder-container {
-        position: fixed;
-        bottom: 20px;
-        right: 20px;
-        z-index: 1000;
-        display: flex;
-        flex-direction: column;
-        align-items: flex-end;
-    }
+.blinking-note h6 {
+    color: #2a38a5ff; /* Deep red for emphasis on title */
+}
 
-    /* 3. Style for Each Notifcation (The Note Card itself) */
-    .blinking-note {
-        /* Applying Animation */
-        animation: blinker 2s ease-in-out infinite;
-        /* Slower, smoother animation */
-        /* Soft gradient background */
-        color: #fefcfcff;
-        /* Darker text for readability */
-        padding: 10px;
-        border-radius: 10px;
-        margin-top: 15px;
-        /* Increased spacing */
-        width: 280px;
-        /* Slightly wider card */
-        font-size: 14px;
-        font-family: 'Arial', sans-serif;
-        transition: transform 0.2s ease-in-out;
-        /* Smooth transition */
-    }
+.note-source {
+    font-size: 0.85em;
+    font-style: italic;
+    color: rgba(51, 51, 51, 0.8);
+    border-top: 1px dashed rgba(51, 51, 51, 0.3); /* Dashed line separator */
+    padding-top: 8px;
+    margin-top: 10px;
+    display: block; /* Ensure it takes full width */
+}
 
-    /* Hover Effect: Lifts the card and stops the blinking */
-    .blinking-note:hover {
-        animation: none;
-        transform: translateY(-5px);
-        /* Lift effect */
-        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
-    }
-
-    .blinking-note h6 {
-        color: #ffffffff;
-        /* Deep red for emphasis on title */
-    }
-
-    .note-source {
-        font-size: 0.85em;
-        font-style: italic;
-        color: white;
-        border-top: 1px dashed rgba(51, 51, 51, 0.3);
-        /* Dashed line separator */
-        padding-top: 8px;
-        margin-top: 10px;
-        display: block;
-        /* Ensure it takes full width */
-    }
-
-    /* Style for the 'All Reminders Completed' message */
-    .floating-reminder-container>.btn-success {
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    }
+/* Style for the 'All Reminders Completed' message */
+.floating-reminder-container > .btn-success {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
 </style>
 
 @section('content')
@@ -99,66 +83,66 @@
         </div>
     </div>
 
-    {{-- Floating Container --}}
-    <div class="floating-reminder-container">
+{{-- Floating Container --}}
+<div class="floating-reminder-container">
 
-        @foreach ($teacher_notes as $item)
+    @foreach ($teacher_reminders as $item)
         {{-- Only display if the status is NOT 'completed' --}}
         @if (strtolower($item->status) !== 'completed')
+            
+           
+            <div class="blinking-note">
+                 <i class="fas fa-exclamation-circle mr-2"></i><span class="font-weight-bold">Reminder</span>
+                <h6 style="font-weight: bold; margin-bottom: 5px;">
+                    {{ $item->teacher ? $item->teacher->name : 'Teacher ID: ' . $item->teacher_id }} - 
+                    <span style="font-size: 0.9em; color: #555;">[{{ $item->category }}]</span>
+                </h6>
+                
+                {{-- Reminder Description (Limited text) --}}
+                <p style="margin-bottom: 0;">
+                    {{ \Illuminate\Support\Str::limit(strip_tags($item->description), 200, '...') }}
+                </p>
+                
+                {{-- Source Staff --}}
+                <span class="note-source">
+                    From: 
+                    {{-- Assumes the Staff relationship is eager-loaded ($item->staff->name) --}}
+                    @if ($item->staff)
+                        {{ $item->staff->name }}
+                    @else
+                        Staff ID: {{ $item->staff_id }}
+                    @endif
+                </span>
+                
+                {{-- ================================================= --}}
+                {{-- FORM BUTTON TO UPDATE STATUS TO 'COMPLETED' (DONE) --}}
+                {{-- ================================================= --}}
+                <form 
+                    action="{{ route('teacher-reminder.update_status', $item->id) }}" 
+                    method="POST" 
+                    style="margin-top: 10px; text-align: right;"> {{-- Align button to the right --}}
+                    
+                    @csrf
+                    @method('PUT')
 
+                    {{-- Hidden input to send the new status value --}}
+                    <input type="hidden" name="status" value="Completed">
 
-        <div class="blinking-note bg-primary">
-            <i class="fas fa-exclamation-circle mr-2 mb-3"></i><span class="font-weight-bold">Notes</span>
-            <h6 style="font-weight: bold; margin-bottom: 5px;">
-                {{ $item->teacher ? $item->teacher->name : 'Teacher ID: ' . $item->teacher_id }} -
-                <span style="font-size: 0.9em;">[{{ $item->category }}]</span>
-            </h6>
+                    <button type="submit"
+                        onclick="return confirm('Are you sure you want to mark this reminder as completed?')"
+                        class="btn btn-sm btn-secondary" 
+                        style="font-size: 12px; padding: 3px 8px;"
+                        title="Mark as Done">
+                        <i class="fas fa-check"></i> Done
+                    </button>
+                </form>
+                {{-- ================================================= --}}
 
-            {{-- Reminder Description (Limited text) --}}
-            <p style="margin-bottom: 0;">
-                {{ \Illuminate\Support\Str::limit(strip_tags($item->description), 200, '...') }}
-            </p>
-
-            {{-- Source Staff --}}
-            <span class="note-source">
-                From:
-                {{-- Assumes the Staff relationship is eager-loaded ($item->staff->name) --}}
-                @if ($item->staff)
-                {{ $item->staff->name }}
-                @else
-                Staff ID: {{ $item->staff_id }}
-                @endif
-            </span>
-
-            {{-- ================================================= --}}
-            {{-- FORM BUTTON TO UPDATE STATUS TO 'COMPLETED' (DONE) --}}
-            {{-- ================================================= --}}
-            <form
-                action="{{ route('teacher-reminder.update_status', $item->id) }}"
-                method="POST"
-                style=" text-align: right;"> {{-- Align button to the right --}}
-
-                @csrf
-                @method('PUT')
-
-                {{-- Hidden input to send the new status value --}}
-                <input type="hidden" name="status" value="Completed">
-
-                <button type="submit"
-                    onclick="return confirm('Are you sure you want to mark this reminder as completed?')"
-                    class="btn btn-sm btn-success"
-                    style="font-size: 12px; padding: 3px 3px;"
-                    title="Mark as Done">
-                    <i class="fas fa-check"></i> Done
-                </button>
-            </form>
-            {{-- ================================================= --}}
-
-        </div>
+            </div>
         @endif
-        @endforeach
-
-    </div>
+   @endforeach
+    
+</div>
 
     <div class="container mb-5 mt-5">
         <div class="row">
@@ -377,62 +361,101 @@
                 </div>
             </div>
         </div>
-
-        <!-- cek apakah ada teacher_reminder -->
-        @if (Auth::guard('teacher')->check() && $teacher_reminders->count() > 0)
         <div class="col-md-4">
-            <div class="card p-0 border-0 rounded-3" style="max-width: 400px; background-color: #e7e1bfff;">
+            <div class="card mb-3 shadow-sm border-0">
+                <div class="card-body border-1" style="background-color: #cdcdcd">
+                    <h5 class="card-title text-center text-white mb-2" style="font-weight: bold">🎉 Birthday Point
+                    </h5>
+                    {{-- <small class="text-white text-center text-danger">*Ignore if the birthday field has already
+                                been
+                                filled in</small> --}}
 
-                <div class="card-header border-bottom-0 d-flex align-items-center justify-content-between p-3 bg-warning" style=" border-radius: 0.3rem 0.3rem 0 0;">
-                    <h6 class="mb-0 text-dark fw-bold text-uppercase small" style="letter-spacing: 0.5px;">
-                        🚨 TEACHER REMINDER
-                    </h6>
-                    <span class="badge text-light rounded-pill small" style="background-color: #ff7700ff;">
-                        {{ $teacher_reminders->count() }} total
-                    </span>
-                </div>
+                    {{-- {{ $student_birthday_notification }} --}}
 
-                <div class="card-body p-3">
+                    <ul class="list-group list-group-flush">
+                        @php
+                        $todayMonthDay = date('m-d'); // Format bulan-tanggal hari ini
+                        $todayDay = date('l'); // Nama hari ini (Monday, Tuesday, dll.)
 
+                        // Ambil daftar student_id yang sudah memiliki point_category_id = 7 di tahun ini
+                        $students_with_points = DB::table('attendance_detail_points')
+                        ->where('point_category_id', 7)
+                        ->whereYear('created_at', date('Y'))
+                        ->pluck('attendance_detail_id') // Ambil ID attendance_details
+                        ->toArray();
 
+                        // Ambil daftar student_id dari attendance_details
+                        $students_with_attendance = DB::table('attendance_details')
+                        ->whereIn('id', $students_with_points)
+                        ->pluck('student_id') // Ambil student_id
+                        ->toArray();
 
-                    @foreach($teacher_reminders as $item)
-                    <div class="mb-3 border-bottom border-light pb-3">
+                        // Filter siswa yang belum memiliki point_category_id = 7 tahun ini
+                        $birthday_points = array_filter($student_birthday, function ($s) use (
+                        $todayMonthDay,
+                        $todayDay,
+                        $students_with_attendance,
+                        ) {
+                        // Jika student_id sudah ada dalam daftar attendance_detail_points, maka tidak ditampilkan
+                        if (in_array($s['id'], $students_with_attendance)) {
+                        return false;
+                        }
 
-                        <div class="d-flex justify-content-between mb-2 small text-muted">
-                            <div class="me-3">
-                                <span class="text-uppercase fw-normal d-block">FROM:</span>
-                                <p class="mb-0 fw-semibold text-dark">{{ $item->staff->name }}</p>
+                        // Ambil bulan dan tanggal dari ulang tahun siswa
+                        $studentMonthDay = date('m-d', strtotime($s['birthday']));
+
+                        // Hitung batas akhir tampilan (7 hari setelah ulang tahun)
+                        $birthday_plus_7 = date('m-d', strtotime($s['birthday'] . ' +7 days'));
+
+                        // Cek apakah hari ini dalam rentang ulang tahun hingga 7 hari setelahnya
+                        $is_within_7_days =
+                        $todayMonthDay >= $studentMonthDay && $todayMonthDay <= $birthday_plus_7;
+
+                            // Cek apakah hari ini cocok dengan day1 atau day2 siswa
+                            $is_matching_day=in_array($todayDay, [$s['day1'], $s['day2']]);
+
+                            return $is_within_7_days && $is_matching_day;
+                            });
+
+                            // dd($birthday_points);
+
+                            @endphp
+                            @if (!empty($student_birthday_notification))
+                            @foreach ($student_birthday_notification as $student)
+                            <li
+                            class="list-group-item mt-2 bg-white rounded shadow-sm p-3 d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="mb-1">👦 {{ $student['name'] }}</h6>
+                                <p class="mb-1 text-muted text-small">
+                                    🏫 <strong>Class:</strong> {{ $student['class'] }} -
+                                    {{ $student['day1'] . '' . $student['day2'] . ' ' . $student['course_time'] }}
+                                    <br>
+                                    👨‍🏫 <strong>Teacher:</strong> {{ $student['teacher'] ?? 'Unknown' }}
+                                    <br>
+                                    📅<strong>Birthday:</strong>
+                                    {{ date('F j', strtotime($student['birthday'])) }}
+
+                                </p>
                             </div>
-                            <div class="text-end">
-                                <span class="text-uppercase fw-normal d-block">TO:</span>
-                                <p class="mb-0 fw-semibold text-dark">{{ $item->teacher->name }}</p>
-                            </div>
-                        </div>
+                            <span class="badge bg-danger text-white rounded-pill px-3 py-2 fs-6">
+                                {{ $student['age'] }} yrs
+                            </span>
+                            </li>
+                            @endforeach
+                            @else
+                            <li class="list-group-item text-muted text-center bg-light rounded shadow-sm p-3">
+                                🎉 No birthday points today.
+                            </li>
+                            @endif
 
-                        <div class="p-3 rounded border-start border-4" style="background-color: #ffffff; border-color: #ff7700ff !important;">
-                            <p class="mb-1 text-uppercase fw-bolder small text-warning" style="letter-spacing: 0.5px;">
-                                📝 Description
-                            </p>
-                            <p class="mb-0 text-black compact-text" style="font-size: 0.875rem;">
-                                {{ $item->description }} <span class="fw-bold">({{ $item->category }})</span>
-                            </p>
-                        </div>
-                    </div>
-
-                    @if (!$loop->last)
-                    <div class="text-center my-3">
-                        <hr class="my-0 mx-auto" style="width: 50px; border-top: 1px solid #dee2e6;">
-                    </div>
-                    @endif
-                    @endforeach
-
+                    </ul>
                 </div>
             </div>
         </div>
-        @endif
+
 
 
     </div>
+</div>
 </div>
 @endsection

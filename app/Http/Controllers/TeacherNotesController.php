@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Teacher;
 use Illuminate\Http\Request;
 
-class TeacherReminderController extends Controller
+class TeacherNotesController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -15,17 +15,17 @@ class TeacherReminderController extends Controller
     public function index()
     {
         // $data = \App\Models\TeacherReminder::all();
-        // return view('teacher-reminder.index', compact('data'));
+        // return view('teacher-notes.index', compact('data'));
 
         if(auth()->guard('staff')->user()->id == 7 || auth()->guard('staff')->user()->id == 10){
-            $data = \App\Models\TeacherReminder::with(['teacher', 'staff'])->where('type_announce', 'reminder')->get();
+            $data = \App\Models\TeacherReminder::with(['teacher', 'staff'])->where('type_announce', 'note')->get();
         } else {
             $data = \App\Models\TeacherReminder::with(['teacher', 'staff'])
                 ->where('staff_id', auth()->guard('staff')->user()->id)
-                ->where('type_announce', 'reminder')
+                ->where('type_announce', 'note')
                 ->get();
         }
-        return view('teacher-reminder.index', compact('data'));
+        return view('teacher-notes.index', compact('data'));
     }
 
     /**
@@ -35,7 +35,7 @@ class TeacherReminderController extends Controller
      */
     public function create()
     {
-        $title = 'Add Teacher Reminder';
+        $title = 'Add Teacher Notes';
         $teacher = Teacher::where('status', 'active')->get();
         $data = (object)[
             'id' => 0,
@@ -46,7 +46,7 @@ class TeacherReminderController extends Controller
             'category' => '',
             'type' => 'create',
         ];
-        return view('teacher-reminder.form', compact('data', 'title', 'teacher'));
+        return view('teacher-notes.form', compact('data', 'title', 'teacher'));
     }
 
     /**
@@ -72,10 +72,10 @@ class TeacherReminderController extends Controller
         $reminder->status = 'pending'; // Default status
         $reminder->category = $request->category;
         $reminder->created_at = now();
-        $reminder->type_announce = 'reminder';
+        $reminder->type_announce = 'note';
         $reminder->save();
 
-        return redirect()->route('teacher-reminder.index')->with('success', 'Teacher Reminder created successfully.');
+        return redirect()->route('teacher-notes.index')->with('success', 'Teacher Notes created successfully.');
     }
 
     /**
@@ -97,11 +97,11 @@ class TeacherReminderController extends Controller
      */
     public function edit($id)
     {
-        $title = 'Edit Teacher Reminder';
+        $title = 'Edit Teacher Notes';
         $teacher = Teacher::where('status', 'active')->get();
         $data = \App\Models\TeacherReminder::findOrFail($id);
         $data->type = 'edit';
-        return view('teacher-reminder.form', compact('data', 'title', 'teacher'));
+        return view('teacher-notes.form', compact('data', 'title', 'teacher'));
         
     }
 
@@ -128,7 +128,7 @@ class TeacherReminderController extends Controller
         $reminder->category = $request->category;
         $reminder->save();
 
-        return redirect()->route('teacher-reminder.index')->with('success', 'Teacher Reminder updated successfully.');
+        return redirect()->route('teacher-notes.index')->with('success', 'Teacher Notes updated successfully.');
     }
 
     /**
@@ -142,7 +142,7 @@ class TeacherReminderController extends Controller
         $reminder = \App\Models\TeacherReminder::findOrFail($id);
         $reminder->delete();
 
-        return redirect()->route('teacher-reminder.index')->with('success', 'Teacher Reminder deleted successfully.');
+        return redirect()->route('teacher-notes.index')->with('success', 'Teacher Notes deleted successfully.');
     }
 
     public function updateStatus($id, Request $request)
@@ -158,6 +158,6 @@ class TeacherReminderController extends Controller
     $reminder->save();
 
     // Redirect back to the previous page with a success message
-    return back()->with('status', 'Reminder successfully marked as completed!');
+    return back()->with('status', 'Notes successfully marked as completed!');
 }
 }

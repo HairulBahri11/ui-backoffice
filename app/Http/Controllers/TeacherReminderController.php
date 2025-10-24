@@ -17,7 +17,16 @@ class TeacherReminderController extends Controller
         // $data = \App\Models\TeacherReminder::all();
         // return view('teacher-reminder.index', compact('data'));
 
-        if(auth()->guard('staff')->user()->id == 7 || auth()->guard('staff')->user()->id == 10){
+        // if(auth()->guard('staff')->user()->id == 7 || auth()->guard('staff')->user()->id == 10){
+        //     $data = \App\Models\TeacherReminder::with(['teacher', 'staff'])->where('type_announce', 'reminder')->get();
+        // } else {
+        //     $data = \App\Models\TeacherReminder::with(['teacher', 'staff'])
+        //         ->where('staff_id', auth()->guard('staff')->user()->id)
+        //         ->where('type_announce', 'reminder')
+        //         ->get();
+        // }
+
+        if(auth()->guard('teacher')->user()->id == 20){
             $data = \App\Models\TeacherReminder::with(['teacher', 'staff'])->where('type_announce', 'reminder')->get();
         } else {
             $data = \App\Models\TeacherReminder::with(['teacher', 'staff'])
@@ -25,6 +34,8 @@ class TeacherReminderController extends Controller
                 ->where('type_announce', 'reminder')
                 ->get();
         }
+
+
         return view('teacher-reminder.index', compact('data'));
     }
 
@@ -67,7 +78,8 @@ class TeacherReminderController extends Controller
 
         $reminder = new \App\Models\TeacherReminder();
         $reminder->teacher_id = $request->teacher_id;
-        $reminder->staff_id = auth()->guard('staff')->user()->id; // Assuming staff is logged in
+        // teacher ms.dewi only but i set to 7 (superadmin)
+        $reminder->staff_id = '7'; // Assuming staff is logged in
         $reminder->description = $request->description;
         $reminder->status = 'pending'; // Default status
         $reminder->category = $request->category;

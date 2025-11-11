@@ -35,7 +35,7 @@ class TeacherNotesController extends Controller
      */
     public function create()
     {
-        $title = 'Add Teacher Notes';
+        $title = "Add Teacher's Note";
         $teacher = Teacher::where('status', 'active')->get();
         $data = (object)[
             'id' => 0,
@@ -97,7 +97,7 @@ class TeacherNotesController extends Controller
      */
     public function edit($id)
     {
-        $title = 'Edit Teacher Notes';
+        $title = "Edit Teacher's Note";
         $teacher = Teacher::where('status', 'active')->get();
         $data = \App\Models\TeacherReminder::findOrFail($id);
         $data->type = 'edit';

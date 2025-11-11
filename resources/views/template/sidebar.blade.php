@@ -150,12 +150,12 @@
 
                 </li>
 
-                @if(Auth::guard('teacher')->check() == true && Auth::guard('teacher')->user()->id == 20)
+                @if(Auth::guard('teacher')->check() == true && Auth::guard('teacher')->user()->id == 20 || Auth::guard('teacher')->user()->id == 21)
 
                 <li class="nav-item {{ Request::segment(1) == 'teacher-reminder' ? 'active' : '' }}">
                     <a href="{{ url('/teacher-reminder') }}" class="collapsed">
                         <i class="fas fa-user-clock"></i>
-                        <p>Teacher Reminder</p>
+                        <p>Teacher's Reminder</p>
                     </a>
                 </li>
 
@@ -165,7 +165,7 @@
                 <li class="nav-item {{ Request::segment(1) == 'teacher-notes' ? 'active' : '' }}">
                     <a href="{{ url('/teacher-notes') }}" class="collapsed">
                         <i class="fas fa-address-book"></i>
-                        <p>Teacher Notes</p>
+                        <p>Teacher's Note</p>
                     </a>
                 </li>
                 @endif

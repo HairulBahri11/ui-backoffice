@@ -26,7 +26,7 @@ class TeacherReminderController extends Controller
         //         ->get();
         // }
 
-        if(auth()->guard('teacher')->user()->id == 20){
+        if(auth()->guard('teacher')->user()->id == 20 || auth()->guard('teacher')->user()->id == 21){
             $data = \App\Models\TeacherReminder::with(['teacher', 'staff'])->where('type_announce', 'reminder')->get();
         } else {
             $data = \App\Models\TeacherReminder::with(['teacher', 'staff'])
@@ -46,7 +46,7 @@ class TeacherReminderController extends Controller
      */
     public function create()
     {
-        $title = 'Add Teacher Reminder';
+        $title = "Add Teacher's Reminder";
         $teacher = Teacher::where('status', 'active')->get();
         $data = (object)[
             'id' => 0,
@@ -109,7 +109,7 @@ class TeacherReminderController extends Controller
      */
     public function edit($id)
     {
-        $title = 'Edit Teacher Reminder';
+        $title = "Edit Teacher's Reminder";
         $teacher = Teacher::where('status', 'active')->get();
         $data = \App\Models\TeacherReminder::findOrFail($id);
         $data->type = 'edit';

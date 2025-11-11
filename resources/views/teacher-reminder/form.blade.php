@@ -94,7 +94,7 @@
                                             <label for="category">Category</label>
                                             <select class="form-control @error('category') is-invalid @enderror" name="category" id="category">
                                                 <option value="" disabled {{ old('category', $data->category) == '' ? 'selected' : '' }}>Choose Category</option>
-                                                @php $categories = ['New Student', 'Move Student', 'Other']; @endphp
+                                                @php $categories = ['Arrival', 'Pre Teaching', 'Teaching', 'Post Teaching']; @endphp
                                                 @foreach ($categories as $cat)
                                                     <option value="{{ $cat }}" {{ old('category', $data->category) == $cat ? 'selected' : '' }}>{{ $cat }}</option>
                                                 @endforeach

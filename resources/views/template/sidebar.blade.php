@@ -150,7 +150,7 @@
 
                 </li>
 
-                @if(Auth::guard('teacher')->check() == true && Auth::guard('teacher')->user()->id == 20 || Auth::guard('teacher')->user()->id == 21)
+                @if(Auth::guard('teacher')->check() == true && Auth::guard('teacher')->user()->id == 20 || Auth::guard('teacher')->check() == true &&Auth::guard('teacher')->user()->id == 21)
 
                 <li class="nav-item {{ Request::segment(1) == 'teacher-reminder' ? 'active' : '' }}">
                     <a href="{{ url('/teacher-reminder') }}" class="collapsed">

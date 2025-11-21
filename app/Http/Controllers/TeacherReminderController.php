@@ -27,11 +27,12 @@ class TeacherReminderController extends Controller
         // }
 
         if(auth()->guard('teacher')->user()->id == 20 || auth()->guard('teacher')->user()->id == 21){
-            $data = \App\Models\TeacherReminder::with(['teacher', 'staff'])->where('type_announce', 'reminder')->get();
+            $data = \App\Models\TeacherReminder::with(['teacher', 'staff'])->where('type_announce', 'reminder')->orderBy('created_at', 'desc')->get();
         } else {
             $data = \App\Models\TeacherReminder::with(['teacher', 'staff'])
                 ->where('staff_id', auth()->guard('staff')->user()->id)
                 ->where('type_announce', 'reminder')
+                ->orderBy('created_at', 'desc')
                 ->get();
         }
 

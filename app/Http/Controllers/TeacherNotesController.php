@@ -18,11 +18,12 @@ class TeacherNotesController extends Controller
         // return view('teacher-notes.index', compact('data'));
 
         if(auth()->guard('staff')->user()->id == 7 || auth()->guard('staff')->user()->id == 10){
-            $data = \App\Models\TeacherReminder::with(['teacher', 'staff'])->where('type_announce', 'note')->get();
+            $data = \App\Models\TeacherReminder::with(['teacher', 'staff'])->where('type_announce', 'note')->orderBy('created_at', 'desc')->get();
         } else {
             $data = \App\Models\TeacherReminder::with(['teacher', 'staff'])
                 ->where('staff_id', auth()->guard('staff')->user()->id)
                 ->where('type_announce', 'note')
+                ->orderBy('created_at', 'desc')
                 ->get();
         }
         return view('teacher-notes.index', compact('data'));

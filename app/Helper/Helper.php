@@ -72,11 +72,11 @@ class Helper
     {
         try {
             // Mengambil API Key dan URL Gateway dari environment variables #v5
-            // $apiKey = env('API_KEY_BROADCAST');
-            // $urlGateway = env('URL_GATEWAY_BROADCAST');
+            $apiKey = env('API_KEY_BROADCAST');
+            $urlGateway = env('URL_GATEWAY_BROADCAST');
 
-            $apiKey = env('API_KEY');
-            $urlGateway = env('URL_GATEWAY');
+            // $apiKey = env('API_KEY');
+            // $urlGateway = env('URL_GATEWAY');
 
             // Log informasi sebelum mengirim request
             // Log::info('Mencoba mengirim broadcast.', [

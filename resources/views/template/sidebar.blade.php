@@ -155,7 +155,7 @@
                 <li class="nav-item {{ Request::segment(1) == 'teacher-reminder' ? 'active' : '' }}">
                     <a href="{{ url('/teacher-reminder') }}" class="collapsed">
                         <i class="fas fa-user-clock"></i>
-                        <p>Teacher's Reminder</p>
+                        <p>Teacher's Reminders</p>
                     </a>
                 </li>
 
@@ -165,7 +165,7 @@
                 <li class="nav-item {{ Request::segment(1) == 'teacher-notes' ? 'active' : '' }}">
                     <a href="{{ url('/teacher-notes') }}" class="collapsed">
                         <i class="fas fa-address-book"></i>
-                        <p>Teacher's Note</p>
+                        <p>Teacher's Notes</p>
                     </a>
                 </li>
                 @endif

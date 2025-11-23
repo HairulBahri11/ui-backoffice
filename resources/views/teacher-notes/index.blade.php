@@ -6,11 +6,11 @@
             <div class="page-inner py-5">
                 <div class="d-flex align-items-left align-items-md-center flex-column flex-md-row">
                     <div>
-                        <h2 class="text-white pb-2 fw-bold">Teacher Notes</h2>
+                        <h2 class="text-white pb-2 fw-bold">Teacher's Notes</h2>
                     </div>
                     <div class="ml-md-auto py-2 py-md-0">
                         {{-- Assuming the route for creating a reminder is 'teacher-notes/create' --}}
-                        <a href="{{ url('/teacher-notes/create') }}" class="btn btn-secondary btn-round">Tambah Data</a>
+                        <a href="{{ url('/teacher-notes/create') }}" class="btn btn-secondary btn-round">Add Data</a>
                     </div>
                 </div>
             </div>
@@ -44,7 +44,7 @@
                 <div class="col-md-12">
                     <div class="card">
                         <div class="card-header">
-                            <h4 class="card-title">Data Teacher Notes</h4>
+                            <h4 class="card-title">Teacher's Notes Data</h4>
                         </div>
                         <div class="card-body">
                             <div class="table-responsive">
@@ -57,8 +57,8 @@
                                             <th>Category</th>
                                             <th>Description</th>
                                             <th>Status</th>
-                                            <th>Created At</th>
-                                            <th>Aksi</th>
+                                            <th>Created On</th>
+                                            <th>Action</th>
                                         </tr>
                                     </thead>
                                     <tbody>

@@ -189,34 +189,7 @@
                                                     ->get();
                                                     @endphp
                                                     @endif
-                                                    <!-- @foreach ($item as $itKey => $itValue)
-                                                    <tr style="height: 40px!important">
-                                                        <td style="height: 40px!important; padding: 8px 16px!important;">
-                                                            {{ $no }}</td>
-                                                        <td style="height: 40px!important; padding: 8px 16px!important;">
-                                                            {{ $itValue->name }}</td>
-                                                        <td style="height: 40px!important; padding: 8px 16px!important;">
-                                                            <input type="hidden" value="{{ $itValue->id }}"
-                                                                name="items[]">
-                                                            <input type="hidden" name="idScore[]"
-                                                                id="idScore{{ $no }}"
-                                                                value="{{ $detail != null ? $detail[$itKey]->id : '' }}">
-                                                            <input type="number" id="{{ 'score' . $no }}" name="score[]"
-                                                                required class="form-table score"
-                                                                value="{{ $detail != null ? $detail[$itKey]->score : '' }}">
-
-                                                        </td>
-                                                        <td
-                                                            style="height: 40px!important; padding: 8px 16px!important; text-align:center;">
-                                                            <h6 id="grade{{ $no }}">
-                                                                {{ $detail != null ? Helper::getGrade($detail[$itKey]->score) : '' }}
-                                                            </h6>
-                                                        </td>
-                                                    </tr>
-                                                    @php
-                                                        $no++;
-                                                    @endphp
-                                                @endforeach -->
+                                                 
 
                                                     @foreach ($item as $itKey => $itValue)
                                                     <tr style="height: 40px!important">

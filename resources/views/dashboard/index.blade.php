@@ -402,7 +402,7 @@
                         <div class="d-flex justify-content-between mb-2 small text-muted">
                             <div class="me-3">
                                 <span class="text-uppercase fw-normal d-block">FROM:</span>
-                                <p class="mb-0 fw-semibold text-dark">{{ $item->staff->name }}</p>
+                                <p class="mb-0 fw-semibold text-dark">{{ $item->staff_id != 20 ? "Ms. Vonny" : "Ms. Dewi" }}</p>
                             </div>
                             <div class="text-end">
                                 <span class="text-uppercase fw-normal d-block">TO:</span>

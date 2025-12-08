@@ -164,4 +164,8 @@ Route::middleware(['web'])->group(function () {
         Route::post('/{id}/update', [\App\Http\Controllers\TeacherNotesController::class, 'update'])->name('teacher-notes.update');
         Route::delete('/{id}/delete', [\App\Http\Controllers\TeacherNotesController::class, 'destroy'])->name('teacher-notes.destroy');
     });
+
+    Route::prefix('calendar')->group(function () {
+        Route::get('/', [\App\Http\Controllers\CalendarController::class, 'index'])->name('calendar.index');
+    });
 });

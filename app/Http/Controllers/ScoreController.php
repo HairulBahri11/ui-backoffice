@@ -86,6 +86,7 @@ class ScoreController extends Controller
      */
     public function create(Request $request)
     {
+
         $students = Students::where('status', 'ACTIVE')->get();
         $test = ModelsTests::all();
         $item = '';

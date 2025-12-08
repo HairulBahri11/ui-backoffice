@@ -206,6 +206,7 @@
                                                             $total_test2 += $score_test2;
                                                             $total_test3 += $score_test3;
                                                             $total_test += $score_test;
+
                                                         @endphp
                                                         <tr>
                                                             <td>{{ $loop->iteration }}</td>

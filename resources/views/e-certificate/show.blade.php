@@ -206,6 +206,7 @@
                                                             $total_test2 += $score_test2;
                                                             $total_test3 += $score_test3;
                                                             $total_test += $score_test;
+
                                                         @endphp
                                                         <tr>
                                                             <td>{{ $loop->iteration }}</td>
@@ -267,58 +268,58 @@
                                                                         aria-labelledby="dropdownMenuButton">
                                                                         @if ($class->id >= 43 && $class->id <= 45)
                                                                             @if ($score1)
-                                                                                <a href="{{ url('score/create?type=edit&class=') . $student->priceid . '&student=' . $student->student_id . '&test=1&id_test=' . $score1->id . '&date=' . $score1->date . '&day1=' . $student->day1 . '&day2=' . $student->day2 . '&teacher=' . $student->student_id_teacher . '&time=' . $student->course_time }}"
+                                                                                <a href="{{ url('score/create?type=edit&class=') . $class->id . '&student=' . $student->student_id . '&test=1&id_test=' . $score1->id . '&date=' . $score1->date . '&day1=' . $student->day1 . '&day2=' . $student->day2 . '&teacher=' . $student->student_id_teacher . '&time=' . $student->course_time }}"
                                                                                     class="dropdown-item">Test 1</a>
                                                                             @else
                                                                                 <a class="dropdown-item"
-                                                                                    href="{{ url('score/create?type=create&class=') . $student->priceid . '&student=' . $student->student_id . '&test=1&day1=' . $student->day1 . '&day2=' . $student->day2 . '&teacher=' . $student->student_id_teacher . '&time=' . $student->course_time }}"
+                                                                                    href="{{ url('score/create?type=create&class=') . $class->id . '&student=' . $student->student_id . '&test=1&day1=' . $student->day1 . '&day2=' . $student->day2 . '&teacher=' . $student->student_id_teacher . '&time=' . $student->course_time }}"
                                                                                     class="btn btn-sm btn-primary">Test
                                                                                     1</a>
                                                                             @endif
                                                                         @elseif($class->id >= 22 && $class->id <= 37)
                                                                             @if ($score1)
-                                                                                <a href="{{ url('score/create?type=edit&class=') . $student->priceid . '&student=' . $student->student_id . '&test=1&id_test=' . $score1->id . '&date=' . $score1->date . '&day1=' . $student->day1 . '&day2=' . $student->day2 . '&teacher=' . $student->student_id_teacher . '&time=' . $student->course_time }}"
+                                                                                <a href="{{ url('score/create?type=edit&class=') . $class->id . '&student=' . $student->student_id . '&test=1&id_test=' . $score1->id . '&date=' . $score1->date . '&day1=' . $student->day1 . '&day2=' . $student->day2 . '&teacher=' . $student->student_id_teacher . '&time=' . $student->course_time }}"
                                                                                     class="dropdown-item">Test 1</a>
                                                                             @else
                                                                                 <a class="dropdown-item"
-                                                                                    href="{{ url('score/create?type=create&class=') . $student->priceid . '&student=' . $student->student_id . '&test=1&day1=' . $student->day1 . '&day2=' . $student->day2 . '&teacher=' . $student->student_id_teacher . '&time=' . $student->course_time }}"
+                                                                                    href="{{ url('score/create?type=create&class=') . $class->id . '&student=' . $student->student_id . '&test=1&day1=' . $student->day1 . '&day2=' . $student->day2 . '&teacher=' . $student->student_id_teacher . '&time=' . $student->course_time }}"
                                                                                     class="btn btn-sm btn-primary">Test
                                                                                     1</a>
                                                                             @endif
                                                                             @if ($score2)
-                                                                                <a href="{{ url('score/create?type=edit&class=') . $student->priceid . '&student=' . $student->student_id . '&test=2&id_test=' . $score2->id . '&date=' . $score2->date . '&day1=' . $student->day1 . '&day2=' . $student->day2 . '&teacher=' . $student->student_id_teacher . '&time=' . $student->course_time }}"
+                                                                                <a href="{{ url('score/create?type=edit&class=') . $class->id . '&student=' . $student->student_id . '&test=2&id_test=' . $score2->id . '&date=' . $score2->date . '&day1=' . $student->day1 . '&day2=' . $student->day2 . '&teacher=' . $student->student_id_teacher . '&time=' . $student->course_time }}"
                                                                                     class="dropdown-item">Test 2</a>
                                                                             @else
                                                                                 <a class="dropdown-item"
-                                                                                    href="{{ url('score/create?type=create&class=') . $student->priceid . '&student=' . $student->student_id . '&test=2&day1=' . $student->day1 . '&day2=' . $student->day2 . '&teacher=' . $student->student_id_teacher . '&time=' . $student->course_time }}"
+                                                                                    href="{{ url('score/create?type=create&class=') . $class->id . '&student=' . $student->student_id . '&test=2&day1=' . $student->day1 . '&day2=' . $student->day2 . '&teacher=' . $student->student_id_teacher . '&time=' . $student->course_time }}"
                                                                                     class="btn btn-sm btn-primary">Test
                                                                                     2</a>
                                                                             @endif
                                                                         @else
                                                                             @if ($score1)
-                                                                                <a href="{{ url('score/create?type=edit&class=') . $student->priceid . '&student=' . $student->student_id . '&test=1&id_test=' . $score1->id . '&date=' . $score1->date . '&day1=' . $student->day1 . '&day2=' . $student->day2 . '&teacher=' . $student->student_id_teacher . '&time=' . $student->course_time }}"
+                                                                                <a href="{{ url('score/create?type=edit&class=') . $class->id . '&student=' . $student->student_id . '&test=1&id_test=' . $score1->id . '&date=' . $score1->date . '&day1=' . $student->day1 . '&day2=' . $student->day2 . '&teacher=' . $student->student_id_teacher . '&time=' . $student->course_time }}"
                                                                                     class="dropdown-item">Test 1</a>
                                                                             @else
                                                                                 <a class="dropdown-item"
-                                                                                    href="{{ url('score/create?type=create&class=') . $student->priceid . '&student=' . $student->student_id . '&test=1&day1=' . $student->day1 . '&day2=' . $student->day2 . '&teacher=' . $student->student_id_teacher . '&time=' . $student->course_time }}"
+                                                                                    href="{{ url('score/create?type=create&class=') . $class->id . '&student=' . $student->student_id . '&test=1&day1=' . $student->day1 . '&day2=' . $student->day2 . '&teacher=' . $student->student_id_teacher . '&time=' . $student->course_time }}"
                                                                                     class="btn btn-sm btn-primary">Test
                                                                                     1</a>
                                                                             @endif
                                                                             @if ($score2)
-                                                                                <a href="{{ url('score/create?type=edit&class=') . $student->priceid . '&student=' . $student->student_id . '&test=2&id_test=' . $score2->id . '&date=' . $score2->date . '&day1=' . $student->day1 . '&day2=' . $student->day2 . '&teacher=' . $student->student_id_teacher . '&time=' . $student->course_time }}"
+                                                                                <a href="{{ url('score/create?type=edit&class=') . $class->id . '&student=' . $student->student_id . '&test=2&id_test=' . $score2->id . '&date=' . $score2->date . '&day1=' . $student->day1 . '&day2=' . $student->day2 . '&teacher=' . $student->student_id_teacher . '&time=' . $student->course_time }}"
                                                                                     class="dropdown-item">Test 2</a>
                                                                             @else
                                                                                 <a class="dropdown-item"
-                                                                                    href="{{ url('score/create?type=create&class=') . $student->priceid . '&student=' . $student->student_id . '&test=2&day1=' . $student->day1 . '&day2=' . $student->day2 . '&teacher=' . $student->student_id_teacher . '&time=' . $student->course_time }}"
+                                                                                    href="{{ url('score/create?type=create&class=') . $class->id . '&student=' . $student->student_id . '&test=2&day1=' . $student->day1 . '&day2=' . $student->day2 . '&teacher=' . $student->student_id_teacher . '&time=' . $student->course_time }}"
                                                                                     class="btn btn-sm btn-primary">Test
                                                                                     2</a>
                                                                             @endif
                                                                             @if ($score3)
-                                                                                <a href="{{ url('score/create?type=edit&class=') . $student->priceid . '&student=' . $student->student_id . '&test=3&id_test=' . $score3->id . '&date=' . $score3->date . '&day1=' . $student->day1 . '&day2=' . $student->day2 . '&teacher=' . $student->student_id_teacher . '&time=' . $student->course_time }}"
+                                                                                <a href="{{ url('score/create?type=edit&class=') . $class->id . '&student=' . $student->student_id . '&test=3&id_test=' . $score3->id . '&date=' . $score3->date . '&day1=' . $student->day1 . '&day2=' . $student->day2 . '&teacher=' . $student->student_id_teacher . '&time=' . $student->course_time }}"
                                                                                     class="dropdown-item">Test 3</a>
                                                                             @else
                                                                                 <a class="dropdown-item"
-                                                                                    href="{{ url('score/create?type=create&class=') . $student->priceid . '&student=' . $student->student_id . '&test=3&day1=' . $student->day1 . '&day2=' . $student->day2 . '&teacher=' . $student->student_id_teacher . '&time=' . $student->course_time }}"
+                                                                                    href="{{ url('score/create?type=create&class=') . $class->id . '&student=' . $student->student_id . '&test=3&day1=' . $student->day1 . '&day2=' . $student->day2 . '&teacher=' . $student->student_id_teacher . '&time=' . $student->course_time }}"
                                                                                     class="btn btn-sm btn-primary">Test
                                                                                     3</a>
                                                                             @endif

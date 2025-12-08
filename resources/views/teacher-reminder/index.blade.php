@@ -67,7 +67,7 @@
                                             <tr>
                                                 <td>{{ $item->id }}</td>
                                                 <td>{{ $item->teacher->name }}</td>
-                                                <td>{{ $item->staff->name }}</td>
+                                                <td>{{ $item->staff_id != 20 ? "Ms. Vonny" : "Ms. Dewi" }}</td>
                                                 <td>{{ $item->category }}</td>
                                                 <td>{{ $item->description }}</td>
                                                 <!-- <td>{{ $item->status }}</td> -->

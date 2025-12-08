@@ -80,7 +80,7 @@ class TeacherReminderController extends Controller
         $reminder = new \App\Models\TeacherReminder();
         $reminder->teacher_id = $request->teacher_id;
         // teacher ms.dewi only but i set to 7 (superadmin)
-        $reminder->staff_id = '7'; // Assuming staff is logged in
+        $reminder->staff_id = auth()->guard('teacher')->user()->id; // Assuming staff is logged in
         $reminder->description = $request->description;
         $reminder->status = 'pending'; // Default status
         $reminder->category = $request->category;

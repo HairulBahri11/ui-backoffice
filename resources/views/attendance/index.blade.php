@@ -113,6 +113,22 @@
                                             ->where('status', 'ACTIVE')
                                             ->where('id_teacher', $item->id_teacher)
                                             ->count();
+
+                                             $query = DB::table('attendances')
+                                            ->where('price_id', $item->priceid)
+                                            ->where('day1', $item->day1)
+                                            ->where('day2', $item->day2)
+                                            ->where('course_time', $item->course_time)
+                                            ->where('teacher_id', $item->id_teacher);
+
+                                        $star = $query
+                                            ->leftJoin('teacher as t2', 'attendances.assist_id', '=', 't2.id')
+                                            ->select('attendances.*', 't2.name as assist_name')
+                                            ->first();
+
+                                        $assistName = $star ? $star->assist_name : null;
+
+                                            
                                     @endphp
                                     <div class="col-sm-6 col-md-4 ">
                                         <div class="card">
@@ -142,6 +158,7 @@
                                                                         $new_label = '';
                                                                     }
                                                                 @endphp
+                                                                
                                                                 <span style="color: red" {{ $new_label }}>(New!)</span>
                                                             @endif
 
@@ -183,8 +200,22 @@
                                                         {{ $item->day1 != $item->day2 ? $item->day_two : '' }}</b>
                                                     <br>
                                                    
-                                                    <b>{{ $item->course_time }}</b> <br>
+                                                    <b>{{ $item->course_time }}</b> <span>
+                                                                    @if ($star && $star->star)
+                                                                    @if ($star->star == 1)
+                                                                    (<i class="fas fa-star"></i>)
+                                                                    @elseif ($star->star == 2)
+                                                                    (<i class="fas fa-star"></i><i class="fas fa-star"></i>)
+                                                                    @else
+                                                                    Star {{ $star->star }}
+                                                                    @endif
+                                                                    @endif
+                                                                </span> <br>
                                                     <i>{{ $student_total . ' Students' }}</i>
+                                                    @if(!empty($assistName))
+                                                        <p style="font-size: 11px; color:rgb(127, 127, 255)">Assist:{{ $assistName }}</p>
+                                                    @endif
+                                                   
 
                                                     <input type="hidden" id="regprogramModal{{ $key }}"
                                                         value="{{ $item->program }}">
@@ -232,6 +263,49 @@
 
                                                                 Transfer
                                                             </button>
+
+                                                            <div class="dropdown">
+                                                    <button class="btn btn-secondary btn-xs dropdown-toggle" type="button"
+                                                        id="dropdownMenuButton_{{ $key }}" data-toggle="dropdown" aria-expanded="false">
+                                                    </button>
+                                                    <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton_{{ $key }}">
+                                                        <a class="dropdown-item" href="javascript:void(0)"
+                                                            data-toggle="modal" data-target="#editStarModal"
+                                                            data-priceid="{{ $item->program }}"
+                                                            data-idteacher="{{ $item->teacher_name }}"
+                                                            data-day1="{{ $item->day_one }}"
+                                                            data-day2="{{ $item->day_two }}"
+                                                            data-time="{{ $item->course_time }}"
+                                                            data-day1-fix="{{ $item->day1 }}"
+                                                            data-day2-fix="{{ $item->day2 }}"
+                                                            data-idteacher-fix="{{ $item->id_teacher }}"
+                                                            data-priceid-fix="{{ $item->priceid }}"><i class="fas fa-star"></i> Star</a>
+                                                        <a class="dropdown-item" href="javascript:void(0)" data-toggle="modal" data-target="#editAssistModal"
+                                                            data-priceid="{{ $item->program }}"
+                                                            data-idteacher="{{ $item->teacher_name }}"
+                                                            data-day1="{{ $item->day_one }}"
+                                                            data-day2="{{ $item->day_two }}"
+                                                            data-time="{{ $item->course_time }}"
+                                                            data-day1-fix="{{ $item->day1 }}"
+                                                            data-day2-fix="{{ $item->day2 }}"
+                                                            data-idteacher-fix="{{ $item->id_teacher }}"
+                                                            data-priceid-fix="{{ $item->priceid }}"><i class="fas fa-handshake"></i> Assist Class</a>
+                                                        <!-- remove assist class -->
+
+                                                        @if($assistName)
+                                                         <a class="dropdown-item" href="javascript:void(0)" data-toggle="modal" data-target="#removeAssistModal"
+                                                            data-priceid="{{ $item->program }}"
+                                                            data-idteacher="{{ $item->teacher_name }}"
+                                                            data-day1="{{ $item->day_one }}"
+                                                            data-day2="{{ $item->day_two }}"
+                                                            data-time="{{ $item->course_time }}"
+                                                            data-day1-fix="{{ $item->day1 }}"
+                                                            data-day2-fix="{{ $item->day2 }}"
+                                                            data-idteacher-fix="{{ $item->id_teacher }}"
+                                                            data-priceid-fix="{{ $item->priceid }}"><i class="fas fa-user-times"></i> Remove Assist</a>
+                                                        @endif
+                                                    </div>
+                                                </div>
                                                         @endif
                                                     </div>
                                                 </div>
@@ -266,6 +340,25 @@
                                             ->where('status', 'ACTIVE')
                                             ->where('id_teacher', $itemSemiPrivate->id_teacher)
                                             ->count();
+
+                                        $query = DB::table('Attendances')->where(
+                                            'price_id',
+                                            $itemSemiPrivate->priceid,
+                                        )
+                                            ->where('day1', $itemSemiPrivate->day1)
+                                            ->where('day2', $itemSemiPrivate->day2)
+                                            ->where('course_time', $itemSemiPrivate->course_time)
+                                            ->where('teacher_id', $itemSemiPrivate->id_teacher);
+                                            
+                                        $star = $query
+                                            ->leftJoin('teacher as t2', 'Attendances.assist_id', '=', 't2.id')
+                                            ->select('Attendances.*', 't2.name as assist_name')
+                                            ->first();
+
+                                        $assistName = $star ? $star->assist_name : null;
+
+                                        
+                                        
                                     @endphp
                                     <div class="col-sm-6 col-md-4 ">
                                         <div class="card">
@@ -334,8 +427,23 @@
                                                         {{ $itemSemiPrivate->day1 != $itemSemiPrivate->day2 ? '&' : '' }}
                                                         {{ $itemSemiPrivate->day1 != $itemSemiPrivate->day2 ? $itemSemiPrivate->day_two : '' }}</b>
                                                     <br>
-                                                    <b>{{ $itemSemiPrivate->course_time }}</b> <br>
+                                                    <b>{{ $itemSemiPrivate->course_time }}</b>
+                                                        <span>
+                                                            @if ($star && $star->star)
+                                                            @if ($star->star == 1)
+                                                            (<i class="fas fa-star"></i>)
+                                                            @elseif ($star->star == 2)
+                                                            (<i class="fas fa-star"></i><i class="fas fa-star"></i>)
+                                                            @else
+                                                            Star {{ $star->star }}
+                                                            @endif
+                                                            @endif
+                                                        </span>
+                                                     <br>
                                                     <i>{{ $student_total_semi_private . ' Students' }}</i>
+                                                    @if(!empty($assistName))
+                                                        <p style="font-size: 11px; color:rgb(127, 127, 255)">Assist:{{ $assistName }}</p>
+                                                    @endif
 
                                                     <input type="hidden" id="regprogramModal{{ $keySemiPrivate }}"
                                                         value="{{ $itemSemiPrivate->program }}">
@@ -383,6 +491,46 @@
 
                                                                 Transfer
                                                             </button>
+                                                            <div class="dropdown">
+                                                    <button class="btn btn-secondary btn-xs dropdown-toggle" type="button"
+                                                        id="dropdownMenuButton_{{ $keySemiPrivate }}" data-toggle="dropdown" aria-expanded="false">
+                                                    </button>
+                                                    <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton_{{ $keySemiPrivate }}">
+                                                        <a class="dropdown-item" href="javascript:void(0)"
+                                                            data-toggle="modal" data-target="#editStarModal"
+                                                            data-priceid="{{ $itemSemiPrivate->program }}"
+                                                            data-idteacher="{{ $itemSemiPrivate->teacher_name }}"
+                                                            data-day1="{{ $itemSemiPrivate->day_one }}"
+                                                            data-day2="{{ $itemSemiPrivate->day_two }}"
+                                                            data-time="{{ $itemSemiPrivate->course_time }}"
+                                                            data-day1-fix="{{ $itemSemiPrivate->day1 }}"
+                                                            data-day2-fix="{{ $itemSemiPrivate->day2 }}"
+                                                            data-idteacher-fix="{{ $itemSemiPrivate->id_teacher }}"
+                                                            data-priceid-fix="{{ $itemSemiPrivate->priceid }}"><i class="fas fa-star"></i> Star</a>
+                                                        <a class="dropdown-item" href="javascript:void(0)" data-toggle="modal" data-target="#editAssistModal"
+                                                            data-priceid="{{ $itemSemiPrivate->program }}"
+                                                            data-idteacher="{{ $itemSemiPrivate->teacher_name }}"
+                                                            data-day1="{{ $itemSemiPrivate->day_one }}"
+                                                            data-day2="{{ $itemSemiPrivate->day_two }}"
+                                                            data-time="{{ $itemSemiPrivate->course_time }}"
+                                                            data-day1-fix="{{ $itemSemiPrivate->day1 }}"
+                                                            data-day2-fix="{{ $itemSemiPrivate->day2 }}"
+                                                            data-idteacher-fix="{{ $itemSemiPrivate->id_teacher }}"
+                                                            data-priceid-fix="{{ $itemSemiPrivate->priceid }}"><i class="fas fa-handshake"></i> Assist Class</a>
+                                                        @if($assistName)
+                                                         <a class="dropdown-item" href="javascript:void(0)" data-toggle="modal" data-target="#removeAssistModal"
+                                                            data-priceid="{{ $itemSemiPrivate->program }}"
+                                                            data-idteacher="{{ $itemSemiPrivate->teacher_name }}"
+                                                            data-day1="{{ $itemSemiPrivate->day_one }}"
+                                                            data-day2="{{ $itemSemiPrivate->day_two }}"
+                                                            data-time="{{ $itemSemiPrivate->course_time }}"
+                                                            data-day1-fix="{{ $itemSemiPrivate->day1 }}"
+                                                            data-day2-fix="{{ $itemSemiPrivate->day2 }}"
+                                                            data-idteacher-fix="{{ $itemSemiPrivate->id_teacher }}"
+                                                            data-priceid-fix="{{ $itemSemiPrivate->priceid }}"><i class="fas fa-user-times"></i> Remove Assist</a>
+                                                        @endif
+                                                    </div>
+                                                </div>
                                                         @endif
                                                     </div>
                                                 </div>
@@ -460,6 +608,39 @@
                                                             {{ $item->day1 != $item->day2 ? $item->day_two : '' }}</b>
                                                         <br>
                                                         <b>{{ $item->course_time }}</b>
+                                                        <span>
+                                                            @php
+                                                                $query = DB::table('Attendances')
+                                                                    ->where('price_id', $item->priceid)
+                                                                    ->where('day1', $item->day1)
+                                                                    ->where('day2', $item->day2)
+                                                                    ->where('course_time', $item->course_time)
+                                                                    ->where('teacher_id', $item->id_teacher);
+
+                                                                $star = $query
+                                                                    ->leftJoin('teacher as t2', 'Attendances.assist_id', '=', 't2.id')
+                                                                    ->select('Attendances.*', 't2.name as assist_name')
+                                                                    ->first();
+
+                                                                $assistName = $star ? $star->assist_name : null;
+                                                            @endphp
+
+                                                           
+                                                            @if ($star && $star->star)
+                                                            @if ($star->star == 1)
+                                                            (<i class="fas fa-star"></i>)
+                                                            @elseif ($star->star == 2)
+                                                            (<i class="fas fa-star"></i><i class="fas fa-star"></i>)
+                                                            @else
+                                                            Star {{ $star->star }}
+                                                            @endif
+                                                            @endif
+                                                            @if (!empty($assistName))
+                                                                <p style="font-size: 11px; color:rgb(127, 127, 255)">Assist:{{ $assistName }}</p>
+                                                        @endif
+
+                                                        </span>
+                                                         
 
                                                         <input type="hidden" id="prvprogramModal{{ $key }}"
                                                             value="{{ $item->program }}">
@@ -508,6 +689,51 @@
 
                                                                 Transfer
                                                             </button>
+
+                                                            <div class="dropdown">
+                                                                <button class="btn btn-secondary btn-xs dropdown-toggle" type="button"
+                                                                    id="dropdownMenuButton_Private_{{ $key }}_{{ $keyStudentName }}"
+                                                                    data-toggle="dropdown" aria-expanded="false">
+                                                                </button>
+                                                                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton_Private_{{ $key }}_{{ $keyStudentName }}">
+                                                                    <a class="dropdown-item" href="javascript:void(0)"
+                                                                        data-toggle="modal" data-target="#editAssistModal"
+                                                                        data-priceid="{{ $item->program }}"
+                                                                        data-idteacher="{{ $item->teacher_name }}"
+                                                                        data-day1="{{ $item->day_one }}"
+                                                                        data-day2="{{ $item->day_two }}"
+                                                                        data-time="{{ $item->course_time }}"
+                                                                        data-day1-fix="{{ $item->day1 }}"
+                                                                        data-day2-fix="{{ $item->day2 }}"
+                                                                        data-idteacher-fix="{{ $item->id_teacher }}"
+                                                                        data-priceid-fix="{{ $item->priceid }}"><i class="fas fa-handshake"></i> Assist Class</a>
+                                                                    <a class="dropdown-item" href="javascript:void(0)"
+                                                                        data-toggle="modal" data-target="#editStarModal"
+                                                                        data-priceid="{{ $item->program }}"
+                                                                        data-idteacher="{{ $item->teacher_name }}"
+                                                                        data-day1="{{ $item->day_one }}"
+                                                                        data-day2="{{ $item->day_two }}"
+                                                                        data-time="{{ $item->course_time }}"
+                                                                        data-day1-fix="{{ $item->day1 }}"
+                                                                        data-day2-fix="{{ $item->day2 }}"
+                                                                        data-idteacher-fix="{{ $item->id_teacher }}"
+                                                                        data-priceid-fix="{{ $item->priceid }}"><i class="fas fa-star"></i> Star</a>
+                                                                    @if($assistName)
+                                                                    <a class="dropdown-item" href="javascript:void(0)" data-toggle="modal" data-target="#removeAssistModal"
+                                                                        data-priceid="{{ $item->program }}"
+                                                                        data-idteacher="{{ $item->teacher_name }}"
+                                                                        data-day1="{{ $item->day_one }}"
+                                                                        data-day2="{{ $item->day_two }}"
+                                                                        data-time="{{ $item->course_time }}"
+                                                                        data-day1-fix="{{ $item->day1 }}"
+                                                                        data-day2-fix="{{ $item->day2 }}"
+                                                                        data-idteacher-fix="{{ $item->id_teacher }}"
+                                                                        data-priceid-fix="{{ $item->priceid }}"><i class="fas fa-user-times"></i> Remove Assist</a>
+                                                                    @endif
+                                                                </div>
+                                                            </div>
+
+
                                                                @endif
 
                                                         </div>
@@ -772,6 +998,176 @@
 
         </div>
     </div>
+
+<!-- star Modal -->
+<div class="modal fade" id="editStarModal" tabindex="-1" role="dialog"
+    aria-labelledby="starModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="starModalLabel">Choose Star</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+
+            <form action="{{ route('update-star') }}" method="POST" id="formStarSelection">
+                @csrf
+
+                <div class="modal-body text-center">
+                    <p class="mb-4">Choose the number of Star icons that match:</p>
+
+                    <input type="hidden" name="selected_star" id="selected_star_input">
+
+                    <input type="hidden" name="priceid" id="modal_priceid">
+                    <input type="hidden" name="day1" id="modal_day1">
+                    <input type="hidden" name="day2" id="modal_day2">
+                    <input type="hidden" name="course_time" id="modal_course_time">
+                    <input type="hidden" name="id_teacher" id="modal_id_teacher">
+                    <div class="d-flex justify-content-around align-items-center">
+
+                        <button type="button" class="btn btn-outline-success btn-huge star-select-btn" data-star-value="1" style="width: 45%; height: 120px; font-size: 24px;">
+                            <i class="fas fa-star fa-3x d-block mb-1"></i>
+                            <span class="d-block" style="font-size: 16px;">Star 1</span>
+                        </button>
+
+                        <button type="button" class="btn btn-outline-primary btn-huge star-select-btn" data-star-value="2" style="width: 45%; height: 120px; font-size: 24px;">
+                            <i class="fas fa-star fa-2x d-inline"></i>
+                            <i class="fas fa-star fa-2x d-inline"></i>
+                            <span class="d-block mt-1" style="font-size: 16px;">Star 2</span>
+                        </button>
+
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="submitStarSelection" disabled>Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- assist modal -->
+<!-- assist modal -->
+<div class="modal fade" id="editAssistModal" tabindex="-1" role="dialog" aria-labelledby="assistModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-md modal-dialog-centered" role="document">
+        <div class="modal-content shadow-lg border-0 rounded-lg">
+            
+            {{-- Header Modal --}}
+            <div class="modal-header bg-primary text-white p-3 rounded-top-lg">
+                <h5 class="modal-title font-weight-bold" id="assistModalLabel">
+                    <i class="fas fa-edit mr-2"></i> Settings for Class Assistance
+                </h5>
+                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+
+            {{-- Form Body --}}
+            <form action="{{ route('set-assistant') }}" method="POST" id="formAssistSelection">
+                @csrf
+
+                <div class="modal-body">
+                    {{-- Hidden Inputs --}}
+                    <input type="hidden" name="old_priceid" id="assist_modal_priceid">
+                    <input type="hidden" name="old_teacher_id" id="assist_modal_old_teacher_id">
+                    <input type="hidden" name="old_day1" id="assist_modal_old_day1">
+                    <input type="hidden" name="old_day2" id="assist_modal_old_day2">
+                    <input type="hidden" name="old_course_time" id="assist_modal_old_course_time">
+
+                    {{-- Teacher Selection --}}
+                    <div class="form-group mb-4 p-3 border rounded-lg bg-light">
+                        <label for="new_teacher_id" class="font-weight-bold text-dark d-block">
+                            <i class="fas fa-user-tie mr-1"></i> Select Teacher
+                        </label>
+                        <p class="text-secondary small mb-2">Current Teacher: <span id="current_teacher_name" class="font-weight-medium">N/A</span></p>
+                        <select class="form-control custom-select" id="new_teacher_id" name="assistant_teacher_id">
+                            <option value="" selected>-- Do not change Teacher --</option>
+                            @foreach ($teachers as $teacher)
+                                <option value="{{ $teacher->id }}">{{ $teacher->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    {{-- Day Clearing Options --}}
+                    <h6 class="mb-3 text-primary font-weight-bold"><i class="fas fa-calendar-alt mr-1"></i> Clear Course Days</h6>
+                    <div class="row">
+                        {{-- Day 1 --}}
+                        <div class="col-md-6 mb-3">
+                            <div class="card p-3 h-100 border-info">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" name="assist_day1" value="true" id="clear_day1_check" class="custom-control-input">
+                                    <label class="custom-control-label font-weight-bold text-info" for="clear_day1_check">
+                                        Day 1
+                                    </label>
+                                    <span class="d-block text-sm text-muted current-day-status mt-1">
+                                        <span id="current_day1" class="font-weight-medium">N/A</span>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        {{-- Day 2 --}}
+                        <div class="col-md-6 mb-3">
+                            <div class="card p-3 h-100 border-info">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" name="assist_day2" value="true" id="clear_day2_check" class="custom-control-input">
+                                    <label class="custom-control-label font-weight-bold text-info" for="clear_day2_check">
+                                        Day 2
+                                    </label>
+                                    <span class="d-block text-sm text-muted current-day-status mt-1">
+                                        <span id="current_day2" class="font-weight-medium">N/A</span>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Footer Modal --}}
+                <div class="modal-footer d-flex justify-content-between">
+                    <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary font-weight-bold" id="submitAssistSelection">
+                        <i class="fas fa-save mr-1"></i> Save Changes
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- remove assist class modal -->
+<div class="modal fade" id="removeAssistModal" tabindex="-1" role="dialog" aria-labelledby="removeAssistModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="removeAssistModalLabel">Remove Class Assistant</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form action="{{ route('remove-assistant') }}" method="POST" id="formRemoveAssist">
+                @csrf
+                <input type="hidden" name="priceid" id="remove_assist_priceid">
+                <input type="hidden" name="teacher_id" id="remove_assist_teacher_id">
+                <input type="hidden" name="day1" id="remove_assist_day1">
+                <input type="hidden" name="day2" id="remove_assist_day2">
+                <input type="hidden" name="course_time" id="remove_assist_course_time">
+                <div class="modal-body">
+                    <p class="fw-bold">Are you sure you want to remove the assistant from this class?</p>
+                    <p class="text-secondary">This action will clear the assistant assignment for the selected class.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-danger">Remove Assistant</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
     <script>
         function updateModalReg(id) {
             var program = $('#regprogramModal' + id).val();
@@ -901,4 +1297,144 @@
 
         });
     </script>
+
+    <script>
+    $(document).ready(function() {
+        // --- LOGIKA PEMILIHAN STAR (Sudah ada, hanya dipertahankan) ---
+        $('.star-select-btn').on('click', function() {
+            // Hapus highlight dari semua tombol
+            $('.star-select-btn').removeClass('active border-5 shadow-lg');
+
+            // Tambahkan highlight ke tombol yang dipilih
+            $(this).addClass('active border-5 shadow-lg');
+
+            // Ambil nilai star dan masukkan ke input hidden
+            var selectedStar = $(this).data('star-value');
+            $('#selected_star_input').val(selectedStar);
+
+            // Aktifkan tombol Lanjutkan
+            $('#submitStarSelection').prop('disabled', false);
+        });
+
+        // --- LOGIKA PENGAMBILAN DATA DARI TOMBOL PEMICU MODAL (BARU) ---
+        $('#editStarModal').on('show.bs.modal', function(event) {
+
+            $('body').focus();
+            var button = $(event.relatedTarget); // Tombol yang memicu modal
+
+            // Ambil data dari atribut data-* tombol pemicu
+            var priceid = button.data('priceid');
+            var day1 = button.data('day1');
+            var day2 = button.data('day2');
+            var courseTime = button.data('time');
+            var idTeacher = button.data('idteacher');
+
+            var id_teacher_fix = button.data('idteacher-fix');
+            var priceid_fix = button.data('priceid-fix');
+            var day1_fix = button.data('day1-fix');
+            var day2_fix = button.data('day2-fix');
+            var studentId_fix = button.data('studentid-fix');
+            var student_name = button.data('studentname');
+
+            var dataClass = priceid + " " + day1 + "," + day2 + "," + courseTime + "," + idTeacher;
+            // console.log(dataClass);
+
+
+            // Isi input hidden di dalam modal
+            var modal = $(this);
+            modal.find('#modal_priceid').val(priceid_fix);
+            modal.find('#modal_day1').val(day1_fix);
+            modal.find('#modal_day2').val(day2_fix);
+            modal.find('#modal_course_time').val(courseTime);
+            modal.find('#modal_id_teacher').val(id_teacher_fix);
+            modal.find('#starModalLabel').text('Choose Star for Class: ' + dataClass);
+
+            // Pastikan tombol Lanjutkan dinonaktifkan dan pilihan star direset saat modal dibuka
+            modal.find('#selected_star_input').val('');
+            modal.find('#submitStarSelection').prop('disabled', true);
+            modal.find('.star-select-btn').removeClass('active border-5 shadow-lg');
+        });
+
+        // --- LOGIKA RESET MODAL KETIKA DITUTUP (Diperbarui untuk menggunakan #editStarModal) ---
+        $('#editStarModal').on('hidden.bs.modal', function() {
+            // Reset pilihan star dan status tombol
+            $('.star-select-btn').removeClass('active border-5 shadow-lg');
+            $('#selected_star_input').val('');
+            $('#submitStarSelection').prop('disabled', true);
+
+            // Reset input hidden data kontekstual
+            $('#modal_priceid').val('');
+            $('#modal_day1').val('');
+            $('#modal_day2').val('');
+            $('#modal_course_time').val('');
+            $('#modal_id_teacher').val('');
+        });
+    });
+</script>
+
+<script>
+    $(document).ready(function() {
+        // Logika saat modal dibuka (untuk reset dan isi data)
+        $('#editAssistModal').on('show.bs.modal', function(event) {
+            var button = $(event.relatedTarget);
+            var modal = $(this);
+
+            // Ambil Data Lama
+            var oldPriceId = button.data('priceidFix');
+            var oldTeacherId = button.data('idteacherFix');
+            var oldDay1Fix = button.data('day1Fix');
+            var oldDay2Fix = button.data('day2Fix');
+            var oldCourseTime = button.data('time');
+
+            var oldTeacherName = button.data('idteacher');
+            var displayDay1 = button.data('day1');
+            var displayDay2 = button.data('day2');
+
+            // 1. Isi Hidden Fields (Kriteria WHERE)
+            modal.find('#assist_modal_priceid').val(oldPriceId);
+            modal.find('#assist_modal_old_teacher_id').val(oldTeacherId);
+            modal.find('#assist_modal_old_day1').val(oldDay1Fix);
+            modal.find('#assist_modal_old_day2').val(oldDay2Fix);
+            modal.find('#assist_modal_old_course_time').val(oldCourseTime);
+
+            // 2. RESET Checkboxes dan Dropdown Guru
+            modal.find('#clear_day1_check').prop('checked', false);
+            modal.find('#clear_day2_check').prop('checked', false);
+
+            modal.find('#new_teacher_id').val(oldTeacherId || "");
+
+            // 3. Update Label Display
+            modal.find('#current_teacher_name').text(oldTeacherName || 'N/A');
+            modal.find('#current_day1').text(displayDay1 || 'Empty');
+            modal.find('#current_day2').text(displayDay2 || 'Empty');
+        });
+    });
+</script>
+
+<script>
+    $(document).ready(function() {
+        $('#removeAssistModal').on('show.bs.modal', function(event) {
+            var button = $(event.relatedTarget);
+            var modal = $(this);
+
+            // Ambil Data dari tombol pemicu
+            var priceId = button.data('priceidFix');
+            var teacherId = button.data('idteacherFix');
+            var day1 = button.data('day1Fix');
+            var day2 = button.data('day2Fix');
+            var courseTime = button.data('time');
+
+            // var classData = priceId + " " + day1 + "," + day2 + "," + courseTime + "," + teacherId;
+            // Update judul modal dengan informasi kelas
+            // modal.find('.modal-title').text('Remove Assist for Class: ' + classData);
+
+            // Isi input hidden di dalam modal
+            modal.find('#remove_assist_priceid').val(priceId);
+            modal.find('#remove_assist_teacher_id').val(teacherId);
+            modal.find('#remove_assist_day1').val(day1);
+            modal.find('#remove_assist_day2').val(day2);
+            modal.find('#remove_assist_course_time').val(courseTime);
+        });
+    });
+</script>
 @endsection

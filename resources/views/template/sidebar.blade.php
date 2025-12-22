@@ -131,6 +131,16 @@
                     </a>
 
                 </li>
+
+                @if (Auth::guard('staff')->check() == true)
+                 <li class="nav-item {{ Request::segment(1) == 'class-info' ? 'active' : '' }}">
+                    <a href="{{ url('/class-info') }}" class="collapsed">
+                        <i class="fas fa-info"></i>
+                        <p>Class Monitoring</p>
+                    </a>
+
+                </li>
+                @endif
                 @if (Auth::guard('teacher')->user() == null)
                 <li class="nav-item {{ Request::segment(1) == 'history-test' ? 'active' : '' }}">
                     <a href="{{ url('/history-test') }}" class="collapsed">

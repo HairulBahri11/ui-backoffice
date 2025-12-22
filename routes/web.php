@@ -102,6 +102,9 @@ Route::middleware(['web'])->group(function () {
         Route::get('/get-class', [AttendanceController::class, 'getClass']);
         Route::post('/update-class', [AttendanceController::class, 'updateClass']);
         Route::get('/get-student', [AttendanceController::class, 'ajaxStudent']);
+        Route::post('/update-star', [AttendanceController::class, 'updateStar'])->name('update-star');
+        Route::post('/set-assistant', [AttendanceController::class, 'setAssistant'])->name('set-assistant');
+        Route::post('/remove-assistant', [AttendanceController::class, 'removeAssistant'])->name('remove-assistant');
     });
     Route::get('/mutasi', [AttendanceController::class, 'mutasi']);
     Route::post('/mutasi', [AttendanceController::class, 'storeMutasi']);
@@ -167,5 +170,9 @@ Route::middleware(['web'])->group(function () {
 
     Route::prefix('calendar')->group(function () {
         Route::get('/', [\App\Http\Controllers\CalendarController::class, 'index'])->name('calendar.index');
+    });
+
+    Route::prefix('class-info')->group(function(){
+        Route::get('/', [\App\Http\Controllers\ClassInfoController::class, 'index'])->name('class-info.index');
     });
 });

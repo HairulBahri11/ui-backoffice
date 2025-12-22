@@ -17,6 +17,7 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class AttendanceController extends Controller
 {
@@ -1696,6 +1697,112 @@ class AttendanceController extends Controller
 
             // Handle error and return failure message
             return redirect()->back()->with('message', 'Failed transfer class : ' . $e->getMessage());
+        }
+    }
+
+
+    public function updateStar(Request $request)
+    {
+        try {
+            // dd($request->all());
+            $updatedRows = Attendance::where('price_id', $request->priceid)
+                ->where('teacher_id', $request->id_teacher)
+                ->where('day1', $request->day1)
+                ->where('day2', $request->day2)
+                ->where('course_time', $request->course_time)
+                ->get();
+
+                // dd($updatedRows);
+
+            foreach ($updatedRows as $row) {
+                $row->star = $request->selected_star;
+                $row->save();
+            }
+
+            $updatedCount = $updatedRows->count();
+
+            if ($updatedCount > 0) {
+                return redirect()->back()->with('message', 'Data Star Updated Successfully.');
+            }
+
+            return redirect()->back()->with('message', 'Tidak ada data yang cocok untuk di-update.');
+
+        } catch (\Illuminate\Database\QueryException $e) {
+            Log::error('Database Error: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Terjadi kesalahan pada database : ' . $e->getMessage());
+        } catch (\Exception $e) {
+            Log::error('General Error: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Terjadi kesalahan umum : ' . $e->getMessage());
+        }
+        
+    }
+
+    public function setAssistant(Request $request)
+    {
+        try {
+            $updatedRows = Attendance::where('price_id', $request->old_priceid)
+                ->where('teacher_id', $request->old_teacher_id)
+                ->where('day1', $request->old_day1)
+                ->where('day2', $request->old_day2)
+                ->where('course_time', $request->old_course_time)
+                ->get();
+
+            foreach ($updatedRows as $row) {
+                $row->assist_id = $request->assistant_teacher_id;
+                $row->assist_day1 = $request->assist_day1 == "true" ? True : False;
+                $row->assist_day2 = $request->assist_day2 == "true" ? True : False;
+                $row->save();
+            }
+
+            $updatedCount = $updatedRows->count();
+
+            if ($updatedCount > 0) {
+                return redirect()->back()->with('message', 'Data Assistant Updated Successfully.');
+            }
+
+            return redirect()->back()->with('message', 'Tidak ada data yang cocok untuk di-update.');
+
+        } catch (\Illuminate\Database\QueryException $e) {
+            Log::error('Database Error: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Terjadi kesalahan pada database : ' . $e->getMessage());
+        } catch (\Exception $e) {
+            Log::error('General Error: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Terjadi kesalahan umum : ' . $e->getMessage());
+        }
+    }
+
+    public function removeAssistant(Request $request)
+    {
+
+        try {
+            $updatedRows = Attendance::where('price_id', $request->priceid)
+                ->where('teacher_id', $request->teacher_id)
+                ->where('day1', $request->day1)
+                ->where('day2', $request->day2)
+                ->where('course_time', $request->course_time)
+                ->get();
+
+            foreach ($updatedRows as $row) {
+                $row->assist_id = null;
+                $row->assist_day1 = false;
+                $row->assist_day2 = false;
+                $row->save();
+            }
+
+            $updatedCount = $updatedRows->count();
+
+            if ($updatedCount > 0) {
+                return redirect()->back()->with('message', 'Data Assistant Removed Successfully.');
+            }
+
+            return redirect()->back()->with('message', 'Tidak ada data yang cocok untuk di-update.');
+
+        } catch (\Illuminate\Database\QueryException $e) {
+            Log::error('Database Error: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Terjadi kesalahan pada database : ' . $e->getMessage());
+        } catch (\Exception $e) {
+            Log::error('General Error: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Terjadi kesalahan umum : ' . $e->getMessage());
         }
     }
 }

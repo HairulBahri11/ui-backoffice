@@ -341,7 +341,7 @@
                                             ->where('id_teacher', $itemSemiPrivate->id_teacher)
                                             ->count();
 
-                                        $query = DB::table('Attendances')->where(
+                                        $query = DB::table('attendances')->where(
                                             'price_id',
                                             $itemSemiPrivate->priceid,
                                         )
@@ -351,8 +351,8 @@
                                             ->where('teacher_id', $itemSemiPrivate->id_teacher);
                                             
                                         $star = $query
-                                            ->leftJoin('teacher as t2', 'Attendances.assist_id', '=', 't2.id')
-                                            ->select('Attendances.*', 't2.name as assist_name')
+                                            ->leftJoin('teacher as t2', 'attendances.assist_id', '=', 't2.id')
+                                            ->select('attendances.*', 't2.name as assist_name')
                                             ->first();
 
                                         $assistName = $star ? $star->assist_name : null;
@@ -610,7 +610,7 @@
                                                         <b>{{ $item->course_time }}</b>
                                                         <span>
                                                             @php
-                                                                $query = DB::table('Attendances')
+                                                                $query = DB::table('attendances')
                                                                     ->where('price_id', $item->priceid)
                                                                     ->where('day1', $item->day1)
                                                                     ->where('day2', $item->day2)
@@ -618,8 +618,8 @@
                                                                     ->where('teacher_id', $item->id_teacher);
 
                                                                 $star = $query
-                                                                    ->leftJoin('teacher as t2', 'Attendances.assist_id', '=', 't2.id')
-                                                                    ->select('Attendances.*', 't2.name as assist_name')
+                                                                    ->leftJoin('teacher as t2', 'attendances.assist_id', '=', 't2.id')
+                                                                    ->select('attendances.*', 't2.name as assist_name')
                                                                     ->first();
 
                                                                 $assistName = $star ? $star->assist_name : null;

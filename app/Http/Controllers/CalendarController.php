@@ -552,8 +552,6 @@ public function index(Request $request)
 
     $mergedSchedule = $mergedSchedule->sortBy('course_time');
 
-    dd($mergedSchedule);
-
     return view('calendar.index', [
         'data' => $mergedSchedule,
         'startOfWeekDate' => $startOfWeekDateString,

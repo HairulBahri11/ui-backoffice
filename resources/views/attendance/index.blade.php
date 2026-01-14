@@ -114,21 +114,21 @@
                                             ->where('id_teacher', $item->id_teacher)
                                             ->count();
 
-                                             $query = DB::table('attendances')
-                                            ->where('price_id', $item->priceid)
-                                            ->where('day1', $item->day1)
-                                            ->where('day2', $item->day2)
-                                            ->where('course_time', $item->course_time)
-                                            ->where('teacher_id', $item->id_teacher);
+                                             // 2. Ambil data attendance terakhir secara aman
+        $star = DB::table('attendances')
+            ->leftJoin('teacher as t2', 'attendances.assist_id', '=', 't2.id')
+            ->where('attendances.price_id', $item->priceid)
+            ->where('attendances.day1', $item->day1)
+            ->where('attendances.day2', $item->day2)
+            ->where('attendances.course_time', $item->course_time)
+            ->where('attendances.teacher_id', $item->id_teacher)
+            ->select('attendances.star', 't2.name as assist_name', 'attendances.is_presence')
+            ->orderBy('attendances.date', 'desc') // Ambil yang paling baru
+            ->first();
 
-                                        $star = $query
-                                            ->leftJoin('teacher as t2', 'attendances.assist_id', '=', 't2.id')
-                                            ->select('attendances.*', 't2.name as assist_name')
-                                            ->first();
-
-                                        $assistName = $star ? $star->assist_name : null;
-
-                                            
+        $assistName = $star ? $star->assist_name : null;
+        $classStar = $star ? $star->star : null; // Simpan star di variabel agar aman  
+                                        
                                     @endphp
                                     <div class="col-sm-6 col-md-4 ">
                                         <div class="card">
@@ -201,15 +201,15 @@
                                                     <br>
                                                    
                                                     <b>{{ $item->course_time }}</b> <span>
-                                                                    @if ($star && $star->star)
-                                                                    @if ($star->star == 1)
-                                                                    (<i class="fas fa-star"></i>)
-                                                                    @elseif ($star->star == 2)
-                                                                    (<i class="fas fa-star"></i><i class="fas fa-star"></i>)
-                                                                    @else
-                                                                    Star {{ $star->star }}
-                                                                    @endif
-                                                                    @endif
+                                                                   @if ($classStar)
+                        @if ($classStar == 1)
+                            (<i class="fas fa-star"></i>)
+                        @elseif ($classStar == 2)
+                            (<i class="fas fa-star"></i><i class="fas fa-star"></i>)
+                        @else
+                            (Star {{ $classStar }})
+                        @endif
+                    @endif
                                                                 </span> <br>
                                                     <i>{{ $student_total . ' Students' }}</i>
                                                     @if(!empty($assistName))
@@ -304,6 +304,22 @@
                                                             data-idteacher-fix="{{ $item->id_teacher }}"
                                                             data-priceid-fix="{{ $item->priceid }}"><i class="fas fa-user-times"></i> Remove Assist</a>
                                                         @endif
+
+                                                        <!-- jika ada star -->
+                                                         @if($star && $star->star != null)
+                                                          <a class="dropdown-item" href="javascript:void(0)" data-toggle="modal" data-target="#removeStarModal"
+                                                            data-priceid="{{ $item->program }}"
+                                                            data-idteacher="{{ $item->teacher_name }}"
+                                                            data-day1="{{ $item->day_one }}"
+                                                            data-day2="{{ $item->day_two }}"
+                                                            data-time="{{ $item->course_time }}"
+                                                            data-day1-fix="{{ $item->day1 }}"
+                                                            data-day2-fix="{{ $item->day2 }}"
+                                                            data-idteacher-fix="{{ $item->id_teacher }}"
+                                                            data-priceid-fix="{{ $item->priceid }}"><i class="fas fa-trash-alt"></i> Remove Star</a>
+                                                        @endif
+
+
                                                     </div>
                                                 </div>
                                                         @endif
@@ -341,21 +357,21 @@
                                             ->where('id_teacher', $itemSemiPrivate->id_teacher)
                                             ->count();
 
-                                        $query = DB::table('attendances')->where(
-                                            'price_id',
-                                            $itemSemiPrivate->priceid,
-                                        )
-                                            ->where('day1', $itemSemiPrivate->day1)
-                                            ->where('day2', $itemSemiPrivate->day2)
-                                            ->where('course_time', $itemSemiPrivate->course_time)
-                                            ->where('teacher_id', $itemSemiPrivate->id_teacher);
-                                            
-                                        $star = $query
-                                            ->leftJoin('teacher as t2', 'attendances.assist_id', '=', 't2.id')
-                                            ->select('attendances.*', 't2.name as assist_name')
-                                            ->first();
+                                        
+    $star = DB::table('attendances')
+        ->leftJoin('teacher as t2', 'attendances.assist_id', '=', 't2.id')
+        ->where('attendances.price_id', $itemSemiPrivate->priceid)
+        ->where('attendances.day1', $itemSemiPrivate->day1)
+        ->where('attendances.day2', $itemSemiPrivate->day2)
+        ->where('attendances.course_time', $itemSemiPrivate->course_time)
+        ->where('attendances.teacher_id', $itemSemiPrivate->id_teacher)
+        ->select('attendances.*', 't2.name as assist_name')
+        ->orderBy('attendances.date', 'desc') // Tambahkan ini agar mendapat star terbaru
+        ->first();
 
-                                        $assistName = $star ? $star->assist_name : null;
+    // Gunakan null coalescing atau ternary untuk mencegah error
+    $assistName = $star ? $star->assist_name : null;
+    $classStar = $star ? $star->star : null; 
 
                                         
                                         
@@ -429,15 +445,15 @@
                                                     <br>
                                                     <b>{{ $itemSemiPrivate->course_time }}</b>
                                                         <span>
-                                                            @if ($star && $star->star)
-                                                            @if ($star->star == 1)
-                                                            (<i class="fas fa-star"></i>)
-                                                            @elseif ($star->star == 2)
-                                                            (<i class="fas fa-star"></i><i class="fas fa-star"></i>)
-                                                            @else
-                                                            Star {{ $star->star }}
-                                                            @endif
-                                                            @endif
+                                                                   @if ($classStar != null)
+                        @if ($classStar == 1)
+                            (<i class="fas fa-star"></i>)
+                        @elseif ($classStar == 2)
+                            (<i class="fas fa-star"></i><i class="fas fa-star"></i>)
+                        @else
+                            (Star {{ $classStar }})
+                        @endif
+                    @endif 
                                                         </span>
                                                      <br>
                                                     <i>{{ $student_total_semi_private . ' Students' }}</i>
@@ -529,6 +545,19 @@
                                                             data-idteacher-fix="{{ $itemSemiPrivate->id_teacher }}"
                                                             data-priceid-fix="{{ $itemSemiPrivate->priceid }}"><i class="fas fa-user-times"></i> Remove Assist</a>
                                                         @endif
+                                                        <!-- jika ada star -->
+                                                         @if($star && $star->star != null)
+                                                          <a class="dropdown-item" href="javascript:void(0)" data-toggle="modal" data-target="#removeStarModal"
+                                                            data-priceid="{{ $itemSemiPrivate->program }}"
+                                                            data-idteacher="{{ $itemSemiPrivate->teacher_name }}"
+                                                            data-day1="{{ $itemSemiPrivate->day_one }}"
+                                                            data-day2="{{ $itemSemiPrivate->day_two }}"
+                                                            data-time="{{ $itemSemiPrivate->course_time }}"
+                                                            data-day1-fix="{{ $itemSemiPrivate->day1 }}"
+                                                            data-day2-fix="{{ $itemSemiPrivate->day2 }}"
+                                                            data-idteacher-fix="{{ $itemSemiPrivate->id_teacher }}"
+                                                            data-priceid-fix="{{ $itemSemiPrivate->priceid }}"><i class="fas fa-trash-alt"></i> Remove Star</a>
+                                                        @endif
                                                     </div>
                                                 </div>
                                                         @endif
@@ -610,29 +639,31 @@
                                                         <b>{{ $item->course_time }}</b>
                                                         <span>
                                                             @php
-                                                                $query = DB::table('attendances')
-                                                                    ->where('price_id', $item->priceid)
-                                                                    ->where('day1', $item->day1)
-                                                                    ->where('day2', $item->day2)
-                                                                    ->where('course_time', $item->course_time)
-                                                                    ->where('teacher_id', $item->id_teacher);
+    // Ambil data attendance beserta join dalam satu kali panggil secara aman
+    $star = DB::table('attendances')
+        ->leftJoin('teacher as t2', 'attendances.assist_id', '=', 't2.id')
+        ->where('attendances.price_id', $item->priceid)
+        ->where('attendances.day1', $item->day1)
+        ->where('attendances.day2', $item->day2)
+        ->where('attendances.course_time', $item->course_time)
+        ->where('attendances.teacher_id', $item->id_teacher)
+        ->select('attendances.star', 't2.name as assist_name')
+        ->orderBy('attendances.date', 'desc') // Mengambil data absensi terbaru
+        ->first();
 
-                                                                $star = $query
-                                                                    ->leftJoin('teacher as t2', 'attendances.assist_id', '=', 't2.id')
-                                                                    ->select('attendances.*', 't2.name as assist_name')
-                                                                    ->first();
-
-                                                                $assistName = $star ? $star->assist_name : null;
-                                                            @endphp
+    // Definisikan variabel penampung agar tidak error saat dipanggil di bawah
+    $assistName = $star ? $star->assist_name : null;
+    $classStar = $star ? $star->star : null; 
+@endphp
 
                                                            
-                                                            @if ($star && $star->star)
-                                                            @if ($star->star == 1)
+                                                            @if ($classStar != null)
+                                                            @if ($classStar == 1)
                                                             (<i class="fas fa-star"></i>)
-                                                            @elseif ($star->star == 2)
+                                                            @elseif ($classStar == 2)
                                                             (<i class="fas fa-star"></i><i class="fas fa-star"></i>)
                                                             @else
-                                                            Star {{ $star->star }}
+                                                            Star {{ $classStar }}
                                                             @endif
                                                             @endif
                                                             @if (!empty($assistName))
@@ -730,6 +761,19 @@
                                                                         data-idteacher-fix="{{ $item->id_teacher }}"
                                                                         data-priceid-fix="{{ $item->priceid }}"><i class="fas fa-user-times"></i> Remove Assist</a>
                                                                     @endif
+                                                                    <!-- jika ada star -->
+                                                                     @if($classStar != null)
+                                                                      <a class="dropdown-item" href="javascript:void(0)" data-toggle="modal" data-target="#removeStarModal"
+                                                                        data-priceid="{{ $item->program }}"
+                                                                        data-idteacher="{{ $item->teacher_name }}"
+                                                                        data-day1="{{ $item->day_one }}"
+                                                                        data-day2="{{ $item->day_two }}"
+                                                                        data-time="{{ $item->course_time }}"
+                                                                        data-day1-fix="{{ $item->day1 }}"
+                                                                        data-day2-fix="{{ $item->day2 }}"
+                                                                        data-idteacher-fix="{{ $item->id_teacher }}"
+                                                                        data-priceid-fix="{{ $item->priceid }}"><i class="fas fa-trash-alt"></i> Remove Star</a>
+                                                                     @endif
                                                                 </div>
                                                             </div>
 
@@ -1168,6 +1212,36 @@
     </div>
 </div>
 
+<!-- remove star modal -->
+<div class="modal fade" id="removeStarModal" tabindex="-1" role="dialog" aria-labelledby="removeStarModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="removeStarModalLabel">Remove Star Icon</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form action="{{ route('remove-star') }}" method="POST" id="formRemoveStar">
+                @csrf
+                <input type="hidden" name="priceid" id="remove_star_priceid">
+                <input type="hidden" name="teacher_id" id="remove_star_teacher_id">
+                <input type="hidden" name="day1" id="remove_star_day1">
+                <input type="hidden" name="day2" id="remove_star_day2">
+                <input type="hidden" name="course_time" id="remove_star_course_time">
+                <div class="modal-body">
+                    <p class="fw-bold">Are you sure you want to remove the star icon from this class?</p>
+                    <p class="text-secondary">This action will clear the star icon assignment for the selected class.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-danger">Remove Star</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
     <script>
         function updateModalReg(id) {
             var program = $('#regprogramModal' + id).val();
@@ -1434,6 +1508,30 @@
             modal.find('#remove_assist_day1').val(day1);
             modal.find('#remove_assist_day2').val(day2);
             modal.find('#remove_assist_course_time').val(courseTime);
+        });
+
+        // Remove Star Modal
+        $('#removeStarModal').on('show.bs.modal', function(event) {
+            var button = $(event.relatedTarget);
+            var modal = $(this);
+
+            // Ambil Data dari tombol pemicu
+            var priceId = button.data('priceidFix');
+            var teacherId = button.data('idteacherFix');
+            var day1 = button.data('day1Fix');
+            var day2 = button.data('day2Fix');
+            var courseTime = button.data('time');
+
+            // var classData = priceId + " " + day1 + "," + day2 + "," + courseTime + "," + teacherId;
+            // Update judul modal dengan informasi kelas
+            // modal.find('.modal-title').text('Remove Assist for Class: ' + classData);
+
+            // Isi input hidden di dalam modal
+            modal.find('#remove_star_priceid').val(priceId);
+            modal.find('#remove_star_teacher_id').val(teacherId);
+            modal.find('#remove_star_day1').val(day1);
+            modal.find('#remove_star_day2').val(day2);
+            modal.find('#remove_star_course_time').val(courseTime);
         });
     });
 </script>

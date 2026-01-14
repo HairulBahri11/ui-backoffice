@@ -1805,4 +1805,36 @@ class AttendanceController extends Controller
             return redirect()->back()->with('error', 'Terjadi kesalahan umum : ' . $e->getMessage());
         }
     }
+
+    public function removeStar(Request $request)
+    {
+        try {
+            $updatedRows = Attendance::where('price_id', $request->priceid)
+                ->where('teacher_id', $request->teacher_id)
+                ->where('day1', $request->day1)
+                ->where('day2', $request->day2)
+                ->where('course_time', $request->course_time)
+                ->get();
+
+            foreach ($updatedRows as $row) {
+                $row->star = null;
+                $row->save();
+            }
+
+            $updatedCount = $updatedRows->count();
+
+            if ($updatedCount > 0) {
+                return redirect()->back()->with('message', 'Data Star Removed Successfully.');
+            }
+
+            return redirect()->back()->with('message', 'Tidak ada data yang cocok untuk di-update.');
+
+        } catch (\Illuminate\Database\QueryException $e) {
+            Log::error('Database Error: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Terjadi kesalahan pada database : ' . $e->getMessage());
+        } catch (\Exception $e) {
+            Log::error('General Error: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Terjadi kesalahan umum : ' . $e->getMessage());
+        }
+    }
 }

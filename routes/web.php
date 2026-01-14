@@ -105,6 +105,8 @@ Route::middleware(['web'])->group(function () {
         Route::post('/update-star', [AttendanceController::class, 'updateStar'])->name('update-star');
         Route::post('/set-assistant', [AttendanceController::class, 'setAssistant'])->name('set-assistant');
         Route::post('/remove-assistant', [AttendanceController::class, 'removeAssistant'])->name('remove-assistant');
+        Route::post('/remove-star', [AttendanceController::class, 'removeStar'])->name('remove-star');
+
     });
     Route::get('/mutasi', [AttendanceController::class, 'mutasi']);
     Route::post('/mutasi', [AttendanceController::class, 'storeMutasi']);

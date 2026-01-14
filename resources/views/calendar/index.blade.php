@@ -161,20 +161,51 @@
                             $teacherQueryString = $currentTeacherId ? '&teacher_id=' . $currentTeacherId : '';
                             @endphp
 
+                            @if(Auth::guard('staff')->check())
+                            <div class="row mb-4 align-items-end justify-content-end">
+                                <div class="col-md-5">
+                                    <form action="{{ url()->current() }}" method="GET" id="filterForm">
+                                        {{-- Pertahankan tanggal yang sedang dibuka --}}
+                                        <input type="hidden" name="start_date" value="{{ $startOfWeekDate }}">
+
+                                        <label class="fw-bold"><i class="fas fa-filter mr-1"></i> Select Teacher:</label>
+                                        <select name="teacher_id" class="form-control select2" onchange="this.form.submit()" style="border: 2px solid var(--main-color)">
+                                            <option value="">-- Choose Teacher --</option>
+                                            @foreach($teachers as $t)
+                                            <option value="{{ $t->id }}" {{ $currentTeacherId == $t->id ? 'selected' : '' }}>
+                                                {{ $t->name }}
+                                            </option>
+                                            @endforeach
+                                        </select>
+                                    </form>
+                                </div>
+                            </div>
+                            @endif
+
                             {{-- NAVIGASI MINGGUAN --}}
                             <div class="d-flex justify-content-between align-items-center mb-4 p-3 border rounded" style="background:#f7fcfb;">
-                                <a href="{{ url()->current() }}?start_date={{ $prevWeek }}{ $teacherQueryString }}" class="btn btn-outline-secondary btn-sm">
+                                <a href="{{ url()->current() }}?start_date={{ $prevWeek }}&teacher_id={{ $currentTeacherId }}" class="btn btn-outline-secondary btn-sm">
                                     <i class="fas fa-chevron-left"></i> Previous Week
                                 </a>
                                 <h5 class="fw-bold mb-0 text-center">
                                     {{ $weekDays['Monday']->isoFormat('D MMM') }} - {{ $weekDays['Saturday']->isoFormat('D MMM YYYY') }}
                                 </h5>
-                                <a href="{{ url()->current() }}?start_date={{ $nextWeek }}{{ $teacherQueryString }}" class="btn btn-outline-secondary btn-sm">
+                                <a href="{{ url()->current() }}?start_date={{ $nextWeek }}&teacher_id={{ $currentTeacherId }}" class="btn btn-outline-secondary btn-sm">
                                     Next Week <i class="fas fa-chevron-right"></i>
                                 </a>
                             </div>
 
                             <div class="row">
+                                @if(Auth::guard('staff')->check() && !$currentTeacherId)
+                                <div class="col-12 text-center py-5">
+                                    <div class="card shadow-none border" style="border-style: dashed !important;">
+                                        <div class="card-body">
+                                            <i class="fas fa-user-check fa-4x mb-3 text-muted"></i>
+                                            <h4 class="text-muted">Please select a teacher to view the schedule</h4>
+                                        </div>
+                                    </div>
+                                </div>
+                                @else
                                 @foreach ($dayOrder as $dayName)
                                 @php
                                 $dayDate = $weekDays[$dayName];
@@ -251,6 +282,8 @@
                                 </div>
                                 @if ($loop->iteration % 3 == 0) <div class="w-100"></div> @endif
                                 @endforeach
+
+                                @endif
                             </div>
                     </div>
                 </div>

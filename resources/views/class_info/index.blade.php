@@ -68,14 +68,38 @@
                         <div class="separator-dashed my-2"></div>
 
                         <div class="mb-3 mt-2 p-3 rounded" style="background-color: #f8f9fa; border-left: 4px solid #01c293;">
-                            <h6 class="fw-bold text-muted small text-uppercase mb-2">Last Activity</h6>
-                            @if($group->last_class)
-                                <small class="text-success fw-bold d-block mb-1">{{ \Carbon\Carbon::parse($group->last_class)->format('d M Y') }}</small>
-                                <p class="text-dark small mb-0 font-italic" style="line-height: 1.4;">"{{ $group->last_activity }}"</p>
-                            @else
-                                <p class="text-danger font-italic small mb-0">No activity recorded yet.</p>
-                            @endif
-                        </div>
+    <h6 class="fw-bold text-muted small text-uppercase mb-2">Last Activity</h6>
+    
+    @if($group->last_class)
+        <small class="text-success fw-bold d-block mb-1">
+            <i class="far fa-calendar-alt mr-1"></i> {{ \Carbon\Carbon::parse($group->last_class)->format('d M Y') }}
+        </small>
+        
+        {{-- Deskripsi Aktivitas --}}
+        <p class="text-dark small mb-2 font-italic" style="line-height: 1.4;">
+            "{{ $group->last_activity }}"
+        </p>
+
+        {{-- Info Buku (Tambahan Baru) --}}
+        <div class="d-flex flex-wrap border-top pt-2 mt-2" style="gap: 15px;">
+            @if($group->last_text_book)
+            <div class="small">
+                <span class="text-muted d-block" style="font-size: 0.75rem;">Text Book:</span>
+                <span class="fw-bold text-dark"><i class="fas fa-book mr-1"></i> {{ $group->last_text_book }}</span>
+            </div>
+            @endif
+
+            @if($group->last_exercise_book)
+            <div class="small">
+                <span class="text-muted d-block" style="font-size: 0.75rem;">Exercise Book:</span>
+                <span class="fw-bold text-dark"><i class="fas fa-edit mr-1"></i> {{ $group->last_exercise_book }}</span>
+            </div>
+            @endif
+        </div>
+    @else
+        <p class="text-danger font-italic small mb-0">No activity recorded yet.</p>
+    @endif
+</div>
 
                         <h6 class="fw-bold text-muted small text-uppercase mb-2">Student List</h6>
                         <div class="custom-scroll" style="max-height: 150px; overflow-y: auto;">

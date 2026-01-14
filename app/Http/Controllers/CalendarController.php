@@ -410,16 +410,22 @@ class CalendarController extends Controller
 public function index(Request $request)
 {
     $teacherId = null;
-    
+    $teachers = []; // Inisialisasi variabel guru
+
+    // Ambil semua daftar guru untuk dropdown (Hanya jika yang login adalah Staff)
+    if (Auth::guard('staff')->check()) {
+        $teachers = DB::table('teacher')->select('id', 'name')->orderBy('name', 'asc')->get();
+    }
+
     // --- 1. OTENTIKASI ---
     if (Auth::guard('teacher')->check()) {
         $teacherId = Auth::guard('teacher')->user()->id;
     } elseif (Auth::guard('staff')->check()) {
-        $teacherId = $request->input('teacher_id') ?? 4;
+        $teacherId = $request->input('teacher_id');
     }
 
-    if (!$teacherId) {
-        return redirect('/')->with('error', 'Akses ditolak.');
+    if (!$teacherId && Auth::guard('teacher')->check()) {
+         return redirect('/')->with('error', 'Akses ditolak.');
     }
 
     // --- 2. PENENTUAN TANGGAL ---
@@ -553,7 +559,8 @@ public function index(Request $request)
     $mergedSchedule = $mergedSchedule->sortBy('course_time');
 
     return view('calendar.index', [
-        'data' => $mergedSchedule,
+        'data' => $mergedSchedule ?? [],
+        'teachers' => $teachers,
         'startOfWeekDate' => $startOfWeekDateString,
         'currentTeacherId' => $teacherId,
     ]);

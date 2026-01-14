@@ -160,7 +160,7 @@
 
                 </li>
 
-                @if (Auth::guard('teacher')->user() != null)
+               
                  <li class="nav-item {{ Request::segment(1) == 'calendar' ? 'active' : '' }}">
                     <a href="{{ url('/calendar') }}" class="collapsed">
                         <i class="fas fa-calendar"></i>
@@ -168,7 +168,7 @@
                     </a>
 
                 </li>
-                @endif
+               
 
 
                 @if(Auth::guard('teacher')->check() == true && Auth::guard('teacher')->user()->id == 20 || Auth::guard('teacher')->check() == true &&Auth::guard('teacher')->user()->id == 21)

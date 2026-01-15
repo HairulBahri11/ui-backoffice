@@ -665,12 +665,70 @@ class PaymentController extends Controller
     }
 
 
+    // public function billDetail($studentId)
+    // {
+    //     // 1. Cek apakah student aktif
+    //     $student = Students::where('id', $studentId)->first();
+
+    //     if ($student->status != 'ACTIVE') {
+    //         return response()->json([
+    //             'code' => '01',
+    //             'message' => 'Student tidak aktif atau tidak ditemukan',
+    //             'payload' => [
+    //                 'bill' => 0,
+    //                 'student_data' => $student,
+    //                 'unpaid_months' => [],
+    //                 'last_payment' => null,
+    //             ],
+    //         ]);
+    //     }
+
+    //     // 2. Ambil pembayaran terakhir
+    //     $lastPay = DB::table('paydetail')
+    //         ->where('studentid', $studentId)
+    //         ->where('category', 'COURSE')
+    //         ->orderByDesc('monthpay')
+    //         ->first();
+
+    //     $lastPaidMonth = $lastPay->monthpay ?? null;
+    //     $unpaidMonths = [];
+
+    //     // 3. Hitung bulan belum dibayar
+    //     if ($lastPaidMonth) {
+    //         $start = new DateTime($lastPaidMonth);
+    //         $start->modify('+1 month');
+    //     } else {
+    //         $start = new DateTime(date('Y-01-01'));
+    //     }
+
+    //     $now = new DateTime();
+
+    //     while ((int)$start->format('Ym') <= (int)$now->format('Ym')) {
+    //         $unpaidMonths[] = $start->format('F Y');
+    //         $start->modify('+1 month');
+    //     }
+
+    //     // 4. Batasi hanya bulan sekarang jika belum bayar ≥ 4 bulan
+    //     if (count($unpaidMonths) >= 4) {
+    //         $unpaidMonths = [date('F Y')]; // hanya bulan ini yang dibolehkan dibayar
+    //     }
+
+    //     return response()->json([
+    //         'code' => '00',
+    //         'payload' => [
+    //             'student_data' => $student,
+    //             'last_payment' => $lastPaidMonth ? date('F Y', strtotime($lastPaidMonth)) : null,
+    //             'unpaid_months' => $unpaidMonths,
+    //         ],
+    //     ]);
+    // }
+
     public function billDetail($studentId)
     {
         // 1. Cek apakah student aktif
         $student = Students::where('id', $studentId)->first();
 
-        if ($student->status != 'ACTIVE') {
+        if (!$student || $student->status != 'ACTIVE') {
             return response()->json([
                 'code' => '01',
                 'message' => 'Student tidak aktif atau tidak ditemukan',
@@ -678,19 +736,23 @@ class PaymentController extends Controller
                     'bill' => 0,
                     'student_data' => $student,
                     'unpaid_months' => [],
-                    'last_payment' => null,
+                    'payment_history' => [], // Tambahkan default kosong
                 ],
             ]);
         }
 
-        // 2. Ambil pembayaran terakhir
-        $lastPay = DB::table('paydetail')
+        // 2. Ambil SEMUA riwayat pembayaran (Terbaru di atas)
+        $paymentHistory = DB::table('paydetail')
             ->where('studentid', $studentId)
             ->where('category', 'COURSE')
             ->orderByDesc('monthpay')
-            ->first();
+            ->where('monthpay', '>=', date('2025-12-31')) // Hanya ambil pembayaran hingga bulan sekarang
+            ->get();
 
+        // Ambil pembayaran terakhir untuk logika perhitungan tunggakan
+        $lastPay = $paymentHistory->first();
         $lastPaidMonth = $lastPay->monthpay ?? null;
+
         $unpaidMonths = [];
 
         // 3. Hitung bulan belum dibayar
@@ -702,7 +764,6 @@ class PaymentController extends Controller
         }
 
         $now = new DateTime();
-
         while ((int)$start->format('Ym') <= (int)$now->format('Ym')) {
             $unpaidMonths[] = $start->format('F Y');
             $start->modify('+1 month');
@@ -710,7 +771,7 @@ class PaymentController extends Controller
 
         // 4. Batasi hanya bulan sekarang jika belum bayar ≥ 4 bulan
         if (count($unpaidMonths) >= 4) {
-            $unpaidMonths = [date('F Y')]; // hanya bulan ini yang dibolehkan dibayar
+            $unpaidMonths = [date('F Y')];
         }
 
         return response()->json([
@@ -719,6 +780,7 @@ class PaymentController extends Controller
                 'student_data' => $student,
                 'last_payment' => $lastPaidMonth ? date('F Y', strtotime($lastPaidMonth)) : null,
                 'unpaid_months' => $unpaidMonths,
+                'payment_history' => $paymentHistory, // Menampilkan daftar yang sudah dibayar
             ],
         ]);
     }

@@ -28,10 +28,6 @@ class AttendanceController extends Controller
      */
     public function index(Request $request)
     {
-        // $class = Price::all();
-        // if (Auth::gurad) {
-        //     # code...
-        // }
         $where = '';
         $teachers = Teacher::get();
         $level = Price::get();
@@ -91,9 +87,98 @@ class AttendanceController extends Controller
         // };
         // dd($already_absent);
 
-
         return view('attendance.index', compact('private', 'general', 'day', 'teachers', 'level', 'semiPrivate', 'isNew'));
     }
+
+
+    //ini untuk assist teacher jika ingin di tampilkan kelas di halaman attendance
+//     public function index(Request $request)
+// {
+//     $teachers = Teacher::get();
+//     $level = Price::get();
+//     $day = DB::table('day')->get();
+//     $isNew = Attendance::where('is_class_new', '1')->get();
+
+//     // Inisialisasi variabel filter
+//     $teacherWhere = "";
+//     $generalWhere = "";
+
+//     // 1. Logic Filter berdasarkan User Login
+//     if (Auth::guard('teacher')->check()) {
+//         $teacherId = Auth::guard('teacher')->user()->id;
+//         // Cek apakah dia teacher utama di tabel student OR asisten di tabel attendance
+//         $teacherWhere = " AND (student.id_teacher = $teacherId OR (att.assist_id = $teacherId AND att.assist_id IS NOT NULL))";
+//     }
+
+//     if (Auth::guard('staff')->check() && Auth::guard('staff')->user()->id != 7) {
+//         $generalWhere .= ' AND student.id_staff = ' . Auth::guard('staff')->user()->id;
+//     }
+
+//     // 2. Logic Filter dari Request
+//     if ($request->teacher) {
+//         $generalWhere .= ' AND student.id_teacher = ' . $request->teacher;
+//     }
+//     if ($request->branch) {
+//         $generalWhere .= ' AND student.branch_id = ' . $request->branch;
+//     }
+//     if ($request->level) {
+//         $generalWhere .= ' AND student.priceid = ' . $request->level;
+//     }
+//     if ($request->day) {
+//         $generalWhere .= " AND (student.day1 = $request->day OR student.day2 = $request->day)";
+//     }
+
+//     /* 3. QUERY UTAMA 
+//        Kita menggunakan Subquery (att) untuk mengambil data attendance terbaru 
+//        agar bisa mendapatkan assist_id yang aktif di kelas tersebut.
+//     */
+//    $class = DB::select("SELECT DISTINCT 
+//             student.priceid, student.day1, student.day2, student.course_time, student.id_teacher,
+//             att.assist_id,
+//             price.level, price.program, 
+//             day_1.day day_one, day_2.day day_two, 
+//             teacher.name teacher_name, 
+//             student.is_class_new, branch.location 
+//         FROM student
+//         JOIN price ON student.priceid = price.id
+//         JOIN day day_1 ON student.day1 = day_1.id
+//         JOIN day day_2 ON student.day2 = day_2.id
+//         JOIN branch ON student.branch_id = branch.id
+//         JOIN teacher ON student.id_teacher = teacher.id
+//         LEFT JOIN (
+//             /* Hanya ambil asisten yang valid (tidak null) */
+//             SELECT DISTINCT price_id, day1, day2, course_time, assist_id
+//             FROM attendances
+//             WHERE assist_id IS NOT NULL 
+//         ) att ON student.priceid = att.price_id 
+//             AND student.day1 = att.day1 
+//             AND student.day2 = att.day2 
+//             AND student.course_time = att.course_time
+//         WHERE student.status = 'ACTIVE'
+//             AND student.day1 IS NOT NULL
+//             $teacherWhere
+//             $generalWhere
+//         ORDER BY student.priceid ASC, student.day1, student.course_time;");
+
+//     // 4. Grouping Hasil
+//     $private = [];
+//     $general = [];
+//     $semiPrivate = [];
+    
+//     foreach ($class as $value) {
+//         if ($value->level == 'Private') {
+//             if ($value->program == 'Private') {
+//                 $private[] = $value;
+//             } else {
+//                 $semiPrivate[] = $value;
+//             }
+//         } else {
+//             $general[] = $value;
+//         }
+//     }
+
+//     return view('attendance.index', compact('private', 'general', 'day', 'teachers', 'level', 'semiPrivate', 'isNew'));
+// }
 
     /**
      * Show the form for creating a new resource.
@@ -102,6 +187,7 @@ class AttendanceController extends Controller
      */
     public function create($priceId, Request $request)
     {
+
         $reqDay1 = $request->day1;
         $reqDay2 = $request->day2;
         $reqTime = $request->time;
@@ -279,6 +365,187 @@ class AttendanceController extends Controller
         }
     }
 
+//ini untuk assist teacher jika ingin di tampilkan kelas di halaman attendance form
+    //  public function create($priceId, Request $request)
+    // {
+
+    //     $reqDay1 = $request->day1;
+    //     $reqDay2 = $request->day2;
+    //     $reqTime = $request->time;
+    //     $reqTeacher = $request->teacher;
+    //     // $reqNew = $request->new;
+    //     // $reqAmpm = $request->ampm;
+    //     $student = "";
+    //     $whereRaw = "";
+    //     $whereStudent = '';
+    //     $day = DB::table('day')->get();
+    //     $cek = Attendance::where('price_id', $priceId)
+    //         ->where('date', date('Y-m-d'))
+    //         ->where('day1', $reqDay1)
+    //         ->where('day2', $reqDay2)
+    //         ->where('course_time', $reqTime)
+    //         ->where('teacher_id', $reqTeacher)
+    //         // ->where('is_class_new', $reqNew)
+    //         ->orderBy('id', 'DESC')
+    //         ->first();
+    //     // $agenda = [];
+
+
+    //     $tgl_mutasi = '';
+    //     $mutasi_teacher = '';
+    //     if ($cek != null) {
+    //         $mutasi_teacher = $cek->mutasi_teacher;
+    //         $tgl_mutasi = $cek->tgl_mutasi;
+    //     }
+
+
+
+
+    //     $class = Price::where('id', $priceId)->first();
+
+    //     $title = $class->level == 'Private' ? 'Private Class ' . $class->program : 'Regular';
+    //     if ($cek) {
+    //         $detail = AttendanceDetail::where('attendance_id', $cek->id)->get();
+    //         foreach ($detail as $key => $id) {
+    //             // multiple
+    //             $points = [];
+    //             $attPoint = AttendanceDetailPoint::where('attendance_detail_id', $id->id)
+    //                 ->select('point_category_id')
+    //                 ->get();
+
+    //             foreach ($attPoint as $idp) {
+    //                 array_push($points, intval($idp->point_category_id));
+    //             }
+    //             $id['category'] = $points;
+
+    //             // manual
+    //             // $points = [];
+    //             // $catPoints = [];
+    //             // $attPoint = AttendanceDetailPoint::where('attendance_detail_id', $id->id)
+    //             //     ->get();
+
+    //             // foreach ($attPoint as $idp) {
+    //             //     array_push($points, $idp->point);
+    //             //     array_push($catPoints, $idp->point_category);
+    //             // }
+    //             // $id->categoryPoint = $points != null ? $points[0] : '';
+    //             // $id->category = $catPoints != null ? $catPoints[0] : '';
+    //         }
+    //         $data = (object)[
+    //             'type' => 'update',
+    //             'id' => $class->id,
+    //             'attendanceId' => $cek->id,
+    //             'comment' => $cek->activity,
+    //             'textBook' => $cek->text_book,
+    //             'excerciseBook' => $cek->excercise_book,
+    //             'students' => $detail,
+    //             'is_presence' => $cek->is_presence,
+    //             'id_test' => $cek->id_test,
+    //             'date_review' => $cek->date_review,
+    //             'date_test' => $cek->date_test,
+    //         ];
+    //         // return $data;
+    //     } else {
+    //         // $agenda = [];
+    //         $data = (object)[
+    //             'type' => 'create',
+    //             'id' => $class->id,
+    //             'attendanceId' => 0,
+    //             'comment' => '',
+    //             'textBook' => '',
+    //             'excerciseBook' => '',
+    //             'students' => [],
+    //             'is_presence' => '',
+    //             'id_test' => '',
+    //             'date_review' => '',
+    //             'date_test' => '',
+    //         ];
+    //     }
+
+
+    //     $student = Students::where('status', 'ACTIVE')->where('priceid', $class->id)
+    //         ->where("day1", $reqDay1)
+    //         ->where("day2", $reqDay2)
+    //         ->where('course_time', $reqTime)
+    //         // ->where('is_class_new', $request->new)
+    //         ->where('is_follow_up', '!=', '1');
+    //     if ($request->student) {
+    //         $student = $student->where('id', $request->student);
+    //     }
+    //     if (Auth::guard('teacher')->check() == true) {
+    //         $student = $student->where('id_teacher', $reqTeacher);
+    //     } else {
+    //         $student = $student->where('id_teacher', $reqTeacher);
+    //     }
+
+    //     $student = $student->get();
+
+
+    //     foreach ($student as $keyS => $valueS) {
+    //         $or = $keyS + 1 != count($student) ? ' or ' : '';
+    //         $whereStudent .= 'student_id = ' . $valueS->id . $or;
+    //     }
+    //     $whereRaw = '(' . $whereStudent . ')';
+    //     $pointCategories = PointCategories::where('id', '!=', 5)->orderBy('point', 'ASC')->get();
+    //     $attendance = Attendance::with('detail')->where('price_id', $priceId)
+    //         ->where('day1', $reqDay1)
+    //         ->where('day2', $reqDay2)
+    //         ->where('course_time', $reqTime)
+    //         ->where('teacher_id', $reqTeacher)
+    //         // ->where('is_class_new', $request->new)
+    //         ->orderBy('id', 'DESC');
+    //     if ($request->student) {
+    //         $attendance = $attendance->whereHas('detail', function ($q) use ($request) {
+    //             $q->where('student_id', $request->student);
+    //         });
+    //     } else {
+    //         $attendance = $attendance->whereHas('detail', function ($q) use ($whereRaw) {
+    //             $q->whereRaw($whereRaw);
+    //         });
+    //     }
+    //     $all_attendence = $attendance->get();
+    //     $attendance = $attendance->paginate(3);
+
+    //     if (count($student) != 0) {
+
+    //         return view('attendance.form', compact(
+    //             'attendance',
+    //             'all_attendence',
+    //             'title',
+    //             'data',
+    //             'student',
+    //             'pointCategories',
+    //             'day',
+    //             'priceId',
+    //             'reqDay1',
+    //             'reqDay2',
+    //             'reqTeacher',
+    //             'reqTime',
+    //             'mutasi_teacher',
+    //             'tgl_mutasi'
+    //         ));
+    //     } else {
+    //         $inStudent = Students::where('status', 'INACTIVE')->where('priceid', $class->id)
+    //             ->where("day1", $reqDay1)
+    //             ->where("day2", $reqDay2)
+    //             ->where('course_time', $reqTime);
+    //         if (Auth::guard('teacher')->check() == true) {
+    //             $inStudent = $inStudent->where('id_teacher', $reqTeacher);
+    //         } else {
+    //             $inStudent = $inStudent->where('id_teacher', $reqTeacher);
+    //         }
+    //         $inStudent = $inStudent->update([
+    //             'day1' => null,
+    //             'day2' => null,
+    //             'course_time' => null,
+    //             'id_teacher' => null,
+    //             'id_staff' => null,
+    //         ]);
+
+    //         return redirect('/attendance/class')->with('error', 'There is no student');
+    //     }
+    // }
+
     /**
      * Store a newly created resource in storage.
      *
@@ -287,6 +554,7 @@ class AttendanceController extends Controller
      */
     public function store(Request $request)
     {
+        dd($request->all());
         DB::beginTransaction();
         try {
             if ($request->cekAllAbsen == true) {

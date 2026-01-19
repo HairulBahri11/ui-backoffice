@@ -18,6 +18,7 @@ use App\Http\Controllers\LandingPageController;
 use App\Http\Controllers\ReedemItemsController;
 use App\Http\Controllers\ReedemPointController;
 use App\Http\Controllers\birthdayPoinController;
+use App\Http\Controllers\CalendarAcademicController;
 use App\Http\Controllers\EcertificateController;
 use App\Http\Controllers\historyCertificateController;
 use App\Http\Controllers\ScheduleClassController;
@@ -177,4 +178,10 @@ Route::middleware(['web'])->group(function () {
     Route::prefix('class-info')->group(function(){
         Route::get('/', [\App\Http\Controllers\ClassInfoController::class, 'index'])->name('class-info.index');
     });
+
+    Route::get('/calendar-academic', [CalendarAcademicController::class, 'index'])->name('calendar.academic.index');
+    Route::get('/calendar-events-json', [CalendarAcademicController::class, 'getEvents'])->name('calendar.events');
+    Route::post('/calendar-academic', [CalendarAcademicController::class, 'store'])->name('calendar-academic.store');
+    Route::put('/calendar-academic/{id}', [CalendarAcademicController::class, 'update'])->name('calendar-academic.update');
+    Route::delete('/calendar-academic/{id}', [CalendarAcademicController::class, 'destroy'])->name('calendar-academic.destroy');
 });

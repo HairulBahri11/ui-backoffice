@@ -95,6 +95,8 @@
                         </ul>
                     </div>
                 </li>
+
+               
                 <li class="nav-item {{ Request::segment(1) == 'reedemPoint' ? 'active' : '' }}">
                     <a href="{{ url('/reedemPoint') }}" class="collapsed">
                         <i class="fas fa-download"></i>
@@ -152,6 +154,14 @@
                 @endif
                 @endif
 
+                 <li class="nav-item {{ Request::segment(1) == 'calendar-academic' ? 'active' : '' }}">
+                    <a href="{{ url('/calendar-academic') }}" class="collapsed">
+                        <i class="fas fa-calendar-alt"></i>
+                        <p>Academic Calendar</p>
+                    </a>
+
+                </li>
+
                 <li class="nav-item {{ Request::segment(2) == 'reminder' ? 'active' : '' }}">
                     <a href="{{ url('/attendance/reminder') }}" class="collapsed">
                         <i class="fas fa-bell"></i>
@@ -168,6 +178,8 @@
                     </a>
 
                 </li>
+
+
                
 
 

@@ -123,7 +123,7 @@
             ->where('attendances.course_time', $item->course_time)
             ->where('attendances.teacher_id', $item->id_teacher)
             ->select('attendances.star', 't2.name as assist_name', 'attendances.is_presence')
-            ->orderBy('attendances.date', 'desc') // Ambil yang paling baru
+            ->orderBy('attendances.date', 'asc') // Ambil yang paling baru
             ->first();
 
         $assistName = $star ? $star->assist_name : null;
@@ -366,7 +366,7 @@
         ->where('attendances.course_time', $itemSemiPrivate->course_time)
         ->where('attendances.teacher_id', $itemSemiPrivate->id_teacher)
         ->select('attendances.*', 't2.name as assist_name')
-        ->orderBy('attendances.date', 'desc') // Tambahkan ini agar mendapat star terbaru
+        ->orderBy('attendances.date', 'asc') // Tambahkan ini agar mendapat star terbaru
         ->first();
 
     // Gunakan null coalescing atau ternary untuk mencegah error
@@ -648,7 +648,7 @@
         ->where('attendances.course_time', $item->course_time)
         ->where('attendances.teacher_id', $item->id_teacher)
         ->select('attendances.star', 't2.name as assist_name')
-        ->orderBy('attendances.date', 'desc') // Mengambil data absensi terbaru
+        ->orderBy('attendances.date', 'asc') // Mengambil data absensi terbaru
         ->first();
 
     // Definisikan variabel penampung agar tidak error saat dipanggil di bawah

@@ -53,6 +53,7 @@ Route::group(['middleware' => ['jwt.auth']], function () {
         Route::get('/verify/{transId}', [PaymentController::class, 'verifyPayment']);
         Route::get('/printInvoice/{paymentId}', [PaymentController::class, 'printInvoice']);
         Route::get('/mybill/{studentId}', [PaymentController::class, 'billDetail']);
+        Route::get('/successPayment/{studentId}', [PaymentController::class, 'successPayment']);
     });
 
     Route::get('getMySertificate/{studentId}', [SertificateController::class, 'apiGenerateCertificate']);

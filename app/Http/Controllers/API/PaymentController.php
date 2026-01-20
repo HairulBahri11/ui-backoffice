@@ -784,4 +784,40 @@ class PaymentController extends Controller
             ],
         ]);
     }
+
+    public function successPayment($studentId)
+    {
+        $student = Students::where('id', $studentId)->first();
+
+        if (!$student || $student->status != 'ACTIVE') {
+            return response()->json([
+                'code' => '01',
+                'message' => 'Student tidak aktif atau tidak ditemukan',
+                'payload' => [],
+            ]);
+        }
+
+        $paymentHistory = DB::table('payment')
+            ->join('paydetail', 'payment.id', '=', 'paydetail.paymentid')
+            ->where('paydetail.studentid', $studentId) // Direct filter on joined table
+            ->where('payment.paydate', '>=', '2025-12-31')
+            ->select('paydetail.*', 'payment.paydate') // Separate arguments
+            ->where('paydetail.category', '!=', 'CANCEL')
+            ->orderByDesc('payment.paytime')
+            ->groupBy('paydetail.id')
+            ->get();
+
+        if ($paymentHistory->isEmpty()) {
+            return response()->json([
+                'code' => '02',
+                'message' => 'Tidak ada riwayat pembayaran ditemukan',
+                'payload' => [],
+            ]);
+        }
+
+        return response()->json([
+            'code' => '00',
+            'payload' => $paymentHistory,
+        ]);
+    }
 }

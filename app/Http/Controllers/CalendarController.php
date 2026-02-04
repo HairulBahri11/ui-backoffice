@@ -407,12 +407,172 @@ class CalendarController extends Controller
 //     ]);
 // }
 
+// public function index(Request $request)
+// {
+//     $teacherId = null;
+//     $teachers = []; // Inisialisasi variabel guru
+
+//     // Ambil semua daftar guru untuk dropdown (Hanya jika yang login adalah Staff)
+//     if (Auth::guard('staff')->check()) {
+//         $teachers = DB::table('teacher')->select('id', 'name')->orderBy('name', 'asc')->get();
+//     }
+
+//     // --- 1. OTENTIKASI ---
+//     if (Auth::guard('teacher')->check()) {
+//         $teacherId = Auth::guard('teacher')->user()->id;
+//     } elseif (Auth::guard('staff')->check()) {
+//         $teacherId = $request->input('teacher_id');
+//     }
+
+//     if (!$teacherId && Auth::guard('teacher')->check()) {
+//          return redirect('/')->with('error', 'Akses ditolak.');
+//     }
+
+//     // --- 2. PENENTUAN TANGGAL ---
+//     $startDateParam = $request->input('start_date');
+//     try {
+//         $startOfWeekDate = $startDateParam 
+//             ? Carbon::parse($startDateParam)->startOfWeek(Carbon::MONDAY) 
+//             : Carbon::now()->startOfWeek(Carbon::MONDAY);
+//     } catch (\Exception $e) {
+//         $startOfWeekDate = Carbon::now()->startOfWeek(Carbon::MONDAY);
+//     }
+//     $startOfWeekDateString = $startOfWeekDate->format('Y-m-d');
+
+//     // --- 3. QUERY JADWAL UTAMA (Main Teacher) ---
+//     $mainScheduleSubQuery = DB::table('student')
+//         ->select('id_teacher', 'day1', 'day2', 'course_time', 'priceid', 
+//                 DB::raw('COUNT(*) as total_students'),
+//                 DB::raw('"main" as role'))
+//         ->where('id_teacher', $teacherId)
+//         ->where('status', 'active')
+//         ->whereNotNull('course_time')
+//         ->where(function ($query) {
+//             $query->whereNotNull('day1')->orWhereNotNull('day2');
+//         })
+//         ->groupBy('id_teacher', 'day1', 'day2', 'course_time', 'priceid');
+
+//     $mainScheduleData = DB::table(DB::raw('(' . $mainScheduleSubQuery->toSql() . ') as sub'))
+//         ->mergeBindings($mainScheduleSubQuery)
+//         ->leftJoin('teacher as t', 'sub.id_teacher', '=', 't.id')
+//         ->leftJoin('price as p', 'sub.priceid', '=', 'p.id')
+//         ->leftJoin('day as d1', 'sub.day1', '=', 'd1.id')
+//         ->leftJoin('day as d2', 'sub.day2', '=', 'd2.id')
+//         ->select(
+//             't.name as teacher_name', 'p.program as class', 'd1.day as day1_name', 'd2.day as day2_name',
+//             'sub.id_teacher', 'sub.course_time', 'sub.total_students', 'sub.role', 'sub.priceid', 
+//             'sub.day1 as day1_id', 'sub.day2 as day2_id' 
+//         )
+//         ->get();
+
+//     // Student list untuk Main Teacher (Siswa Aktif)
+//     foreach ($mainScheduleData as $item) {
+//         $item->student_list = DB::table('student')
+//             ->where('id_teacher', $item->id_teacher)
+//             ->where('day1', $item->day1_id)
+//             ->where('day2', $item->day2_id)
+//             ->where('course_time', $item->course_time)
+//             ->where('priceid', $item->priceid)
+//             ->where('status', 'active')
+//             ->pluck('name')
+//             ->toArray();
+//     }
+
+//     $mergedSchedule = $mainScheduleData;
+
+//     // --- 4. QUERY JADWAL ASSIST ---
+//     $baseAssistQuery = DB::table('attendances as a')
+//         ->join('attendance_details as ad', 'a.id', '=', 'ad.attendance_id')
+//         ->where('a.assist_id', $teacherId)
+//         ->whereNotNull('a.assist_id')
+//         ->whereNotNull('a.course_time');
+
+//     $assistDay1Query = (clone $baseAssistQuery)
+//         ->select(DB::raw('a.assist_id as id_teacher'), DB::raw('a.day1 as day_id'), 'a.course_time', DB::raw('a.price_id as priceid'), DB::raw('"assist" as role'))
+//         ->where('a.assist_day1', 1) 
+//         ->groupBy('a.assist_id', 'a.day1', 'a.course_time', 'a.price_id');
+
+//     $assistDay2Query = (clone $baseAssistQuery)
+//         ->select(DB::raw('a.assist_id as id_teacher'), DB::raw('a.day2 as day_id'), 'a.course_time', DB::raw('a.price_id as priceid'), DB::raw('"assist" as role'))
+//         ->where('a.assist_day2', 1) 
+//         ->groupBy('a.assist_id', 'a.day2', 'a.course_time', 'a.price_id');
+
+//     $assistScheduleUnion = $assistDay1Query->unionAll($assistDay2Query);
+
+//     $assistScheduleData = DB::table(DB::raw('(' . $assistScheduleUnion->toSql() . ') as sub'))
+//         ->mergeBindings($assistScheduleUnion)
+//         ->select('sub.id_teacher', 'sub.day_id', 'sub.course_time', 'sub.priceid', 'sub.role')
+//         ->groupBy('sub.id_teacher', 'sub.day_id', 'sub.course_time', 'sub.priceid', 'sub.role')
+//         ->get();
+
+//     // --- 5. LENGKAPI DETAIL ASSIST ---
+//     foreach ($assistScheduleData as $assistItem) {
+//         $details = DB::table('price as p')
+//             ->where('p.id', $assistItem->priceid)
+//             ->join('day as d', 'd.id', '=', DB::raw($assistItem->day_id))
+//             ->select('p.program as class', 'd.day as day_name')
+//             ->first();
+
+//         if ($details) {
+//             // PERBAIKAN: Gunakan DISTINCT agar nama siswa tidak double dari record absensi lama
+//             $studentsInAssist = DB::table('attendances as a')
+//                 ->join('attendance_details as ad', 'a.id', '=', 'ad.attendance_id')
+//                 ->join('student as s', 'ad.student_id', '=', 's.id')
+//                 ->where('a.assist_id', $assistItem->id_teacher) 
+//                 ->where('a.price_id', $assistItem->priceid)
+//                 ->where('a.course_time', $assistItem->course_time)
+//                 ->where(function($query) use ($assistItem) {
+//                     $query->where('a.day1', $assistItem->day_id)
+//                           ->orWhere('a.day2', $assistItem->day_id);
+//                 })
+//                 ->select('s.name', 's.id_teacher as main_teacher_id')
+//                 ->distinct() // <--- Kunci agar tidak 251 siswa
+//                 ->get();
+
+//             $studentArray = $studentsInAssist->pluck('name')->toArray();
+            
+//             $mainTeacherName = null;
+//             if ($studentsInAssist->isNotEmpty()) {
+//                 // Ambil guru utama dari siswa pertama di daftar tersebut
+//                 $mainTeacherName = DB::table('teacher')
+//                     ->where('id', $studentsInAssist->first()->main_teacher_id)
+//                     ->value('name');
+//             }
+
+//             $mergedSchedule->push((object)[
+//                 'teacher_name'   => $mainTeacherName ? 'Assist: ' . $mainTeacherName : 'Assist Class',
+//                 'class'          => $details->class,
+//                 'day1_name'      => $details->day_name,
+//                 'day2_name'      => null,
+//                 'id_teacher'     => $assistItem->id_teacher,
+//                 'course_time'    => $assistItem->course_time,
+//                 'total_students' => count($studentArray), // Total berdasarkan nama unik
+//                 'student_list'   => $studentArray,
+//                 'role'           => $assistItem->role,
+//                 'priceid'        => $assistItem->priceid, 
+//                 'day1_id'        => $assistItem->day_id,
+//                 'day2_id'        => null,
+//             ]);
+//         }
+//     }
+
+//     $mergedSchedule = $mergedSchedule->sortBy('course_time');
+
+//     return view('calendar.index', [
+//         'data' => $mergedSchedule ?? [],
+//         'teachers' => $teachers,
+//         'startOfWeekDate' => $startOfWeekDateString,
+//         'currentTeacherId' => $teacherId,
+//     ]);
+// }
+
+
 public function index(Request $request)
 {
     $teacherId = null;
-    $teachers = []; // Inisialisasi variabel guru
+    $teachers = [];
 
-    // Ambil semua daftar guru untuk dropdown (Hanya jika yang login adalah Staff)
+    // Ambil daftar guru untuk dropdown (Staff)
     if (Auth::guard('staff')->check()) {
         $teachers = DB::table('teacher')->select('id', 'name')->orderBy('name', 'asc')->get();
     }
@@ -465,7 +625,7 @@ public function index(Request $request)
         )
         ->get();
 
-    // Student list untuk Main Teacher (Siswa Aktif)
+    // Ambil list nama siswa untuk Main Teacher
     foreach ($mainScheduleData as $item) {
         $item->student_list = DB::table('student')
             ->where('id_teacher', $item->id_teacher)
@@ -478,94 +638,76 @@ public function index(Request $request)
             ->toArray();
     }
 
-    $mergedSchedule = $mainScheduleData;
+    $mergedSchedule = collect($mainScheduleData);
 
-    // --- 4. QUERY JADWAL ASSIST ---
-    $baseAssistQuery = DB::table('attendances as a')
-        ->join('attendance_details as ad', 'a.id', '=', 'ad.attendance_id')
+    // --- 4. QUERY JADWAL ASSIST (Dioptimasi) ---
+    // Ambil pola jadwal unik dari tabel attendances di mana user ini menjadi asisten
+    $assistPatterns = DB::table('attendances as a')
+        ->select('a.teacher_id', 'a.price_id', 'a.course_time', 'a.day1', 'a.day2', 'a.assist_day1', 'a.assist_day2')
         ->where('a.assist_id', $teacherId)
-        ->whereNotNull('a.assist_id')
-        ->whereNotNull('a.course_time');
-
-    $assistDay1Query = (clone $baseAssistQuery)
-        ->select(DB::raw('a.assist_id as id_teacher'), DB::raw('a.day1 as day_id'), 'a.course_time', DB::raw('a.price_id as priceid'), DB::raw('"assist" as role'))
-        ->where('a.assist_day1', 1) 
-        ->groupBy('a.assist_id', 'a.day1', 'a.course_time', 'a.price_id');
-
-    $assistDay2Query = (clone $baseAssistQuery)
-        ->select(DB::raw('a.assist_id as id_teacher'), DB::raw('a.day2 as day_id'), 'a.course_time', DB::raw('a.price_id as priceid'), DB::raw('"assist" as role'))
-        ->where('a.assist_day2', 1) 
-        ->groupBy('a.assist_id', 'a.day2', 'a.course_time', 'a.price_id');
-
-    $assistScheduleUnion = $assistDay1Query->unionAll($assistDay2Query);
-
-    $assistScheduleData = DB::table(DB::raw('(' . $assistScheduleUnion->toSql() . ') as sub'))
-        ->mergeBindings($assistScheduleUnion)
-        ->select('sub.id_teacher', 'sub.day_id', 'sub.course_time', 'sub.priceid', 'sub.role')
-        ->groupBy('sub.id_teacher', 'sub.day_id', 'sub.course_time', 'sub.priceid', 'sub.role')
+        ->distinct()
         ->get();
 
-    // --- 5. LENGKAPI DETAIL ASSIST ---
-    foreach ($assistScheduleData as $assistItem) {
-        $details = DB::table('price as p')
-            ->where('p.id', $assistItem->priceid)
-            ->join('day as d', 'd.id', '=', DB::raw($assistItem->day_id))
-            ->select('p.program as class', 'd.day as day_name')
-            ->first();
+    foreach ($assistPatterns as $pattern) {
+        // Cek keterlibatan asisten di Day 1 dan Day 2
+        $daysToProcess = [];
+        if ($pattern->assist_day1 == 1) $daysToProcess[] = $pattern->day1;
+        if ($pattern->assist_day2 == 1) $daysToProcess[] = $pattern->day2;
 
-        if ($details) {
-            // PERBAIKAN: Gunakan DISTINCT agar nama siswa tidak double dari record absensi lama
-            $studentsInAssist = DB::table('attendances as a')
-                ->join('attendance_details as ad', 'a.id', '=', 'ad.attendance_id')
-                ->join('student as s', 'ad.student_id', '=', 's.id')
-                ->where('a.assist_id', $assistItem->id_teacher) 
-                ->where('a.price_id', $assistItem->priceid)
-                ->where('a.course_time', $assistItem->course_time)
-                ->where(function($query) use ($assistItem) {
-                    $query->where('a.day1', $assistItem->day_id)
-                          ->orWhere('a.day2', $assistItem->day_id);
-                })
-                ->select('s.name', 's.id_teacher as main_teacher_id')
-                ->distinct() // <--- Kunci agar tidak 251 siswa
-                ->get();
+        foreach ($daysToProcess as $dayId) {
+            // Ambil info kelas dan hari
+            $details = DB::table('price as p')
+                ->join('day as d', 'd.id', '=', DB::raw($dayId))
+                ->where('p.id', $pattern->price_id)
+                ->select('p.program as class', 'd.day as day_name', 'p.id as priceid')
+                ->first();
 
-            $studentArray = $studentsInAssist->pluck('name')->toArray();
-            
-            $mainTeacherName = null;
-            if ($studentsInAssist->isNotEmpty()) {
-                // Ambil guru utama dari siswa pertama di daftar tersebut
-                $mainTeacherName = DB::table('teacher')
-                    ->where('id', $studentsInAssist->first()->main_teacher_id)
-                    ->value('name');
+            if ($details) {
+                // Ambil daftar siswa aktif milik GURU UTAMA yang dibantu
+                $studentsInAssist = DB::table('student as s')
+                    ->where('s.id_teacher', $pattern->teacher_id)
+                    ->where('s.priceid', $pattern->price_id)
+                    ->where('s.course_time', $pattern->course_time)
+                    ->where('s.status', 'active')
+                    ->where(function($q) use ($dayId) {
+                        $q->where('s.day1', $dayId)->orWhere('s.day2', $dayId);
+                    })
+                    ->select('s.name')
+                    ->get();
+
+                $studentArray = $studentsInAssist->pluck('name')->toArray();
+                
+                // Ambil nama Guru Utama untuk keterangan "Assist: Nama Guru"
+                $mainTeacherName = DB::table('teacher')->where('id', $pattern->teacher_id)->value('name');
+
+                $mergedSchedule->push((object)[
+                    'teacher_name'   => $mainTeacherName ? 'Assist: ' . $mainTeacherName : 'Assist Class',
+                    'class'          => $details->class,
+                    'day1_name'      => $details->day_name,
+                    'day2_name'      => null,
+                    'id_teacher'     => $teacherId,
+                    'course_time'    => $pattern->course_time,
+                    'total_students' => count($studentArray),
+                    'student_list'   => $studentArray,
+                    'role'           => 'assist',
+                    'priceid'        => $pattern->price_id, 
+                    'day1_id'        => $dayId,
+                    'day2_id'        => null,
+                ]);
             }
-
-            $mergedSchedule->push((object)[
-                'teacher_name'   => $mainTeacherName ? 'Assist: ' . $mainTeacherName : 'Assist Class',
-                'class'          => $details->class,
-                'day1_name'      => $details->day_name,
-                'day2_name'      => null,
-                'id_teacher'     => $assistItem->id_teacher,
-                'course_time'    => $assistItem->course_time,
-                'total_students' => count($studentArray), // Total berdasarkan nama unik
-                'student_list'   => $studentArray,
-                'role'           => $assistItem->role,
-                'priceid'        => $assistItem->priceid, 
-                'day1_id'        => $assistItem->day_id,
-                'day2_id'        => null,
-            ]);
         }
     }
 
-    $mergedSchedule = $mergedSchedule->sortBy('course_time');
+    // Urutkan berdasarkan waktu
+    $sortedSchedule = $mergedSchedule->sortBy('course_time')->values();
 
     return view('calendar.index', [
-        'data' => $mergedSchedule ?? [],
+        'data' => $sortedSchedule,
         'teachers' => $teachers,
         'startOfWeekDate' => $startOfWeekDateString,
         'currentTeacherId' => $teacherId,
     ]);
 }
-
 
 
 }

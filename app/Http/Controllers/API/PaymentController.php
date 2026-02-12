@@ -630,7 +630,7 @@ $currentDay = (int)date('j');
 // 2. Logika Pemisahan Pesan dan Gambar sesuai Tanggal
 if ($currentDay <= 21) {
     // SESUAI GAMBAR 1 (REMINDER 1 & 2)
-    $message = "*REMINDER PEMBAYARAN SPP (Reminder 1 & 2)*\n\n" .
+    $message = "*REMINDER PEMBAYARAN SPP*\n\n" .
                 "Yth. Bapak/Ibu Orang Tua/Wali Murid *" . $datanya['name'] . "*,\n" .
                 "Mohon segera melakukan pembayaran *SPP bulan " . implode(", ", $monthsUnpaid) .
                 "* sebesar *Rp" . number_format($totalAmount, 0, ',', '.') . "*.\n\n" .
@@ -644,7 +644,7 @@ if ($currentDay <= 21) {
                 "Terima kasih atas kerjasamanya.";
 } else {
     // SESUAI GAMBAR 2 (REMINDER 3)
-    $message = "*REMINDER PEMBAYARAN SPP (Reminder 3)*\n\n" .
+    $message = "*REMINDER PEMBAYARAN SPP*\n\n" .
                 "Yth. Bapak/Ibu Orang Tua/Wali Murid,\n" .
                 "Mohon segera menyelesaikan pembayaran *SPP " . $datanya['name'] . " bulan " . implode(", ", $monthsUnpaid). "* sebesar *Rp" . number_format($totalAmount, 0, ',', '.') . "* (uang les + denda)*.\n\n" .
                 "*Pembayaran dapat dilakukan melalui:*\n" .
@@ -655,9 +655,6 @@ if ($currentDay <= 21) {
                 "Jika lewat dari tanggal tersebut, maka dengan sangat terpaksa *" . $datanya['name'] . "* tidak dapat mengikuti kelas terlebih dahulu.\n\n" .
                 "Terima kasih atas perhatiannya.";
 }
-
-// 3. Kirim via Helper
-$send = Helper::sendBroadCast($datanya['phone'], $message);
 
                 // Memanggil Helper untuk mengirim broadcast
                 // Pastikan Helper::sendBroadCast menerima argumen sesuai urutan: (phone, message)

@@ -602,26 +602,62 @@ class PaymentController extends Controller
                 }
 
                 // Membuat pesan pengingat pembayaran
-                $message = "*📢 PENGUMUMAN PEMBAYARAN 📢*\n\n" .
-                    "*Yth. Bapak/Ibu Orang Tua/Wali Murid " . $datanya['name'] . ",*\n\n" .
-                    "Mohon segera melakukan pembayaran *SPP* untuk bulan berikut:\n" .
-                    implode(", ", $monthsUnpaid) . "\n\n" .
-                    "*Total yang harus dibayar: Rp" . number_format($totalAmount, 0, ',', '.') . "*\n\n" .
-                    "📌 *Pembayaran dapat dilakukan melalui:*\n" .
-                    "• Front desk *U&I* (tunai/kartu)\n" .
-                    "• Transfer ke *BCA a.n. Lie Citro Dewi Ruslie*\n" .
-                    " No. Rek: *464 1327 187*\n\n" .
-                    "*Batas waktu pembayaran adalah sampai akhir bulan ini.*\n" .
-                    "Pembayaran lewat batas waktu tersebut akan dikenakan *biaya keterlambatan 10%*.\n\n" .
-                    "📌 *Konfirmasi Pembayaran:*\n" .
-                    "Jika Bapak/Ibu telah membayar namun belum menerima e-struk/nota, mohon kirimkan:\n" .
-                    "• Bukti transfer\n" .
-                    "• Nama siswa/No. ID\n" .
-                    "• Program/Kelas\n" .
-                    "Agar pembayaran dapat diproses dengan tepat.\n\n" .
-                    "Terima kasih atas kerjasamanya. 🙏\n\n" .
-                    "*U&I English Course*\n\n" .
-                    "_NB: Abaikan pesan ini jika pembayaran sudah dilakukan dan dikonfirmasi._";
+                // $message = "*📢 PENGUMUMAN PEMBAYARAN 📢*\n\n" .
+                //     "*Yth. Bapak/Ibu Orang Tua/Wali Murid " . $datanya['name'] . ",*\n\n" .
+                //     "Mohon segera melakukan pembayaran *SPP* untuk bulan berikut:\n" .
+                //     implode(", ", $monthsUnpaid) . "\n\n" .
+                //     "*Total yang harus dibayar: Rp" . number_format($totalAmount, 0, ',', '.') . "*\n\n" .
+                //     "📌 *Pembayaran dapat dilakukan melalui:*\n" .
+                //     "• Front desk *U&I* (tunai/kartu)\n" .
+                //     "• Transfer ke *BCA a.n. Lie Citro Dewi Ruslie*\n" .
+                //     " No. Rek: *464 1327 187*\n\n" .
+                //     "*Batas waktu pembayaran adalah sampai akhir bulan ini.*\n" .
+                //     "Pembayaran lewat batas waktu tersebut akan dikenakan *biaya keterlambatan 10%*.\n\n" .
+                //     "📌 *Konfirmasi Pembayaran:*\n" .
+                //     "Jika Bapak/Ibu telah membayar namun belum menerima e-struk/nota, mohon kirimkan:\n" .
+                //     "• Bukti transfer\n" .
+                //     "• Nama siswa/No. ID\n" .
+                //     "• Program/Kelas\n" .
+                //     "Agar pembayaran dapat diproses dengan tepat.\n\n" .
+                //     "Terima kasih atas kerjasamanya. 🙏\n\n" .
+                //     "*U&I English Course*\n\n" .
+                //     "_NB: Abaikan pesan ini jika pembayaran sudah dilakukan dan dikonfirmasi._";
+
+
+                // 1. Ambil tanggal hari ini
+$currentDay = (int)date('j'); 
+
+// 2. Logika Pemisahan Pesan dan Gambar sesuai Tanggal
+if ($currentDay <= 21) {
+    // SESUAI GAMBAR 1 (REMINDER 1 & 2)
+    $message = "*REMINDER PEMBAYARAN SPP (Reminder 1 & 2)*\n\n" .
+                "Yth. Bapak/Ibu Orang Tua/Wali Murid *" . $datanya['name'] . "*,\n" .
+                "Mohon segera melakukan pembayaran *SPP bulan " . implode(", ", $monthsUnpaid) .
+                "* sebesar *Rp" . number_format($totalAmount, 0, ',', '.') . "*.\n\n" .
+                "*Pembayaran dapat dilakukan melalui:*\n" .
+                "• Front desk U&I (tunai/kartu)\n" .
+                "• Transfer ke rek. BCA: *464.1327.187* a.n. *Lie Citro Dewi Ruslie*\n\n" .
+                "*Batas waktu pembayaran: 20 " . date('F Y') . "*.\n" .
+                "Mulai tanggal *21 " . date('F Y') . "*, pembayaran akan dikenakan *denda 10%*.\n\n" .
+                "*Konfirmasi pembayaran:*\n" .
+                "Kirimkan *bukti transfer dengan berita nama lengkap siswa/i* agar pembayaran dapat diproses.\n\n" .
+                "Terima kasih atas kerjasamanya.";
+} else {
+    // SESUAI GAMBAR 2 (REMINDER 3)
+    $message = "*REMINDER PEMBAYARAN SPP (Reminder 3)*\n\n" .
+                "Yth. Bapak/Ibu Orang Tua/Wali Murid,\n" .
+                "Mohon segera menyelesaikan pembayaran *SPP " . $datanya['name'] . " bulan " . implode(", ", $monthsUnpaid). "* sebesar *Rp" . number_format($totalAmount, 0, ',', '.') . "* (uang les + denda)*.\n\n" .
+                "*Pembayaran dapat dilakukan melalui:*\n" .
+                "• Front desk U&I (tunai/kartu)\n" .
+                "• Transfer ke rek. BCA: *464.1327.187* a.n. *Lie Citro Dewi Ruslie*\n\n" .
+                // ganti ke tgl akhir bulan ini
+                "*Batas waktu pembayaran: " . date('d F Y', strtotime('last day of this month')) . "*.\n" .
+                "Jika lewat dari tanggal tersebut, maka dengan sangat terpaksa *" . $datanya['name'] . "* tidak dapat mengikuti kelas terlebih dahulu.\n\n" .
+                "Terima kasih atas perhatiannya.";
+}
+
+// 3. Kirim via Helper
+$send = Helper::sendBroadCast($datanya['phone'], $message);
 
                 // Memanggil Helper untuk mengirim broadcast
                 // Pastikan Helper::sendBroadCast menerima argumen sesuai urutan: (phone, message)

@@ -816,7 +816,9 @@ $birthdayStudentNames = collect($student_birthday_notification)
                             </div>
                             {{-- <div class="row"> --}}
                             {{-- <div class="col-md-6"> --}}
-                            <div class="form-group">
+
+                           
+                             <!-- <div class="form-group">
                                 @php
                                     $tests = DB::table('tests')->get();
                                 @endphp
@@ -830,7 +832,8 @@ $birthdayStudentNames = collect($student_birthday_notification)
                                                 $cekOrder = DB::table('order_reviews')
                                                     ->where('id_attendance', $data->attendanceId)
                                                     ->where('test_id', $t->id)
-                                                    ->first();
+                                                    ->get();
+
                                             @endphp
                                             <div class="form-group">
                                                 <label for="">{{ $t->id }}</label>
@@ -841,7 +844,46 @@ $birthdayStudentNames = collect($student_birthday_notification)
                                     @endforeach
                                 </div>
                                 {{-- </select> --}}
-                            </div>
+                            </div> -->
+     <div class="form-group">
+    @php
+        $tests = DB::table('tests')->get();
+    @endphp
+    <label for="">Review and Test</label>
+
+    <div class="row">
+        @foreach ($tests as $keyt => $t)
+            @php
+                $cekOrder = null;
+                
+                if ($data->attendanceId != 0) {
+                    $cekOrder = DB::table('order_reviews')
+                        ->where('id_attendance', $data->attendanceId)
+                        ->where('test_id', $t->id)
+                        ->first();
+                }
+
+                // Tentukan apakah input harus dimatikan
+                // Mati jika: BUKAN mode update DAN data sudah ada di order_reviews
+                $isDisabled = ($data->type != 'update' && $cekOrder);
+            @endphp
+
+            <div class="col-md-1" style="{{ $isDisabled ? 'opacity: 0.5; cursor: not-allowed;' : '' }}">
+                <div class="form-group">
+                    <label for="" style="{{ $isDisabled ? 'text-decoration: line-through;' : '' }}">
+                        {{ $t->id }} 
+                        @if($isDisabled) <small>(Done)</small> @endif
+                    </label>
+                    <br>
+                    <input type="radio" name="id_test[]" class="form-class"
+                        value="{{ $t->id }}"
+                        {{ $data->type == 'update' && $cekOrder ? 'checked' : '' }}
+                        {{ $isDisabled ? 'disabled' : '' }}>
+                </div>
+            </div>
+        @endforeach
+    </div>
+</div>
                             {{-- </div> --}}
                             {{-- </div> --}}
                             <div class="row">

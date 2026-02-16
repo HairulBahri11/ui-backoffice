@@ -33,6 +33,18 @@
     .form-control { border-radius: 12px; border: 1px solid #eef0f2; background: #fdfdfd; padding: 12px; }
     .form-control:focus { border-color: var(--primary-theme); box-shadow: none; background: #fff; }
     .btn-round { border-radius: 50px !important; padding: 10px 25px !important; font-weight: 600; }
+
+    /* Warna latar belakang area tanggal hari Minggu */
+.fc-day-sun {
+    background-color: rgba(255, 0, 0, 0.05) !important; /* Merah sangat muda agar teks tetap terbaca */
+}
+
+/* Warna angka tanggal hari Minggu */
+.fc-col-header-cell.fc-day-sun .fc-col-header-cell-cushion,
+.fc-daygrid-day.fc-day-sun .fc-daygrid-day-number {
+    color: #e74c3c !important; /* Warna merah terang */
+    font-weight: bold;
+}
 </style>
 
 @section('content')
@@ -151,6 +163,12 @@
             initialView: 'dayGridMonth',
             headerToolbar: { left: 'prev,next today', center: 'title', right: 'dayGridMonth,timeGridWeek,listMonth' },
             events: "{{ route('calendar.events') }}",
+            // Tambahkan ini jika ingin kontrol lebih lewat JavaScript
+    dayCellDidMount: function(info) {
+        if (info.date.getDay() === 0) { // 0 adalah hari Minggu
+            info.el.style.backgroundColor = '#fff5f5'; // Warna merah pastel
+        }
+    },
             
             eventClick: function(info) {
                 const event = info.event;

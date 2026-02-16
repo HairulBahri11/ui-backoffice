@@ -1,7 +1,11 @@
 @extends('template.app')
+
 <link href='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.css' rel='stylesheet' />
 <style>
-    :root { --primary-theme: #01c293; --card-radius: 20px; }
+    :root { 
+        --primary-theme: #01c293; 
+        --card-radius: 20px; 
+    }
     
     #calendar { 
         background: #ffffff; 
@@ -15,46 +19,49 @@
     .fc-toolbar-title { font-weight: 800 !important; color: #2c3e50; }
     .fc-button-primary { 
         background: #fff !important; border: 1px solid #ebedef !important; color: #5d6d7e !important;
-        border-radius: 10px !important; font-weight: 600 !important; transition: 0.3s;
+        border-radius: 10px !important; font-weight: 600 !important;
     }
-    .fc-button-primary:hover { background: var(--primary-theme) !important; color: #fff !important; }
-    .fc-button-active { background: var(--primary-theme) !important; border-color: var(--primary-theme) !important; color: #fff !important; }
+    .fc-button-active { background: var(--primary-theme) !important; color: #fff !important; }
 
-    /* Event Styling */
+    /* --- PERBAIKAN BADGE --- */
     .fc-event { 
-        border: none !important; padding: 5px 10px !important; border-radius: 8px !important; 
-        font-weight: 500 !important; cursor: pointer; transition: 0.2s;
+        background: transparent !important; /* Menghilangkan warna background pada badge */
+        border: none !important; 
+        box-shadow: none !important;
+        padding: 2px 5px !important; 
+        cursor: pointer; 
+        z-index: 5;
     }
-    .fc-event:hover { transform: translateY(-2px); filter: brightness(0.9); box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
 
-    /* Modal Styling */
-    .modal-content { border-radius: 25px; border: none; overflow: hidden; }
-    .modal-header { background: #f8f9fa; border-bottom: none; padding: 25px; }
-    .form-control { border-radius: 12px; border: 1px solid #eef0f2; background: #fdfdfd; padding: 12px; }
-    .form-control:focus { border-color: var(--primary-theme); box-shadow: none; background: #fff; }
-    .btn-round { border-radius: 50px !important; padding: 10px 25px !important; font-weight: 600; }
+    /* Warna teks badge agar tetap kontras (Gelap agar terbaca di background sel yang terang) */
+    .fc-event-main, .fc-event-title, .fc-event-time { 
+        color: #2c3e50 !important; 
+        font-weight: 700 !important;
+    }
 
-    /* Warna latar belakang area tanggal hari Minggu */
-.fc-day-sun {
-    background-color: rgba(255, 0, 0, 0.05) !important; /* Merah sangat muda agar teks tetap terbaca */
-}
+    /* Angka Tanggal */
+    .fc-daygrid-day-number {
+        position: relative;
+        z-index: 10;
+        font-weight: bold;
+        color: #2c3e50 !important;
+    }
 
-/* Warna angka tanggal hari Minggu */
-.fc-col-header-cell.fc-day-sun .fc-col-header-cell-cushion,
-.fc-daygrid-day.fc-day-sun .fc-daygrid-day-number {
-    color: #e74c3c !important; /* Warna merah terang */
-    font-weight: bold;
-}
+    /* Highlight Hari Minggu */
+    .fc-day-sun { background-color: rgba(255, 0, 0, 0.05) !important; }
+    .fc-day-sun .fc-daygrid-day-number { color: #e74c3c !important; }
+
+    .fc-daygrid-day { transition: background-color 0.2s ease; position: relative; }
 </style>
 
 @section('content')
 <div class="content">
-    <div class="panel-header bg-primary-gradient" style="background: linear-gradient(-45deg, #01c293, #01c293) !important">
+    <div class="panel-header" style="background: var(--primary-theme) !important">
         <div class="page-inner py-5">
             <div class="d-flex align-items-center">
                 <div>
                     <h2 class="text-white pb-2 fw-bold">Academic Calendar</h2>
-                    <h5 class="text-white op-8">Plan and track your academic year seamlessly.</h5>
+                    <h5 class="text-white op-8">Badge transparan, background sel solid.</h5>
                 </div>
                 <div class="ml-auto">
                     @if(Auth::guard('staff')->check())
@@ -72,9 +79,9 @@
     </div>
 </div>
 
-<div class="modal fade" id="addEventModal" tabindex="-1" role="dialog">
-    <div class="modal-dialog modal-dialog-centered" role="document">
-        <div class="modal-content shadow-lg">
+<div class="modal fade" id="addEventModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
             <form action="{{ route('calendar-academic.store') }}" method="POST">
                 @csrf
                 <div class="modal-header">
@@ -83,42 +90,32 @@
                 </div>
                 <div class="modal-body px-4">
                     <div class="form-group mb-3">
-                        <label class="font-weight-bold">Event Title</label>
-                        <input type="text" name="title" class="form-control" placeholder="Ex: Final Examination" required>
+                        <label>Event Title</label>
+                        <input type="text" name="title" class="form-control" required>
                     </div>
                     <div class="row">
-                        <div class="col-6">
-                            <label class="small font-weight-bold">Start</label>
-                            <input type="datetime-local" name="start" class="form-control" required>
-                        </div>
-                        <div class="col-6">
-                            <label class="small font-weight-bold">End</label>
-                            <input type="datetime-local" name="end" class="form-control" required>
-                        </div>
+                        <div class="col-6"><label>Start</label><input type="datetime-local" name="start" class="form-control" required></div>
+                        <div class="col-6"><label>End</label><input type="datetime-local" name="end" class="form-control" required></div>
                     </div>
                     <div class="form-group mt-3">
-                        <label class="font-weight-bold">Category</label>
+                        <label>Category</label>
                         <select name="category" class="form-control">
                             <option value="Event">📅 Academic Event</option>
                             <option value="Exam">📝 Examination</option>
                             <option value="Holiday">🏖️ School Holiday</option>
                         </select>
                     </div>
-                    <div class="form-group">
-                        <label class="font-weight-bold">Description</label>
-                        <textarea name="detail" class="form-control" rows="3" placeholder="Additional notes..."></textarea>
-                    </div>
                 </div>
-                <div class="modal-footer border-0">
-                    <button type="submit" class="btn btn-primary btn-round btn-block shadow">Save Event</button>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary btn-round btn-block">Save Event</button>
                 </div>
             </form>
         </div>
     </div>
 </div>
 
-<div class="modal fade" id="editEventModal" tabindex="-1" role="dialog">
-    <div class="modal-dialog modal-dialog-centered" role="document">
+<div class="modal fade" id="editEventModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content border-top border-primary">
             <div class="modal-header">
                 <h4 class="modal-title fw-bold">📝 Edit Event</h4>
@@ -126,26 +123,24 @@
             </div>
             <div class="modal-body px-4">
                 <input type="hidden" id="edit_id">
-                <div class="form-group mb-3"><label class="font-weight-bold">Title</label><input type="text" id="edit_title" class="form-control"></div>
+                <div class="form-group mb-3"><label>Title</label><input type="text" id="edit_title" class="form-control"></div>
                 <div class="row mb-3">
-                    <div class="col-6"><label class="small font-weight-bold">Start</label><input type="datetime-local" id="edit_start" class="form-control"></div>
-                    <div class="col-6"><label class="small font-weight-bold">End</label><input type="datetime-local" id="edit_end" class="form-control"></div>
+                    <div class="col-6"><label>Start</label><input type="datetime-local" id="edit_start" class="form-control"></div>
+                    <div class="col-6"><label>End</label><input type="datetime-local" id="edit_end" class="form-control"></div>
                 </div>
                 <div class="form-group mb-3">
-                    <label class="font-weight-bold">Category</label>
+                    <label>Category</label>
                     <select id="edit_category" class="form-control">
                         <option value="Event">📅 Academic Event</option>
                         <option value="Exam">📝 Examination</option>
                         <option value="Holiday">🏖️ School Holiday</option>
                     </select>
                 </div>
-                <div class="form-group"><label class="font-weight-bold">Description</label><textarea id="edit_detail" class="form-control" rows="3"></textarea></div>
             </div>
-
             @if(Auth::guard('staff')->check())
-            <div class="modal-footer border-0 d-flex justify-content-between">
-                <button type="button" class="btn btn-danger btn-round px-4" id="btnDelete">Delete</button>
-                <button type="button" class="btn btn-primary btn-round px-4 shadow" id="btnUpdate">Update Changes</button>
+            <div class="modal-footer d-flex justify-content-between">
+                <button type="button" class="btn btn-danger btn-round" id="btnDelete">Delete</button>
+                <button type="button" class="btn btn-primary btn-round" id="btnUpdate">Update Changes</button>
             </div>
             @endif
         </div>
@@ -155,35 +150,67 @@
 
 <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js'></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const calendarEl = document.getElementById('calendar');
+        
         const calendar = new FullCalendar.Calendar(calendarEl, {
             initialView: 'dayGridMonth',
-            headerToolbar: { left: 'prev,next today', center: 'title', right: 'dayGridMonth,timeGridWeek,listMonth' },
             events: "{{ route('calendar.events') }}",
-            // Tambahkan ini jika ingin kontrol lebih lewat JavaScript
-    dayCellDidMount: function(info) {
-        if (info.date.getDay() === 0) { // 0 adalah hari Minggu
-            info.el.style.backgroundColor = '#fff5f5'; // Warna merah pastel
-        }
-    },
             
+            eventSourceSuccess: function() {
+                setTimeout(() => colorizeFullRange(), 150);
+            },
+            datesSet: function() {
+                colorizeFullRange();
+            },
+
             eventClick: function(info) {
                 const event = info.event;
                 $('#edit_id').val(event.id);
                 $('#edit_title').val(event.title);
-                $('#edit_start').val(event.start.toISOString().slice(0,16));
-                $('#edit_end').val(event.end ? event.end.toISOString().slice(0,16) : event.start.toISOString().slice(0,16));
+                $('#edit_start').val(event.start.toLocaleString('sv-SE').replace(' ', 'T').slice(0, 16));
+                $('#edit_end').val(event.end ? event.end.toLocaleString('sv-SE').replace(' ', 'T').slice(0, 16) : '');
                 $('#edit_category').val(event.extendedProps.category);
-                $('#edit_detail').val(event.extendedProps.detail);
                 $('#editEventModal').modal('show');
             }
         });
+
         calendar.render();
 
-        // AJAX UPDATE
+        function colorizeFullRange() {
+            document.querySelectorAll('.fc-daygrid-day').forEach(el => el.style.backgroundColor = '');
+
+            const allEvents = calendar.getEvents();
+            allEvents.forEach(event => {
+                const badgeColor = event.backgroundColor || '#01c293';
+                
+                let curr = new Date(event.start);
+                curr.setHours(0,0,0,0);
+                
+                let last = event.end ? new Date(event.end) : new Date(event.start);
+                last.setHours(0,0,0,0);
+
+                if (event.end && event.end.getHours() === 0 && event.end.getMinutes() === 0) {
+                    last.setDate(last.getDate() - 1);
+                }
+
+                while (curr <= last) {
+                    let dateStr = curr.toLocaleString('sv-SE').split(' ')[0];
+                    let cell = document.querySelector(`.fc-daygrid-day[data-date="${dateStr}"]`);
+                    
+                    if (cell) {
+                        // Menggunakan opacity 0.3 agar teks hitam di atasnya terbaca jelas
+                        cell.style.backgroundColor = badgeColor + '44'; 
+                    }
+                    curr.setDate(curr.getDate() + 1);
+                }
+            });
+        }
+
+        // Handler Update & Delete (AJAX)
         $('#btnUpdate').click(function() {
             const id = $('#edit_id').val();
             $.ajax({
@@ -194,39 +221,26 @@
                     title: $('#edit_title').val(),
                     start: $('#edit_start').val(),
                     end: $('#edit_end').val(),
-                    category: $('#edit_category').val(),
-                    detail: $('#edit_detail').val(),
+                    category: $('#edit_category').val()
                 },
-                success: function(res) {
+                success: function() {
                     $('#editEventModal').modal('hide');
-                    Swal.fire('Success!', res.message, 'success');
                     calendar.refetchEvents();
-                    window.location.reload();
+                    Swal.fire('Updated!', 'Success', 'success');
                 }
             });
         });
 
-        // AJAX DELETE
         $('#btnDelete').click(function() {
             const id = $('#edit_id').val();
-            Swal.fire({
-                title: 'Delete this event?',
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#f3545d',
-                confirmButtonText: 'Yes, delete!'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    $.ajax({
-                        url: `/calendar-academic/${id}`,
-                        type: 'DELETE',
-                        data: { _token: "{{ csrf_token() }}" },
-                        success: function(res) {
-                            $('#editEventModal').modal('hide');
-                            Swal.fire('Deleted!', res.message, 'success');
-                            calendar.refetchEvents();
-                        }
-                    });
+            $.ajax({
+                url: `/calendar-academic/${id}`,
+                type: 'DELETE',
+                data: { _token: "{{ csrf_token() }}" },
+                success: function() {
+                    $('#editEventModal').modal('hide');
+                    calendar.refetchEvents();
+                    Swal.fire('Deleted!', 'Success', 'success');
                 }
             });
         });

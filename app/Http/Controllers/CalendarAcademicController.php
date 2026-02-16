@@ -81,9 +81,9 @@ class CalendarAcademicController extends Controller
     {
         return match ($category) {
             'Exam'  => '#fdaf4b', // Red
-            'Holiday'  => '#f3545d', // Orange
+            'Holiday'  => '#01c293', // green
             'Event'  => '#1572e8', // Blue
-            default  => '#01c293', // Theme Green
+            default  => '#cccccc', // Theme Green
         };
     }
 }

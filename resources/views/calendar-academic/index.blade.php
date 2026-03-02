@@ -35,49 +35,91 @@
         color: #fff !important;
     }
 
-    /* --- BADGE TEXT TRANSPARAN --- */
+    /* --- LAYOUT POSISI TENGAH --- */
+    .fc-daygrid-day {
+        transition: background-color 0.2s ease;
+        position: relative;
+        min-height: 120px !important;
+    }
+
+    /* Memaksa kontainer angka tanggal memenuhi kotak dan ke tengah */
+    .fc .fc-daygrid-day-top {
+        display: flex !important;
+        justify-content: center !important;
+        align-items: center !important;
+        position: absolute !important;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 1 !important;
+        /* Di bawah event */
+        flex-direction: row !important;
+        pointer-events: none;
+    }
+
+    /* --- ANGKA TANGGAL HITAM PEKAT & BESAR --- */
+    .fc-daygrid-day-number {
+        font-size: 4rem !important;
+        /* Sangat besar memenuhi kotak */
+        font-weight: 900 !important;
+        color: #0c0c0c !important;
+        /* Hitam Pekat */
+        opacity: 1 !important;
+        text-decoration: none !important;
+        line-height: 1;
+    }
+
+    /* Hari Minggu tetap Hitam Pekat (sesuai permintaan) */
+    .fc-day-sun .fc-daygrid-day-number {
+        color: #0c0c0c !important;
+    }
+
+    /* Highlight Hari Minggu (Background saja) */
+    .fc-day-sun {
+        background-color: rgba(255, 0, 0, 0.05) !important;
+    }
+
+    /* --- TULISAN EVENT (TETAP HITAM) --- */
+    .fc-daygrid-day-events {
+        position: relative;
+        z-index: 10 !important;
+        /* Di atas angka */
+        padding: 5px !important;
+    }
+
     .fc-event {
         background: transparent !important;
         border: none !important;
         box-shadow: none !important;
         padding: 2px 5px !important;
         cursor: pointer;
-        z-index: 5;
     }
 
-    /* Warna teks badge agar kontras di background sel */
+    /* Tulisan event tetap hitam pekat dengan shadow putih agar tidak 'tenggelam' */
     .fc-event-main,
     .fc-event-title,
     .fc-event-time {
-        color: #2c3e50 !important;
+        color: #0c0c0c !important;
+        /* Tetap Hitam */
         font-weight: 900 !important;
+        text-shadow:
+            2px 2px 0px #fff,
+            -2px -2px 0px #fff,
+            2px -2px 0px #fff,
+            -2px 2px 0px #fff;
+        /* Border putih agar teks hitam terbaca di atas angka hitam */
+        font-size: 1rem;
+        white-space: normal !important;
     }
 
-    /* Angka Tanggal */
-    .fc-daygrid-day-number {
-        position: relative;
-        z-index: 10;
-        font-weight: bold;
-        color: #2c3e50 !important;
-        text-shadow: 0px 0px 4px rgba(255, 255, 255, 1);
-    }
-
-    /* Highlight Hari Minggu */
-    .fc-day-sun {
-        background-color: rgba(255, 0, 0, 0.05) !important;
-    }
-
-    .fc-day-sun .fc-daygrid-day-number {
-        color: #e74c3c !important;
-    }
-
-    .fc-daygrid-day {
-        transition: background-color 0.2s ease;
-        position: relative;
+    /* Hilangkan dot/titik bawaan agar bersih */
+    .fc-daygrid-event-dot {
+        display: none !important;
     }
 
     body {
-        font-size: 18px !important;
+        font-size: 19px !important;
     }
 </style>
 

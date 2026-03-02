@@ -5,6 +5,9 @@
     :root {
         --primary-theme: #01c293;
         --card-radius: 20px;
+        --pure-black: #0c0c0c;
+        --pure-red: #e74c3c;
+        /* Merah untuk hari Minggu */
     }
 
     #calendar {
@@ -53,38 +56,34 @@
         width: 100%;
         height: 100%;
         z-index: 1 !important;
-        /* Di bawah event */
         flex-direction: row !important;
         pointer-events: none;
     }
 
-    /* --- ANGKA TANGGAL HITAM PEKAT & BESAR --- */
+    /* --- ANGKA TANGGAL UMUM (HITAM PEKAT) --- */
     .fc-daygrid-day-number {
         font-size: 4rem !important;
-        /* Sangat besar memenuhi kotak */
         font-weight: 900 !important;
-        color: #0c0c0c !important;
-        /* Hitam Pekat */
+        color: var(--pure-black) !important;
         opacity: 1 !important;
         text-decoration: none !important;
         line-height: 1;
     }
 
-    /* Hari Minggu tetap Hitam Pekat (sesuai permintaan) */
+    /* --- KHUSUS HARI MINGGU (ANGKA MERAH) --- */
     .fc-day-sun .fc-daygrid-day-number {
-        color: #0c0c0c !important;
+        color: var(--pure-red) !important;
     }
 
-    /* Highlight Hari Minggu (Background saja) */
+    /* Highlight Background Hari Minggu (Sangat Soft) */
     .fc-day-sun {
-        background-color: rgba(255, 0, 0, 0.05) !important;
+        background-color: rgba(231, 76, 60, 0.05) !important;
     }
 
     /* --- TULISAN EVENT (TETAP HITAM) --- */
     .fc-daygrid-day-events {
         position: relative;
         z-index: 10 !important;
-        /* Di atas angka */
         padding: 5px !important;
     }
 
@@ -96,24 +95,22 @@
         cursor: pointer;
     }
 
-    /* Tulisan event tetap hitam pekat dengan shadow putih agar tidak 'tenggelam' */
+    /* Tulisan event tetap hitam pekat dengan shadow putih */
     .fc-event-main,
     .fc-event-title,
     .fc-event-time {
-        color: #0c0c0c !important;
-        /* Tetap Hitam */
+        color: var(--pure-black) !important;
         font-weight: 900 !important;
         text-shadow:
             2px 2px 0px #fff,
             -2px -2px 0px #fff,
             2px -2px 0px #fff,
             -2px 2px 0px #fff;
-        /* Border putih agar teks hitam terbaca di atas angka hitam */
         font-size: 1rem;
         white-space: normal !important;
     }
 
-    /* Hilangkan dot/titik bawaan agar bersih */
+    /* Hilangkan dot/titik bawaan */
     .fc-daygrid-event-dot {
         display: none !important;
     }

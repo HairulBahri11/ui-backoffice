@@ -2,41 +2,55 @@
 
 <link href='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.css' rel='stylesheet' />
 <style>
-    :root { 
-        --primary-theme: #01c293; 
-        --card-radius: 20px; 
+    :root {
+        --primary-theme: #01c293;
+        --card-radius: 20px;
     }
-    
-    #calendar { 
-        background: #ffffff; 
-        padding: 25px; 
-        border-radius: var(--card-radius); 
-        box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+
+    #calendar {
+        background: #ffffff;
+        padding: 25px;
+        border-radius: var(--card-radius);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
         border: none;
     }
 
     /* Header Styling */
-    .fc-toolbar-title { font-weight: 800 !important; color: #2c3e50; }
-    .fc-button-primary { 
-        background: #fff !important; border: 1px solid #ebedef !important; color: #5d6d7e !important;
-        border-radius: 10px !important; font-weight: 600 !important;
+    .fc-toolbar-title {
+        font-weight: 800 !important;
+        color: #2c3e50;
     }
-    .fc-button-active { background: var(--primary-theme) !important; border-color: var(--primary-theme) !important; color: #fff !important; }
+
+    .fc-button-primary {
+        background: #fff !important;
+        border: 1px solid #ebedef !important;
+        color: #5d6d7e !important;
+        border-radius: 10px !important;
+        font-weight: 600 !important;
+    }
+
+    .fc-button-active {
+        background: var(--primary-theme) !important;
+        border-color: var(--primary-theme) !important;
+        color: #fff !important;
+    }
 
     /* --- BADGE TEXT TRANSPARAN --- */
-    .fc-event { 
-        background: transparent !important; 
-        border: none !important; 
+    .fc-event {
+        background: transparent !important;
+        border: none !important;
         box-shadow: none !important;
-        padding: 2px 5px !important; 
-        cursor: pointer; 
+        padding: 2px 5px !important;
+        cursor: pointer;
         z-index: 5;
     }
 
     /* Warna teks badge agar kontras di background sel */
-    .fc-event-main, .fc-event-title, .fc-event-time { 
-        color: #2c3e50 !important; 
-        font-weight: 800 !important;
+    .fc-event-main,
+    .fc-event-title,
+    .fc-event-time {
+        color: #2c3e50 !important;
+        font-weight: 900 !important;
     }
 
     /* Angka Tanggal */
@@ -45,14 +59,26 @@
         z-index: 10;
         font-weight: bold;
         color: #2c3e50 !important;
-        text-shadow: 0px 0px 4px rgba(255,255,255,1);
+        text-shadow: 0px 0px 4px rgba(255, 255, 255, 1);
     }
 
     /* Highlight Hari Minggu */
-    .fc-day-sun { background-color: rgba(255, 0, 0, 0.05) !important; }
-    .fc-day-sun .fc-daygrid-day-number { color: #e74c3c !important; }
+    .fc-day-sun {
+        background-color: rgba(255, 0, 0, 0.05) !important;
+    }
 
-    .fc-daygrid-day { transition: background-color 0.2s ease; position: relative; }
+    .fc-day-sun .fc-daygrid-day-number {
+        color: #e74c3c !important;
+    }
+
+    .fc-daygrid-day {
+        transition: background-color 0.2s ease;
+        position: relative;
+    }
+
+    body {
+        font-size: 18px !important;
+    }
 </style>
 
 @section('content')
@@ -173,16 +199,16 @@
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const calendarEl = document.getElementById('calendar');
-        
+
         const calendar = new FullCalendar.Calendar(calendarEl, {
             initialView: 'dayGridMonth',
-            headerToolbar: { 
-                left: 'prev,next today', 
-                center: 'title', 
-                right: 'dayGridMonth,timeGridWeek,listMonth' 
+            headerToolbar: {
+                left: 'prev,next today',
+                center: 'title',
+                right: 'dayGridMonth,timeGridWeek,listMonth'
             },
             events: "{{ route('calendar.events') }}",
-            
+
             eventSourceSuccess: function() {
                 setTimeout(() => colorizeFullRange(), 150);
             },
@@ -210,12 +236,12 @@
             const allEvents = calendar.getEvents();
             allEvents.forEach(event => {
                 const badgeColor = event.backgroundColor || '#01c293';
-                
+
                 let curr = new Date(event.start);
-                curr.setHours(0,0,0,0);
-                
+                curr.setHours(0, 0, 0, 0);
+
                 let last = event.end ? new Date(event.end) : new Date(event.start);
-                last.setHours(0,0,0,0);
+                last.setHours(0, 0, 0, 0);
 
                 if (event.end && event.end.getHours() === 0 && event.end.getMinutes() === 0) {
                     last.setDate(last.getDate() - 1);
@@ -224,7 +250,7 @@
                 while (curr <= last) {
                     let dateStr = curr.toLocaleString('sv-SE').split(' ')[0];
                     let cell = document.querySelector(`.fc-daygrid-day[data-date="${dateStr}"]`);
-                    
+
                     if (cell) {
                         cell.style.backgroundColor = badgeColor + '44'; // Solid opacity 
                     }
@@ -269,7 +295,9 @@
                     $.ajax({
                         url: `/calendar-academic/${id}`,
                         type: 'DELETE',
-                        data: { _token: "{{ csrf_token() }}" },
+                        data: {
+                            _token: "{{ csrf_token() }}"
+                        },
                         success: function(res) {
                             $('#editEventModal').modal('hide');
                             Swal.fire('Deleted!', 'Event deleted.', 'success');

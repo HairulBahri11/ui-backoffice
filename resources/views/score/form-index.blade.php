@@ -94,8 +94,10 @@
                                                 <th class="text-center">Average</th>
                                                 <th class="text-center">Grade</th>
                                                 <th class="text-center">Comment For Student</th>
+                                                @if(Auth::guard('staff')->check() == true)
                                                 <th class="text-center">Date Test</th>
                                                 <th class="text-center">Date Time</th>
+                                                @endif
                                                 <th class="text-center">Action</th>
                                             </tr>
                                         </thead>
@@ -133,10 +135,12 @@
                                                 </td>
                                                 <td>{{ $average != null ? $average->comment : '-' }}
                                                 </td>
+                                                @if(Auth::guard('staff')->check() == true)
                                                 <td>{{ $average != null ? $average->date : '-' }}
                                                 </td>
                                                 <td>{{ $average != null ? $average->updated_at : '-' }}
                                                 </td>
+                                                @endif
                                                 <td>
                                                     @if ($average != null)
                                                     <a href="{{ url('score/create?type=edit&class=') . Request::get('class') . '&student=' . $itemSValue->id . '&test=' . Request::get('test') . '&id_test=' . $average->id . '&date=' . $average->date . '&day1=' . Request::get('day1') . '&day2=' . Request::get('day2') . '&teacher=' . Request::get('teacher') . '&time=' . Request::get('time') }}"

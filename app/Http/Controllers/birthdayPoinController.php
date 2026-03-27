@@ -95,44 +95,46 @@ class birthdayPoinController extends Controller
         $student_list_active = $query->get();
         $student_birthday = [];
         $currentMonth = now()->month;
-
         foreach ($student_list_active as $item) {
+            // 1. Bersihkan karakter aneh di awal/akhir dan hapus tanda strip (-) di depan jika ada
             $birthdayString = trim($item->birthday);
+            $birthdayString = ltrim($birthdayString, '- '); // Menghapus "-" dan spasi di depan
+
             $date = null;
 
             try {
-                // Cek Format 1: "1995 March 24" (Y F d)
+                // Cek Format 1: "2019 March 30" (Ada Tahun)
                 if (preg_match('/^\d{4}\s+[A-Za-z]+\s+\d{1,2}$/', $birthdayString)) {
                     $date = Carbon::createFromFormat('Y F d', $birthdayString);
                 }
-                // Cek Format 2: "March 24" (F d)
+                // Cek Format 2: "March 24" (Hanya Bulan dan Tanggal)
                 elseif (preg_match('/^[A-Za-z]+\s+\d{1,2}$/', $birthdayString)) {
-                    // Gunakan tahun sekarang sebagai placeholder agar Carbon bisa memproses bulan & tanggal
+                    // Kita gunakan tahun sekarang sebagai placeholder
                     $date = Carbon::createFromFormat('F d', $birthdayString);
                 }
             } catch (\Exception $e) {
-                continue; // Skip jika format benar-benar rusak
+                continue;
             }
 
-            // Jika berhasil diparsing dan bulannya sama dengan bulan ini
-            if ($date && $date->month === $currentMonth) {
+            // Periksa apakah bulannya sama dengan bulan ini
+            if ($date && $date->month === now()->month) {
                 $className = $item->class->program ?? 'Unknown';
                 $teacherName = $item->teacher->name ?? 'Unknown';
 
-                // Cek apakah data asli punya tahun untuk menghitung umur
-                $hasYear = preg_match('/\d{4}/', $birthdayString);
+                // Logika umur: Jika data asli tidak mengandung angka tahun 4 digit, umur tulis "-"
+                $hasYear = preg_match('/\d{4}/', $item->birthday);
 
                 $student_birthday[] = [
                     'id' => $item->id,
                     'name' => $item->name,
-                    'birthday' => $date->format('F d'), // Tampilkan format cantik "March 24"
+                    'birthday' => $date->format('Y-m-d'),
                     'class' => $className,
                     'day1' => $item->day1_name,
                     'day2' => $item->day2_name,
                     'course_time' => $item->course_time,
                     'teacher' => $teacherName,
-                    'age' => $hasYear ? now()->diffInYears($date) : '-', // Umur "-" jika tahun tidak ada
-                    'day_sort' => $date->day // Helper untuk sorting
+                    'age' => $hasYear ? now()->diffInYears($date) : '-',
+                    'day_sort' => $date->day
                 ];
             }
         }

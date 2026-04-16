@@ -111,16 +111,29 @@ class UsersController extends Controller
         foreach ($student_list_active as $item) {
             $birthdayString = trim($item->birthday); // Hapus spasi ekstra
 
-            // Pastikan format tanggal valid sebelum diproses
-            if (preg_match('/^\d{4} [A-Za-z]+ \d{1,2}$/', $birthdayString)) {
-                // Format "2019 November 24" → "2019-11-24"
-                $date = Carbon::createFromFormat('Y F d', $birthdayString);
-            } elseif (preg_match('/^[A-Za-z]+ \d{1,2}$/', $birthdayString)) {
-                // Format "November 24" → "2025-11-24" (asumsi tahun ini)
-                $birthdayString .= ' ' . now()->year;
-                $date = Carbon::createFromFormat('F d Y', $birthdayString);
-            } else {
-                continue; // Lewati jika format salah
+            // // Pastikan format tanggal valid sebelum diproses
+            // if (preg_match('/^\d{4} [A-Za-z]+ \d{1,2}$/', $birthdayString)) {
+            //     // Format "2019 November 24" → "2019-11-24"
+            //     $date = Carbon::createFromFormat('Y F d', $birthdayString);
+            // } elseif (preg_match('/^[A-Za-z]+ \d{1,2}$/', $birthdayString)) {
+            //     // Format "November 24" → "2025-11-24" (asumsi tahun ini)
+            //     $birthdayString .= ' ' . now()->year;
+            //     $date = Carbon::createFromFormat('F d Y', $birthdayString);
+            // } else {
+            //     continue; // Lewati jika format salah
+            // }
+
+            // Cek Format 1: "2019 March 30"
+            if (preg_match('/^\d{4}\s+[A-Za-z]+\s+\d{1,2}$/', $birthdayString)) {
+                $date = Carbon::createFromFormat('Y F d', $birthdayString)->startOfDay();
+            }
+            // Cek Format 2: "March 24"
+            elseif (preg_match('/^[A-Za-z]+\s+\d{1,2}$/', $birthdayString)) {
+                $date = Carbon::createFromFormat('F d', $birthdayString)->startOfDay();
+            }
+            // Tambahkan else agar program tidak error jika string kosong/salah format
+            else {
+                continue;
             }
 
             // Hitung umur hanya jika tahun ada

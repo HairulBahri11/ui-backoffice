@@ -63,5 +63,6 @@ Route::group(['middleware' => ['jwt.auth']], function () {
     Route::get('/e-receipt/{transId}/{phoneNumber}', [PaymentController::class, 'eReceipt']);
     Route::post('/broadcast', [PaymentController::class, 'broadcastLatePayment']);
     Route::post('/agreement', [StudentController::class, 'agreementPayment']);
+    Route::get('/info-agreement/{parentId}', [StudentController::class, 'infoParentAggreement']);
 });
 Route::post('/send-payment-reminders', [PaymentController::class, 'sendPaymentReminders']);

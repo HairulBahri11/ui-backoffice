@@ -301,4 +301,13 @@ class StudentController extends Controller
             'message' => 'Agreement rejected',
         ], 200);
     }
+
+    public function infoParentAggreement($parentId)
+    {
+        $parent = Parents::where('id', $parentId)->first();
+        return response()->json([
+            'code' => '00',
+            'aggreement' => $parent->aggreement,
+        ], 200);
+    }
 }

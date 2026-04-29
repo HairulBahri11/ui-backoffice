@@ -7,6 +7,7 @@ use App\Models\Attendance;
 use App\Models\AttendanceDetail;
 use App\Models\FollowUp;
 use App\Models\OrderReview;
+use App\Models\Parents;
 use App\Models\PaymentBillDetail;
 use App\Models\PointHistory;
 use App\Models\PointHistoryCategory;
@@ -282,5 +283,31 @@ class StudentController extends Controller
                 'message' => $th,
             ], 403);
         }
+    }
+
+    public function aggreement(Request $request)
+    {
+        if ($request->aggreement == true) {
+            $parent = Parents::where('id', $request->parent_id)->first();
+            $parent->aggreement = true;
+            $parent->save();
+            return response()->json([
+                'code' => '00',
+                'message' => 'Agreement accepted',
+            ], 200);
+        }
+        return response()->json([
+            'code' => '00',
+            'message' => 'Agreement rejected',
+        ], 200);
+    }
+
+    public function infoParentAggreement($parentId)
+    {
+        $parent = Parents::where('id', $parentId)->first();
+        return response()->json([
+            'code' => '00',
+            'aggreement' => $parent->aggreement,
+        ], 200);
     }
 }

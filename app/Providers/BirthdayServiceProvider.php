@@ -84,7 +84,7 @@ class BirthdayServiceProvider extends ServiceProvider
                 $studentMonthDay = $birthdayDate->format('m-d');
 
                 $birthdayPlus7DaysDate = clone $birthdayDate;
-                $birthdayPlus7DaysDate->addDays(7);
+                $birthdayPlus7DaysDate->addDays(20);
                 $birthdayPlus7DaysMonthDay = $birthdayPlus7DaysDate->format('m-d');
 
                 $isWithin7Days = false;

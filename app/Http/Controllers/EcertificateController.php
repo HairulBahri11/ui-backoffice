@@ -136,6 +136,7 @@ class EcertificateController extends Controller
                             'is_follow_up' => '0',
                             'date_certificate' => $request->date_certificate,
                             'is_certificate' => true,
+                            'is_failed_promoted' => '0',
                         ]);
 
                         // create history_certificate

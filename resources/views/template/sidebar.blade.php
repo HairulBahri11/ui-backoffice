@@ -96,7 +96,7 @@
                     </div>
                 </li>
 
-               
+
                 <li class="nav-item {{ Request::segment(1) == 'reedemPoint' ? 'active' : '' }}">
                     <a href="{{ url('/reedemPoint') }}" class="collapsed">
                         <i class="fas fa-download"></i>
@@ -104,6 +104,17 @@
                     </a>
 
                 </li>
+                <!-- book-collection -->
+
+                @if(Auth::guard('staff')->check() == true)
+                <li class="nav-item {{ Request::segment(1) == 'book-collection' ? 'active' : '' }}">
+                    <a href="{{ url('/book-collection') }}" class="collapsed">
+                        <i class="fas fa-book-open"></i>
+                        <p>Book Collection</p>
+                    </a>
+
+                </li>
+                @endif
                 <li class="nav-item {{ Request::segment(1) == 'birthday-point' ? 'active' : '' }}">
                     <a href="{{ url('/birthday-point') }}" class="collapsed">
                         <i class="fas fa-birthday-cake"></i>
@@ -135,7 +146,7 @@
                 </li>
 
                 @if (Auth::guard('staff')->check() == true)
-                 <li class="nav-item {{ Request::segment(1) == 'class-info' ? 'active' : '' }}">
+                <li class="nav-item {{ Request::segment(1) == 'class-info' ? 'active' : '' }}">
                     <a href="{{ url('/class-info') }}" class="collapsed">
                         <i class="fas fa-info"></i>
                         <p>Class Monitoring</p>
@@ -154,7 +165,7 @@
                 @endif
                 @endif
 
-                 <li class="nav-item {{ Request::segment(1) == 'calendar-academic' ? 'active' : '' }}">
+                <li class="nav-item {{ Request::segment(1) == 'calendar-academic' ? 'active' : '' }}">
                     <a href="{{ url('/calendar-academic') }}" class="collapsed">
                         <i class="fas fa-calendar-alt"></i>
                         <p>Academic Calendar</p>
@@ -170,8 +181,8 @@
 
                 </li>
 
-               
-                 <li class="nav-item {{ Request::segment(1) == 'calendar' ? 'active' : '' }}">
+
+                <li class="nav-item {{ Request::segment(1) == 'calendar' ? 'active' : '' }}">
                     <a href="{{ url('/calendar') }}" class="collapsed">
                         <i class="fas fa-calendar"></i>
                         <p>Weekly Schedule</p>
@@ -180,7 +191,7 @@
                 </li>
 
 
-               
+
 
 
                 @if(Auth::guard('teacher')->check() == true && Auth::guard('teacher')->user()->id == 20 || Auth::guard('teacher')->check() == true &&Auth::guard('teacher')->user()->id == 21)

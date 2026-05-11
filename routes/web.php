@@ -18,6 +18,7 @@ use App\Http\Controllers\LandingPageController;
 use App\Http\Controllers\ReedemItemsController;
 use App\Http\Controllers\ReedemPointController;
 use App\Http\Controllers\birthdayPoinController;
+use App\Http\Controllers\BookCollectionController;
 use App\Http\Controllers\CalendarAcademicController;
 use App\Http\Controllers\EcertificateController;
 use App\Http\Controllers\historyCertificateController;
@@ -107,7 +108,6 @@ Route::middleware(['web'])->group(function () {
         Route::post('/set-assistant', [AttendanceController::class, 'setAssistant'])->name('set-assistant');
         Route::post('/remove-assistant', [AttendanceController::class, 'removeAssistant'])->name('remove-assistant');
         Route::post('/remove-star', [AttendanceController::class, 'removeStar'])->name('remove-star');
-
     });
     Route::get('/mutasi', [AttendanceController::class, 'mutasi']);
     Route::post('/mutasi', [AttendanceController::class, 'storeMutasi']);
@@ -175,7 +175,7 @@ Route::middleware(['web'])->group(function () {
         Route::get('/', [\App\Http\Controllers\CalendarController::class, 'index'])->name('calendar.index');
     });
 
-    Route::prefix('class-info')->group(function(){
+    Route::prefix('class-info')->group(function () {
         Route::get('/', [\App\Http\Controllers\ClassInfoController::class, 'index'])->name('class-info.index');
     });
 
@@ -184,4 +184,7 @@ Route::middleware(['web'])->group(function () {
     Route::post('/calendar-academic', [CalendarAcademicController::class, 'store'])->name('calendar-academic.store');
     Route::put('/calendar-academic/{id}', [CalendarAcademicController::class, 'update'])->name('calendar-academic.update');
     Route::delete('/calendar-academic/{id}', [CalendarAcademicController::class, 'destroy'])->name('calendar-academic.destroy');
+
+    Route::get('/book-collection', [BookCollectionController::class, 'index'])->name('book-collection.index');
+    Route::post('/book-collection/take', [BookCollectionController::class, 'markAsTaken'])->name('book-collection.mark-as-taken');
 });

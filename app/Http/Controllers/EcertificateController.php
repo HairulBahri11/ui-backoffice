@@ -97,6 +97,7 @@ class EcertificateController extends Controller
                         'id_teacher' => $followUp->old_teacher_id,
                         'course_time' => $followUp->course_time,
                         "is_failed_promoted" => '1',
+                        'is_book_taken' => '0',
                     ]);
                     // Delete Follow Up
                     $followUp->delete();
@@ -107,6 +108,7 @@ class EcertificateController extends Controller
                         'is_follow_up' => '0',
                         'date_certificate' => $request->date_certificate,
                         'is_certificate' => true,
+                        'is_book_taken' => '0',
                     ]);
 
                     // create history_certificate

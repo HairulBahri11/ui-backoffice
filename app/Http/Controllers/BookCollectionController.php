@@ -427,6 +427,7 @@ class BookCollectionController extends Controller
                 'student.name as student_name',
                 'student.course_time as course_time',
                 'student.is_failed_promoted',
+                'student.is_book_taken',
                 'price.id as price_id',
                 'price.program',
                 'day_one.day as day_one_name',
@@ -436,6 +437,7 @@ class BookCollectionController extends Controller
                 'bp.monthpay',
                 'bp.combined_categories',
                 'bp.combined_ids',
+                'bp.total_ready',
 
                 // LOGIKA STATUS: READY TO TAKE atau UNPAID
                 DB::raw("
@@ -492,6 +494,7 @@ class BookCollectionController extends Controller
                 'student.name',
                 'student.course_time',
                 'student.is_failed_promoted',
+                'student.is_book_taken',
                 'student.date_certificate',
                 'price.id',
                 'price.program',
@@ -504,10 +507,14 @@ class BookCollectionController extends Controller
                 'bp.combined_categories',
                 'bp.combined_ids',
                 'bp.total_ready',
-                'bp.total_records'
+                'bp.total_records',
+                // taken or not taken'
+
             )
             ->orderBy('payment_status', 'DESC') // Urutkan berdasarkan tanggal sertifikasi terbaru.', 'DESC')
             ->get();
+
+        // dd($data);
 
         return view('book-collection.index', compact('data'));
     }
@@ -520,6 +527,12 @@ class BookCollectionController extends Controller
             ->whereIn('id', $ids)
             ->update([
                 'is_taken' => 1
+            ]);
+
+        DB::table('student')
+            ->where('id', $request->studentid)
+            ->update([
+                'is_book_taken' => 1
             ]);
 
         return redirect()->back()->with('status', 'Book/Booklet marked as taken successfully!');

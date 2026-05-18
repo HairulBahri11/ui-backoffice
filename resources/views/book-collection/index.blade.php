@@ -53,13 +53,13 @@
                                             <strong>{{ ucwords($item->student_name) }}</strong>
                                         </td>
                                         <td>
-                                            @if($item->payment_status == 'READY TO TAKE' && $item->combined_categories)
+                                            @if($item->combined_categories)
                                             @foreach(explode(', ', $item->combined_categories) as $cat)
                                             <span class="badge badge-primary">{{ $cat }}</span>
                                             @endforeach
                                             @else
                                             <span class="text-muted" style="font-size: 0.85rem; font-style: italic;">
-                                                <i class="fas fa-exclamation-circle mr-1"></i> No book selected / unpaid
+                                                <i class="fas fa-exclamation-circle mr-1"></i> No book selected
                                             </span>
                                             @endif
                                         </td>
@@ -77,18 +77,32 @@
                                             @endif
                                         </td>
                                         <td class="text-center">
-                                            @if($item->payment_status == 'READY TO TAKE')
+                                            {{--
+                                                Silakan sesuaikan kondisi di bawah ini dengan kolom penanda di database Anda.
+                                                Contoh di bawah memeriksa jika properti status bernilai 'TAKEN' atau 'SUDAH DIAMBIL'
+                                            --}}
+                                            @if(isset($item->collection_status) && ($item->collection_status == 'TAKEN' || $item->collection_status == 'SUDAH DIAMBIL') || (isset($item->is_taken) && $item->is_taken == 1) || (isset($item->is_book_taken) && $item->is_book_taken == 1))
+                                            <span class="badge badge-count" style="background: #e0e0e0; color: #424242; font-weight: bold; padding: 5px 10px;">
+                                                Already Collected
+                                            </span>
+                                            @else
+                                            {{-- Button hanya muncul jika barang BELUM pernah diambil --}}
                                             <form action="{{ url('/book-collection/take') }}" method="POST" class="form-distribute">
                                                 @csrf
                                                 <input type="hidden" name="item_ids" value="{{ $item->combined_ids }}">
-                                                <button type="button" class="btn btn-sm btn-success btn-round btn-confirm-take" data-name="{{ $item->student_name }}">
+                                                <input type="hidden" name="studentid" value="{{ $item->studentid }}">
+
+                                                @if($item->payment_status == 'READY TO TAKE')
+                                                <button type="button" class="btn btn-sm btn-success btn-round btn-confirm-take" data-name="{{ $item->student_name }}" data-paid="true">
                                                     <i class="fas fa-check-double mr-1"></i> Mark as Taken
                                                 </button>
+                                                @else
+
+                                                <button type="button" class="btn btn-sm btn-success btn-round btn-confirm-take" data-name="{{ $item->student_name }}" data-paid="false">
+                                                    <i class="fas fa-check-double mr-1"></i> Mark as Taken
+                                                </button>
+                                                @endif
                                             </form>
-                                            @else
-                                            <button type="button" class="btn btn-sm btn-secondary btn-round" disabled title="Student has not settled the book payment">
-                                                <i class="fas fa-ban mr-1"></i> Locked
-                                            </button>
                                             @endif
                                         </td>
                                     </tr>
@@ -103,7 +117,6 @@
     </div>
 </div>
 
-{{-- JavaScript Section for SweetAlert Confirmation handling --}}
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const confirmButtons = document.querySelectorAll('.btn-confirm-take');
@@ -113,11 +126,19 @@
                 e.preventDefault();
                 const form = this.closest('.form-distribute');
                 const studentName = this.getAttribute('data-name');
+                const isPaid = this.getAttribute('data-paid') === 'true';
+
+                let alertText = "Are you sure you want to mark the items as taken for " + studentName + "?";
+                let alertIcon = "warning";
+
+                if (!isPaid) {
+                    alertText = "Warning: " + studentName + " has NOT paid yet. Are you sure you want to allow them to take the books anyway?";
+                }
 
                 swal({
                     title: "Confirm Distribution?",
-                    text: "Are you sure you want to mark the items as taken for " + studentName + "?",
-                    icon: "warning",
+                    text: alertText,
+                    icon: alertIcon,
                     buttons: {
                         cancel: {
                             visible: true,
@@ -129,7 +150,7 @@
                             className: 'btn btn-success'
                         }
                     },
-                    dangerMode: false,
+                    dangerMode: !isPaid,
                 }).then((willSubmit) => {
                     if (willSubmit) {
                         form.submit();

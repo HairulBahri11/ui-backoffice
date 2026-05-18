@@ -129,6 +129,7 @@ class EcertificateController extends Controller
                         // Failed
                         Students::where('id', $value)->update([
                             'is_failed_promoted' => '1',
+                            'is_book_taken' => '0',
                         ]);
                     } else if ($request->status[$key] == '1') {
                         // Passed
@@ -137,6 +138,7 @@ class EcertificateController extends Controller
                             'date_certificate' => $request->date_certificate,
                             'is_certificate' => true,
                             'is_failed_promoted' => '0',
+                            'is_book_taken' => '0',
                         ]);
 
                         // create history_certificate
@@ -161,6 +163,7 @@ class EcertificateController extends Controller
                         $followUp->save();
 
                         $students->is_follow_up = '1';
+                        $students->is_book_taken = '0';
                         $students->save();
                     }
                 }

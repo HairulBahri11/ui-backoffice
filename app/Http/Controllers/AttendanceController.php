@@ -29,7 +29,7 @@ class AttendanceController extends Controller
     public function index(Request $request)
     {
         $where = '';
-        $teachers = Teacher::get();
+        $teachers = Teacher::where('status', 'active')->get();
         $level = Price::get();
         if (Auth::guard('teacher')->check() == true) {
             $where = 'AND id_teacher = ' . Auth::guard('teacher')->user()->id;
@@ -1979,7 +1979,7 @@ class AttendanceController extends Controller
                 ->where('course_time', $request->course_time)
                 ->get();
 
-                // dd($updatedRows);
+            // dd($updatedRows);
 
             foreach ($updatedRows as $row) {
                 $row->star = $request->selected_star;
@@ -1993,7 +1993,6 @@ class AttendanceController extends Controller
             }
 
             return redirect()->back()->with('message', 'Tidak ada data yang cocok untuk di-update.');
-
         } catch (\Illuminate\Database\QueryException $e) {
             Log::error('Database Error: ' . $e->getMessage());
             return redirect()->back()->with('error', 'Terjadi kesalahan pada database : ' . $e->getMessage());
@@ -2001,7 +2000,6 @@ class AttendanceController extends Controller
             Log::error('General Error: ' . $e->getMessage());
             return redirect()->back()->with('error', 'Terjadi kesalahan umum : ' . $e->getMessage());
         }
-        
     }
 
     public function setAssistant(Request $request)
@@ -2028,7 +2026,6 @@ class AttendanceController extends Controller
             }
 
             return redirect()->back()->with('message', 'Tidak ada data yang cocok untuk di-update.');
-
         } catch (\Illuminate\Database\QueryException $e) {
             Log::error('Database Error: ' . $e->getMessage());
             return redirect()->back()->with('error', 'Terjadi kesalahan pada database : ' . $e->getMessage());
@@ -2063,7 +2060,6 @@ class AttendanceController extends Controller
             }
 
             return redirect()->back()->with('message', 'Tidak ada data yang cocok untuk di-update.');
-
         } catch (\Illuminate\Database\QueryException $e) {
             Log::error('Database Error: ' . $e->getMessage());
             return redirect()->back()->with('error', 'Terjadi kesalahan pada database : ' . $e->getMessage());
@@ -2095,7 +2091,6 @@ class AttendanceController extends Controller
             }
 
             return redirect()->back()->with('message', 'Tidak ada data yang cocok untuk di-update.');
-
         } catch (\Illuminate\Database\QueryException $e) {
             Log::error('Database Error: ' . $e->getMessage());
             return redirect()->back()->with('error', 'Terjadi kesalahan pada database : ' . $e->getMessage());

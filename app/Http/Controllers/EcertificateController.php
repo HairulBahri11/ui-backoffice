@@ -84,6 +84,7 @@ class EcertificateController extends Controller
             ]);
         }
         DB::beginTransaction();
+
         try {
             if ($request->type == 'show') {
                 if ($request->status != true) {
@@ -120,6 +121,8 @@ class EcertificateController extends Controller
                     $history_certificate->price_id = $followUp->old_price_id;
                     $history_certificate->teacher_id = $followUp->old_teacher_id;
                     $history_certificate->date_certificate = $request->date_certificate;
+                    $history_certificate->status = $request->status == '1' ? 'passed' : 'failed';
+
                     $history_certificate->save();
                     // Delete Follow Up
                     $followUp->delete();
@@ -133,6 +136,18 @@ class EcertificateController extends Controller
                             'is_failed_promoted' => '1',
                             'is_book_taken' => '0',
                         ]);
+
+                        // create history_certificate
+                        $history_certificate = new HistoryCertificate();
+                        $history_certificate->student_id = $value;
+                        $history_certificate->day_1 = $students->day1;
+                        $history_certificate->day_2 = $students->day2;
+                        $history_certificate->course_time = $students->course_time;
+                        $history_certificate->price_id = $students->priceid;
+                        $history_certificate->teacher_id = $students->id_teacher;
+                        $history_certificate->date_certificate = $request->date_certificate;
+                        $history_certificate->status = 'failed';
+                        $history_certificate->save();
                     } else if ($request->status[$key] == '1') {
                         // Passed
                         Students::where('id', $value)->update([
@@ -152,6 +167,7 @@ class EcertificateController extends Controller
                         $history_certificate->price_id = $students->priceid;
                         $history_certificate->teacher_id = $students->id_teacher;
                         $history_certificate->date_certificate = $request->date_certificate;
+                        $history_certificate->status = 'passed';
                         $history_certificate->save();
                     } else {
                         // Follow Up

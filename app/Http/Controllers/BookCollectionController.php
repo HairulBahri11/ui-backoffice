@@ -397,6 +397,129 @@ class BookCollectionController extends Controller
     //     return view('book-collection.index', compact('data'));
     // }
 
+    // public function index()
+    // {
+    //     // 1. Subquery Sertifikat: Ambil ID sertifikat terakhir dari setiap siswa
+    //     $latestCertificate = DB::table('history-certificate')
+    //         ->select('student_id', DB::raw('MAX(id) as max_cert_id'))
+    //         ->groupBy('student_id');
+
+    //     // 2. Subquery Paydetail: Ringkas data pembayaran buku/booklet
+    //     $bookPayments = DB::table('paydetail')
+    //         ->select(
+    //             'studentid',
+    //             'price_id',
+    //             'monthpay',
+    //             DB::raw("GROUP_CONCAT(category SEPARATOR ', ') as combined_categories"),
+    //             DB::raw("GROUP_CONCAT(id) as combined_ids"),
+    //             // Hitung item yang belum diambil (is_taken = 0 atau null)
+    //             DB::raw("SUM(CASE WHEN is_taken = 0 OR is_taken IS NULL THEN 1 ELSE 0 END) as total_ready"),
+    //             // Total record pembayaran buku siswa untuk paket harga ini
+    //             DB::raw("COUNT(id) as total_records")
+    //         )
+    //         ->whereIn('category', ['BOOK', 'BOOKLET'])
+    //         ->groupBy('studentid', 'price_id', 'monthpay');
+
+    //     // 3. Main Query
+    //     $data = DB::table('student')
+    //         ->select(
+    //             'student.id as studentid',
+    //             'student.name as student_name',
+    //             'student.course_time as course_time',
+    //             'student.is_failed_promoted',
+    //             'student.is_book_taken',
+    //             'price.id as price_id',
+    //             'price.program',
+    //             'day_one.day as day_one_name',
+    //             'day_two.day as day_two_name',
+    //             'teacher.name as teacher_name',
+    //             'hc.date_certificate as history_date',
+    //             'bp.monthpay',
+    //             'bp.combined_categories',
+    //             'bp.combined_ids',
+    //             'bp.total_ready',
+
+    //             // LOGIKA STATUS: READY TO TAKE atau UNPAID
+    //             DB::raw("
+    //             CASE 
+    //                 -- Jika ada data pembayaran dan ada item yang belum diambil
+    //                 WHEN bp.total_ready > 0 THEN 'READY TO TAKE'
+    //                 -- Jika ada data pembayaran tapi semua item sudah diambil
+    //                 WHEN bp.total_records > 0 AND bp.total_ready = 0 THEN 'TAKEN'
+    //                 -- Jika tidak ada data pembayaran sama sekali
+    //                 ELSE 'UNPAID'
+    //             END as payment_status
+    //         ")
+    //         )
+    //         // LEFT JOIN ke subquery sertifikat
+    //         ->leftJoinSub($latestCertificate, 'latest_cert', function ($join) {
+    //             $join->on('latest_cert.student_id', '=', 'student.id');
+    //         })
+    //         ->leftJoin('history-certificate as hc', 'hc.id', '=', 'latest_cert.max_cert_id')
+
+    //         // Hubungkan data master pendukung siswa
+    //         ->join('price', 'price.id', '=', 'student.priceid')
+    //         ->leftJoin('day as day_one', 'day_one.id', '=', 'student.day1')
+    //         ->leftJoin('day as day_two', 'day_two.id', '=', 'student.day2')
+    //         ->leftJoin('teacher', 'teacher.id', '=', 'student.id_teacher')
+
+    //         // Hubungkan ke Subquery Paydetail
+    //         ->leftJoinSub($bookPayments, 'bp', function ($join) {
+    //             $join->on('bp.studentid', '=', 'student.id')
+    //                 ->on('bp.price_id', '=', 'student.priceid');
+    //         })
+
+    //         // Filter ketat pencocokan kriteria sertifikasi siswa
+    //         ->where(function ($query) {
+    //             $query->where('student.is_failed_promoted', '1')
+    //                 ->orWhere(function ($sub) {
+    //                     $sub->whereNotNull('latest_cert.max_cert_id')
+    //                         ->whereColumn('hc.date_certificate', 'student.date_certificate');
+    //                 });
+    //         })
+
+    //         // PERBAIKAN DI SINI: Jika bp.studentid NULL artinya UNPAID (lolos), jika ada pembayaran harus yang total_ready > 0
+    //         ->where(function ($query) {
+    //             $query->whereNull('bp.studentid')
+    //                 ->orWhere('bp.total_ready', '>', 0);
+    //         })
+
+    //         ->where('student.status', 'ACTIVE')
+    //         // kecuali student.priceid 39 dan 40 karena itu paket khusus yang tidak termasuk buku/buklet
+    //         ->whereNotIn('student.priceid', [39, 40])
+
+    //         // Group By Utama
+    //         ->groupBy(
+    //             'student.id',
+    //             'student.name',
+    //             'student.course_time',
+    //             'student.is_failed_promoted',
+    //             'student.is_book_taken',
+    //             'student.date_certificate',
+    //             'price.id',
+    //             'price.program',
+    //             'day_one.day',
+    //             'day_two.day',
+    //             'teacher.name',
+    //             'hc.date_certificate',
+    //             'bp.studentid', // Ikut dimasukkan karena dipakai di where clause atas
+    //             'bp.monthpay',
+    //             'bp.combined_categories',
+    //             'bp.combined_ids',
+    //             'bp.total_ready',
+    //             'bp.total_records',
+    //             // taken or not taken'
+
+    //         )
+    //         ->orderBy('payment_status', 'DESC') // Urutkan berdasarkan tanggal sertifikasi terbaru.', 'DESC')
+    //         ->get();
+
+    //     dd($data);
+
+    //     return view('book-collection.index', compact('data'));
+    // }
+
+
     public function index()
     {
         // 1. Subquery Sertifikat: Ambil ID sertifikat terakhir dari setiap siswa
@@ -405,20 +528,26 @@ class BookCollectionController extends Controller
             ->groupBy('student_id');
 
         // 2. Subquery Paydetail: Ringkas data pembayaran buku/booklet
+        // Ambil tanggal pertama di bulan sekarang (Format: '2026-06-01')
+        $startOfCurrentMonth = \Carbon\Carbon::now()->startOfMonth()->toDateString();
+
+        // 2. Subquery Paydetail + Payment: Ringkas data pembayaran buku/booklet start dari bulan sekarang
         $bookPayments = DB::table('paydetail')
+            ->join('payment', 'payment.id', '=', 'paydetail.paymentid') // <-- Hubungkan ke tabel payment
             ->select(
-                'studentid',
-                'price_id',
-                'monthpay',
-                DB::raw("GROUP_CONCAT(category SEPARATOR ', ') as combined_categories"),
-                DB::raw("GROUP_CONCAT(id) as combined_ids"),
+                'paydetail.studentid',
+                'paydetail.price_id',
+                'paydetail.monthpay',
+                DB::raw("GROUP_CONCAT(paydetail.category SEPARATOR ', ') as combined_categories"),
+                DB::raw("GROUP_CONCAT(paydetail.id) as combined_ids"),
                 // Hitung item yang belum diambil (is_taken = 0 atau null)
-                DB::raw("SUM(CASE WHEN is_taken = 0 OR is_taken IS NULL THEN 1 ELSE 0 END) as total_ready"),
+                DB::raw("SUM(CASE WHEN paydetail.is_taken = 0 OR paydetail.is_taken IS NULL THEN 1 ELSE 0 END) as total_ready"),
                 // Total record pembayaran buku siswa untuk paket harga ini
-                DB::raw("COUNT(id) as total_records")
+                DB::raw("COUNT(paydetail.id) as total_records")
             )
-            ->whereIn('category', ['BOOK', 'BOOKLET'])
-            ->groupBy('studentid', 'price_id', 'monthpay');
+            ->whereIn('paydetail.category', ['BOOK', 'BOOKLET'])
+            ->where('payment.paydate', '>=', $startOfCurrentMonth)
+            ->groupBy('paydetail.studentid', 'paydetail.price_id', 'paydetail.monthpay');
 
         // 3. Main Query
         $data = DB::table('student')
@@ -434,6 +563,7 @@ class BookCollectionController extends Controller
                 'day_two.day as day_two_name',
                 'teacher.name as teacher_name',
                 'hc.date_certificate as history_date',
+                'hc.status as certificate_status', // Menampilkan status dinamis passed/failed
                 'bp.monthpay',
                 'bp.combined_categories',
                 'bp.combined_ids',
@@ -469,19 +599,21 @@ class BookCollectionController extends Controller
                     ->on('bp.price_id', '=', 'student.priceid');
             })
 
-            // Filter ketat pencocokan kriteria sertifikasi siswa
+            // BLOCK 1: Filter kriteria status sertifikat (Menangani dynamic passed/failed & siswa baru)
             ->where(function ($query) {
-                $query->where('student.is_failed_promoted', '1')
+                $query->where('hc.status', '=', 'failed') // Jika status sertifikat terakhirnya gagal
                     ->orWhere(function ($sub) {
-                        $sub->whereNotNull('latest_cert.max_cert_id')
+                        $sub->where('hc.status', '=', 'passed') // Jika lulus, tanggalnya harus cocok
                             ->whereColumn('hc.date_certificate', 'student.date_certificate');
-                    });
+                    })
+                    // ->orWhereNull('latest_cert.max_cert_id'); // PINTU PENYELAMAT: Loloskan jika siswa belum punya sertifikat sama sekali
+                    ->orWhere('bp.total_ready', '>', 0);;
             })
 
-            // PERBAIKAN DI SINI: Jika bp.studentid NULL artinya UNPAID (lolos), jika ada pembayaran harus yang total_ready > 0
+            // BLOCK 2: Filter untuk Book Payment (Tetap dipertahankan secara independen)
             ->where(function ($query) {
-                $query->whereNull('bp.studentid')
-                    ->orWhere('bp.total_ready', '>', 0);
+                $query->whereNull('bp.studentid') // Lolos jika belum bayar sama sekali (UNPAID)
+                    ->orWhere('bp.total_ready', '>', 0); // Atau jika sudah bayar, tapi ada item yang belum diambil
             })
 
             ->where('student.status', 'ACTIVE')
@@ -502,19 +634,16 @@ class BookCollectionController extends Controller
                 'day_two.day',
                 'teacher.name',
                 'hc.date_certificate',
-                'bp.studentid', // Ikut dimasukkan karena dipakai di where clause atas
+                'hc.status', // Wajib masuk group by karena di-select
+                'bp.studentid',
                 'bp.monthpay',
                 'bp.combined_categories',
                 'bp.combined_ids',
                 'bp.total_ready',
-                'bp.total_records',
-                // taken or not taken'
-
+                'bp.total_records'
             )
-            ->orderBy('payment_status', 'DESC') // Urutkan berdasarkan tanggal sertifikasi terbaru.', 'DESC')
+            ->orderBy('payment_status', 'DESC')
             ->get();
-
-        // dd($data);
 
         return view('book-collection.index', compact('data'));
     }

@@ -107,6 +107,17 @@
         right: 1px;
         width: 20px
     }
+
+    input[type=number]::-webkit-inner-spin-button,
+    input[type=number]::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+
+    input[type=number] {
+        -moz-appearance: textfield;
+        appearance: textfield;
+    }
 </style>
 
 <script>
@@ -221,6 +232,14 @@
             "ordering": false, // Menonaktifkan sorting
         });
     });
+</script>
+
+<script>
+    document.addEventListener('wheel', function(e) {
+        if (document.activeElement.type === 'number') {
+            document.activeElement.blur();
+        }
+    }, { passive: false });
 </script>
 
 @stack('js')

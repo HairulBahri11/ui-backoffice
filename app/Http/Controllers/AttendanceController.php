@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Attendance;
 use App\Models\AttendanceDetail;
 use App\Models\AttendanceDetailPoint;
+use App\Models\LessonPlan;
 use App\Models\Mutasi;
 use App\Models\OrderReview;
 use App\Models\PointCategories;
@@ -325,6 +326,24 @@ class AttendanceController extends Controller
         $all_attendence = $attendance->get();
         $attendance = $attendance->paginate(3);
 
+        // created_at nya sama dengan bulan ini
+        $lesson_plan = DB::table('lesson_plan')->join('teacher', 'lesson_plan.teacher_id', '=', 'teacher.id')
+            ->join('price', 'lesson_plan.class', '=', 'price.id')
+            ->join('day as day1', 'day1.id', '=', 'lesson_plan.day1')
+            ->join('day as day2', 'day2.id', '=', 'lesson_plan.day2')
+            ->select('lesson_plan.*', 'teacher.name as teacher_name', 'price.program as class', 'day1.day as day1', 'day2.day as day2')
+            ->where('day1', $reqDay1)
+            ->where('day2', $reqDay2)
+            ->where('class', $priceId)
+            ->where('course_time', $reqTime)
+            ->where('teacher_id', $reqTeacher)
+            ->whereMonth('created_at', Carbon::now()->month)
+            ->whereYear('created_at', Carbon::now()->year)
+            ->orderBy('created_at', 'DESC')
+            ->get();
+
+        // dd($lesson_plan);
+
         if (count($student) != 0) {
 
             return view('attendance.form', compact(
@@ -341,7 +360,8 @@ class AttendanceController extends Controller
                 'reqTeacher',
                 'reqTime',
                 'mutasi_teacher',
-                'tgl_mutasi'
+                'tgl_mutasi',
+                'lesson_plan'
             ));
         } else {
             $inStudent = Students::where('status', 'INACTIVE')->where('priceid', $class->id)

@@ -115,6 +115,8 @@
 
                 </li>
                 @endif
+
+
                 <li class="nav-item {{ Request::segment(1) == 'birthday-point' ? 'active' : '' }}">
                     <a href="{{ url('/birthday-point') }}" class="collapsed">
                         <i class="fas fa-birthday-cake"></i>
@@ -164,7 +166,12 @@
                 </li>
                 @endif
                 @endif
-
+                <li class="nav-item {{ Request::segment(1) == 'lesson-plan' ? 'active' : '' }}">
+                    <a href="{{ url('/lesson-plan') }}" class="collapsed">
+                        <i class="fas fa-pen-alt"></i>
+                        <p>Lesson Plan</p>
+                    </a>
+                </li>
                 <li class="nav-item {{ Request::segment(1) == 'calendar-academic' ? 'active' : '' }}">
                     <a href="{{ url('/calendar-academic') }}" class="collapsed">
                         <i class="fas fa-calendar-alt"></i>

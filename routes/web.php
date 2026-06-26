@@ -187,4 +187,15 @@ Route::middleware(['web'])->group(function () {
 
     Route::get('/book-collection', [BookCollectionController::class, 'index'])->name('book-collection.index');
     Route::post('/book-collection/take', [BookCollectionController::class, 'markAsTaken'])->name('book-collection.mark-as-taken');
+
+    Route::prefix('lesson-plan')->group(function () {
+        Route::get('/', [\App\Http\Controllers\LessonPlanController::class, 'index'])->name('lesson-plan.index');
+        Route::get('/create', [\App\Http\Controllers\LessonPlanController::class, 'create'])->name('lesson-plan.create');
+        Route::post('/store', [\App\Http\Controllers\LessonPlanController::class, 'store'])->name('lesson-plan.store');
+        Route::get('/get-classes', [\App\Http\Controllers\LessonPlanController::class, 'getClassesByDay'])->name('lesson-plan.get-classes');
+        Route::get('/{id}', [\App\Http\Controllers\LessonPlanController::class, 'show'])->name('lesson-plan.show');
+        Route::get('/{id}/edit', [\App\Http\Controllers\LessonPlanController::class, 'edit'])->name('lesson-plan.edit');
+        Route::put('/{id}/update', [\App\Http\Controllers\LessonPlanController::class, 'update'])->name('lesson-plan.update');
+        Route::delete('/{id}/delete', [\App\Http\Controllers\LessonPlanController::class, 'destroy'])->name('lesson-plan.destroy');
+    });
 });

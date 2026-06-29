@@ -9,11 +9,11 @@
                     <h2 class="text-white pb-2 fw-bold">Lesson Plans</h2>
                 </div>
                 <!-- aku ingin di jam 15:01 - 23.59 tidak bisa create data -->
-                @if(Auth::guard('teacher')->check() && (date('H:i') < '15:01' || date('H:i')> '23:59'))
-                    <div class="ml-md-auto py-2 py-md-0">
-                        <a href="{{ url('/lesson-plan/create') }}" class="btn btn-secondary btn-round">Add Data</a>
-                    </div>
-                    @endif
+                @if(Auth::guard('teacher')->check() == true)
+                <div class="ml-md-auto py-2 py-md-0">
+                    <a href="{{ url('/lesson-plan/create') }}" class="btn btn-secondary btn-round">Add Data</a>
+                </div>
+                @endif
             </div>
         </div>
     </div>

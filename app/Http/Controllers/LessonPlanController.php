@@ -77,9 +77,9 @@ class LessonPlanController extends Controller
         if (!Auth::guard('teacher')->check()) {
             return redirect()->back()->with('error', 'You are not authorized to create a lesson plan.');
         }
-        if (now()->between('15:00', '23:59')) {
-            return redirect()->route('lesson-plan.index')->with('error', 'You can only create a lesson plan between 15:00 and 00:00.');
-        }
+        // if (now()->between('15:00', '23:59')) {
+        //     return redirect()->route('lesson-plan.index')->with('error', 'You can only create a lesson plan between 15:00 and 00:00.');
+        // }
         return view('lesson-plan.create');
     }
 

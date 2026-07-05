@@ -337,7 +337,7 @@ class AttendanceController extends Controller
             ->where('class', $priceId)
             ->where('course_time', $reqTime)
             ->where('teacher_id', $reqTeacher)
-            ->whereMonth('created_at', Carbon::now()->month)
+            // ->whereMonth('created_at', Carbon::now()->month)
             ->whereYear('created_at', Carbon::now()->year)
             ->orderBy('created_at', 'DESC')
             ->get();

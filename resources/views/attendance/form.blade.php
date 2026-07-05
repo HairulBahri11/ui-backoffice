@@ -794,7 +794,7 @@
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label for="">Topic</label>
-                                        <textarea name="comment" class="form-control" id="" cols="30" rows="3">{{ $data->type == 'update' ? $data->comment : '' }}</textarea>
+                                        <textarea name="comment" class="form-control" id="comment_textarea" cols="30" rows="3">{{ $data->type == 'update' ? $data->comment : '' }}</textarea>
                                     </div>
                                 </div>
                             </div>
@@ -1085,21 +1085,21 @@
                 </div>
 
                 {{-- BAGIAN 2: LOOPING SEMUA AGENDA MATERI --}}
-                {{-- BAGIAN 2: LOOPING SEMUA AGENDA MATERI (Maksimal 2 Bersanding di Dalam Modal) --}}
                 <div class="container-fluid px-0">
                     <div class="d-flex flex-nowrap overflow-x-auto pb-3" style="width: 100%; max-width: 100%; overflow-x: auto !important; -webkit-overflow-scrolling: touch;">
                         @foreach($lesson_plan as $item)
                         <div class="flex-shrink-0 mb-1 px-2" style="width: 49%; min-width: 650px;">
-                            <div class="card shadow-md  h-100">
+                            <div class="card shadow-md h-100">
                                 <div class="card-header bg-light d-flex justify-content-between align-items-center py-2">
-                                    {{-- COPY UNTUK TOPIC --}}
                                     <div class="d-flex align-items-center w-75">
                                         <h6 class="m-0 font-weight-bold text-primary mr-2">{{ $loop->iteration }}. Topic :</h6>
                                         <span class="text-dark font-weight-bold text-truncate mr-2">{{ $item->topic }}</span>
-                                        <button type="button" class="btn btn-xs btn-link p-0 text-muted btn-inline-copy"
+                                        <button type="button" class="btn btn-xs btn-link p-0 text-muted btn-inline-copy mr-2"
                                             data-copy="{{ $item->topic }}" title="Copy Topic">
                                             <i class="far fa-copy"></i>
                                         </button>
+
+
                                     </div>
                                     <small class="text-muted font-italic text-xs">Created On : {{ \Carbon\Carbon::parse($item->created_at)->format('d M Y') }}</small>
                                 </div>
@@ -1151,6 +1151,15 @@
                                         </div>
                                     </div>
                                 </div>
+                                <div class="card-footer">
+                                    <button type="button" class="btn btn-sm btn-primary btn-insert-data"
+                                        data-topic="{{ $item->topic }}"
+                                        data-flashcards="{{ $item->flashcards ?? '-' }}"
+                                        data-exercise="{{ $item->exercise ?? '-' }}"
+                                        data-activity="{{ $item->activity ?? '-' }}">
+                                        <i class="fas fa-plus mr-1"></i> Copy to Agenda Topic
+                                    </button>
+                                </div>
                             </div>
                         </div>
                         @endforeach
@@ -1194,6 +1203,73 @@
             });
         });
     });
+
+    // Script untuk mengisi otomatis ke Textarea
+    // Script untuk mengisi otomatis ke Textarea + Notifikasi Toast
+    document.querySelectorAll('.btn-insert-data').forEach(button => {
+        button.addEventListener('click', function() {
+            // Ambil data-attribute dari tombol yang diklik
+            const topic = this.getAttribute('data-topic');
+            const flashcards = this.getAttribute('data-flashcards');
+            const exercise = this.getAttribute('data-exercise');
+            const activity = this.getAttribute('data-activity');
+
+            // Menyusun teks yang akan dimasukkan ke textarea
+            const formattedText = `Topic: ${topic}\nFlashcards: ${flashcards}\nExercise: ${exercise}\nActivity: ${activity}`;
+
+            // Cari element textarea berdasarkan ID
+            const textarea = document.getElementById('comment_textarea');
+
+            if (textarea) {
+                // Masukkan teks ke dalam textarea (Tanpa Scroll)
+                textarea.value = formattedText;
+                // textarea.focus();
+
+                // TAMPILKAN PEMBERITAHUAN (TOAST)
+                showToastNotification("Already copied to the agenda topic!");
+            }
+        });
+    });
+
+    // Fungsi untuk membuat Alert Toast melayang di pojok layar
+    function showToastNotification(message) {
+        // Cek apakah elemen toast sudah ada, kalau belum kita buat container-nya
+        let toastContainer = document.getElementById('toast-container-materi');
+        if (!toastContainer) {
+            toastContainer = document.createElement('div');
+            toastContainer.id = 'toast-container-materi';
+            // Styling agar melayang di pojok kanan atas layar
+            toastContainer.style.position = 'fixed';
+            toastContainer.style.top = '20px';
+            toastContainer.style.right = '20px';
+            toastContainer.style.zIndex = '9999';
+            document.body.appendChild(toastContainer);
+        }
+
+        // Membuat box notifikasi
+        const toast = document.createElement('div');
+        toast.className = 'alert alert-success shadow-lg text-sm d-flex align-items-center';
+        toast.style.minWidth = '280px';
+        toast.style.marginBottom = '10px';
+        toast.style.transition = 'all 0.4s ease';
+        toast.style.opacity = '0';
+        toast.innerHTML = `<i class="fas fa-check-circle mr-2"></i> <span>${message}</span>`;
+
+        toastContainer.appendChild(toast);
+
+        // Fade in
+        setTimeout(() => {
+            toast.style.opacity = '1';
+        }, 10);
+
+        // Fade out dan hapus otomatis setelah 2.5 detik
+        setTimeout(() => {
+            toast.style.opacity = '0';
+            setTimeout(() => {
+                toast.remove();
+            }, 400);
+        }, 2500);
+    }
 </script>
 
 </div>

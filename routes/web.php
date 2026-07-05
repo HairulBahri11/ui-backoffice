@@ -198,4 +198,14 @@ Route::middleware(['web'])->group(function () {
         Route::put('/{id}/update', [\App\Http\Controllers\LessonPlanController::class, 'update'])->name('lesson-plan.update');
         Route::delete('/{id}/delete', [\App\Http\Controllers\LessonPlanController::class, 'destroy'])->name('lesson-plan.destroy');
     });
+
+    // print out
+    Route::prefix('print-out')->group(function () {
+        Route::get('/', [\App\Http\Controllers\PrintOutController::class, 'index'])->name('print-out.index');
+        Route::get('/create', [\App\Http\Controllers\PrintOutController::class, 'create'])->name('print-out.create');
+        Route::post('/store', [\App\Http\Controllers\PrintOutController::class, 'store'])->name('print-out.store');
+        Route::get('/{id}/edit', [\App\Http\Controllers\PrintOutController::class, 'edit'])->name('print-out.edit');
+        Route::post('/{id}/update', [\App\Http\Controllers\PrintOutController::class, 'update'])->name('print-out.update');
+        Route::delete('/{id}/delete', [\App\Http\Controllers\PrintOutController::class, 'destroy'])->name('print-out.destroy');
+    });
 });

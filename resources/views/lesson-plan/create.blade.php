@@ -43,7 +43,13 @@
                                 </div>
 
                                 <div class="col-md-8 form-group">
-                                    <label class="fw-bold text-dark"><i class="fas fa-school text-info mr-1"></i> Available Classes:</label>
+                                    <div class="d-flex justify-content-between align-items-center mb-1">
+                                        <label class="fw-bold text-dark mb-0"><i class="fas fa-school text-info mr-1"></i> Available Classes:</label>
+                                        <div id="bulk-select-actions" style="display: none;">
+                                            <button type="button" class="btn btn-xs btn-outline-primary mr-1" id="btn-select-all">Select All</button>
+                                            <button type="button" class="btn btn-xs btn-outline-secondary" id="btn-unselect-all">Unselect All</button>
+                                        </div>
+                                    </div>
                                     <div id="class-selection-wrapper" class="p-3 border rounded d-flex flex-wrap gap-2" style="background: #fafafa; min-height: 45px; max-height: 180px; overflow-y: auto;">
                                         <span class="text-muted italic">Please select a day first to load schedules...</span>
                                     </div>
@@ -83,9 +89,16 @@
         transition: all 0.2s ease;
     }
 
-    .class-card-checkbox:hover {
+    .class-card-checkbox:hover:not(.disabled-card) {
         border-color: #01c293;
         background: #f4fbf9;
+    }
+
+    .disabled-card {
+        background: #fbeeeefc !important;
+        border-color: #f5c6cb !important;
+        cursor: not-allowed !important;
+        opacity: 0.85;
     }
 </style>
 
@@ -98,10 +111,12 @@
         const selectionWrapper = document.getElementById('class-selection-wrapper');
         const formsContainer = document.getElementById('dynamic-forms-container');
         const submitContainer = document.getElementById('submit-all-container');
+        const bulkActions = document.getElementById('bulk-select-actions');
 
         selectionWrapper.innerHTML = '<span class="text-info"><i class="fas fa-spinner fa-spin mr-2"></i>Loading schedules...</span>';
         formsContainer.innerHTML = '';
-        submitContainer.style.display = 'none'; // Sembunyikan tombol submit jika ganti hari
+        submitContainer.style.display = 'none';
+        bulkActions.style.display = 'none';
 
         if (!day) {
             selectionWrapper.innerHTML = '<span class="text-muted">Please select a day first...</span>';
@@ -119,9 +134,14 @@
                     return;
                 }
 
+                bulkActions.style.display = 'block';
+
                 data.forEach((item, index) => {
+                    // Status true didapatkan dari kalkulasi 1 minggu setelah day2 di Controller
+                    const isLockedByDay2Rule = item.already_filled_this_week === true;
+
                     selectionWrapper.innerHTML += `
-                        <div class="custom-control custom-checkbox class-card-checkbox m-1">
+                        <div class="custom-control custom-checkbox class-card-checkbox m-1 ${isLockedByDay2Rule ? 'disabled-card' : ''}">
                             <input type="checkbox" class="custom-control-input class-selector-checkbox" 
                                    value="${item.priceid}" id="chk-${index}" 
                                    data-index="${index}"
@@ -131,16 +151,18 @@
                                    data-day1="${item.day1_name || '-'}"
                                    data-day2="${item.day2_name || '-'}"
                                    data-day1_id="${item.day1 || '-'}"
-                                   data-day2_id="${item.day2 || '-'}">
-                            <label class="custom-control-label fw-bold text-dark" for="chk-${index}" style="cursor:pointer">
+                                   data-day2_id="${item.day2 || '-'}"
+                                   ${isLockedByDay2Rule ? 'disabled' : ''}>
+                            <label class="custom-control-label fw-bold ${isLockedByDay2Rule ? 'text-danger' : 'text-dark'}" for="chk-${index}" style="cursor:${isLockedByDay2Rule ? 'not-allowed' : 'pointer'}">
                                 ${item.program || 'Class'}
                                 <span class="badge ml-1" style="background:#e1f5fe; color:#0288d1; font-size:11px;">${item.course_time}</span>
+                                ${isLockedByDay2Rule ? '<span class="badge ml-1" style="background-color: #dc3545; color: white; font-size:10px;"><i class="fas fa-lock mr-1"></i>Locked</span>' : ''}
                             </label>
                         </div>
                     `;
                 });
 
-                document.querySelectorAll('.class-selector-checkbox').forEach(checkbox => {
+                document.querySelectorAll('.class-selector-checkbox:not(:disabled)').forEach(checkbox => {
                     checkbox.addEventListener('change', handleClassSelection);
                 });
             })
@@ -150,13 +172,34 @@
             });
     });
 
-    // 2. Render Form Card Menggunakan Array Index (`plans[index][nama_input]`)
+    // Aksi Tombol Select All & Unselect All (Hanya menargetkan checkbox aktif / bukan readonly)
+    document.getElementById('btn-select-all').addEventListener('click', function() {
+        const checkboxes = document.querySelectorAll('.class-selector-checkbox:not(:disabled)');
+        checkboxes.forEach(cb => {
+            if (!cb.checked) {
+                cb.checked = true;
+                handleClassSelection.call(cb);
+            }
+        });
+    });
+
+    document.getElementById('btn-unselect-all').addEventListener('click', function() {
+        const checkboxes = document.querySelectorAll('.class-selector-checkbox:not(:disabled)');
+        checkboxes.forEach(cb => {
+            if (cb.checked) {
+                cb.checked = false;
+                handleClassSelection.call(cb);
+            }
+        });
+    });
+
+    // 2. Render Form Card Menggunakan Array Index
     function handleClassSelection() {
         const formsContainer = document.getElementById('dynamic-forms-container');
         const submitContainer = document.getElementById('submit-all-container');
 
         const classId = this.value;
-        const index = this.getAttribute('data-index'); // Jadikan key unik di array form
+        const index = this.getAttribute('data-index');
         const courseTime = this.getAttribute('data-time');
         const program = this.getAttribute('data-program');
         const students = this.getAttribute('data-students');
@@ -167,6 +210,8 @@
         const formId = `form-card-${classId.replace(/[^a-zA-Z0-9]/g, '-')}`;
 
         if (this.checked) {
+            if (document.getElementById(formId)) return;
+
             const cardHTML = `
                 <div class="col-md-6 mb-4" id="${formId}">
                     <div class="card shadow-sm border-0" style="border-radius: 8px; overflow: hidden;">
@@ -174,7 +219,6 @@
                             <div class="d-flex justify-content-between align-items-center">
                                 <div>
                                     <h4 class="card-title fw-bold text-white mb-0" style="font-size: 1.2rem;">${program}</h4>
-                                    
                                 </div>
                                 <span class="badge badge-light text-success fw-bold px-2 py-1" style="font-size: 11px;">
                                     <i class="fas fa-users mr-1"></i> ${students} Students
@@ -218,13 +262,8 @@
             if (existingCard) existingCard.remove();
         }
 
-        // Tampilkan tombol "Save All" jika minimal ada 1 checkbox yang dicentang
         const totalChecked = document.querySelectorAll('.class-selector-checkbox:checked').length;
-        if (totalChecked > 0) {
-            submitContainer.style.display = 'block';
-        } else {
-            submitContainer.style.display = 'none';
-        }
+        submitContainer.style.display = totalChecked > 0 ? 'block' : 'none';
     }
 </script>
 @endsection

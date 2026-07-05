@@ -4,31 +4,167 @@ namespace App\Http\Controllers;
 
 use App\Models\LessonPlan;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class LessonPlanController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
+        // Fitur 2: Menentukan default hari berjalan (1 = Monday, ..., 7 = Sunday)
+        $currentDayOfWeek = Carbon::now()->dayOfWeekIso;
 
-        if (Auth::guard('teacher')->check()) {
+        $query = LessonPlan::with(['teacher', 'price']);
+
+        if (Auth::guard('teacher')->check() && Auth::guard('teacher')->id() != 21) {
+            // Fitur 3: Teacher Area
             $teacherId = Auth::guard('teacher')->id();
-            $lessonPlans = LessonPlan::with('teacher', 'price')->where('teacher_id', $teacherId)->orderBy('created_at', 'desc')->get();
+            $query->where('teacher_id', $teacherId);
+
+            // Filter hari untuk teacher (jika tidak dipilih, default ke hari berjalan)
+            $dayFilter = $request->query('day', $currentDayOfWeek);
+            if ($dayFilter) {
+                $query->where(function ($q) use ($dayFilter) {
+                    $q->where('day1', $dayFilter)->orWhere('day2', $dayFilter);
+                });
+            }
         } else {
-            $lessonPlans = LessonPlan::with('teacher', 'price',)->orderBy('created_at', 'desc')->get();
+            // Fitur 4: Superadmin Area dengan multi-filter (Teacher, Day, Tanggal, Class)
+            if ($request->filled('teacher_id')) {
+                $query->where('teacher_id', $request->teacher_id);
+            }
+
+            if ($request->filled('day')) {
+                $dayFilter = $request->day;
+                $query->where(function ($q) use ($dayFilter) {
+                    $q->where('day1', $dayFilter)->orWhere('day2', $dayFilter);
+                });
+            } else if (!$request->filled('teacher_id') && !$request->filled('date') && !$request->filled('class_id')) {
+                // Jika superadmin tidak memfilter apapun, default tampilkan hari berjalan
+                $query->where(function ($q) use ($currentDayOfWeek) {
+                    $q->where('day1', $currentDayOfWeek)->orWhere('day2', $currentDayOfWeek);
+                });
+            }
+
+            if ($request->filled('date')) {
+                $query->whereDate('created_at', $request->date);
+            }
+
+            if ($request->filled('class_id')) {
+                $query->where('class', $request->class_id);
+            }
         }
 
-        return view('lesson-plan.index', compact('lessonPlans'));
+        $lessonPlans = $query->orderBy('created_at', 'desc')->get();
+
+        // Ambil data master pendukung filter Superadmin
+        $teachers = DB::table('teacher')->get();
+        $classes = DB::table('price')->get();
+
+        return view('lesson-plan.index', compact('lessonPlans', 'teachers', 'classes'));
+    }
+
+    public function create()
+    {
+        if (!Auth::guard('teacher')->check()) {
+            return redirect()->back()->with('error', 'You are not authorized to create a lesson plan.');
+        }
+
+        // Komentar asli di view: jam 15:01 - 23:59 tidak boleh create data hari berjalan
+        if (Carbon::now()->format('H:i') >= '15:01' && Carbon::now()->format('H:i') <= '23:59') {
+            return redirect()->route('lesson-plan.index')->with('error', 'Cannot create data after 15:00 on the current day.');
+        }
+
+        return view('lesson-plan.create');
+    }
+
+    // Fungsi helper privat untuk mengecek validasi waktu edit/update sesuai Fitur 1
+    private function isEditable($createdAt)
+    {
+        $createdDate = Carbon::parse($createdAt)->startOfDay();
+        $today = Carbon::today();
+
+        // Jika data dibuat hari ini, hanya bisa diedit SEBELUM jam 15:00 (Jam 3 Sore)
+        if ($createdDate->equalTo($today)) {
+            return Carbon::now()->format('H:i') < '15:00';
+        }
+
+        // Hari berikutnya / sesudahnya bebas bisa diedit kapan saja
+        return $createdDate->lessThan($today);
+    }
+
+    public function edit($id)
+    {
+        $item = DB::table('lesson_plan')->where('id', $id)->first();
+
+        if (!$item) {
+            return redirect()->route('lesson-plan.index')->with('error', 'Data Lesson Plan tidak ditemukan.');
+        }
+
+        // Fitur 1: Cek Batasan Waktu Edit
+        if (!$this->isEditable($item->created_at)) {
+            return redirect()->route('lesson-plan.index')->with('error', 'This lesson plan can no longer be edited (Time limit exceeded).');
+        }
+
+        $item->teacher = DB::table('teacher')->where('id', $item->teacher_id)->first();
+        $item->price = DB::table('price')->where('id', $item->class)->first();
+
+        $totalStudents = DB::table('student')
+            ->where('priceid', $item->class)
+            ->where('status', 'ACTIVE')
+            ->count();
+
+        return view('lesson-plan.edit', compact('item', 'totalStudents'));
+    }
+
+    public function update(Request $request, $id)
+    {
+        $item = DB::table('lesson_plan')->where('id', $id)->first();
+        if (!$item) {
+            return redirect()->route('lesson-plan.index')->with('error', 'Data tidak ditemukan.');
+        }
+
+        // Fitur 1: Cek Batasan Waktu Update ke Database
+        if (!$this->isEditable($item->created_at)) {
+            return redirect()->route('lesson-plan.index')->with('error', 'This lesson plan can no longer be updated.');
+        }
+
+        $request->validate([
+            'topic'       => 'required|string|max:255',
+            'flashcards'  => 'nullable|string',
+            'exercise'    => 'nullable|string',
+            'activity'    => 'nullable|string',
+        ]);
+
+        DB::table('lesson_plan')
+            ->where('id', $id)
+            ->update([
+                'topic'      => $request->topic,
+                'flashcards' => $request->flashcards,
+                'exercise'   => $request->exercise,
+                'activity'   => $request->activity,
+            ]);
+
+        return redirect()->route('lesson-plan.index')->with('success', 'Lesson Plan Updated Successfully!');
     }
 
     public function getClassesByDay(Request $request)
     {
         $day = $request->query('day');
-
         $teacherId = Auth::guard('teacher')->id();
 
-        // Ambil data dari tabel student yang mana day1 ATAU day2 cocok dengan inputan
+        // Mapping ID hari ke nama hari bahasa Inggris untuk Carbon
+        $dayNames = [
+            1 => 'Monday',
+            2 => 'Tuesday',
+            3 => 'Wednesday',
+            4 => 'Thursday',
+            5 => 'Friday',
+            6 => 'Saturday',
+            7 => 'Sunday'
+        ];
+
         $classes = DB::table('student')
             ->join('price', 'price.id', '=', 'student.priceid')
             ->join('day as day_one', 'day_one.id', '=', 'student.day1')
@@ -52,7 +188,6 @@ class LessonPlanController extends Controller
                 'day_two.day as day2_name',
                 DB::raw('COUNT(student.id) as total_students')
             )
-            // WAJIB ditambahkan agar data terbagi per kelas & jam mengajar masing-masing
             ->groupBy(
                 'price.program',
                 'student.priceid',
@@ -64,31 +199,51 @@ class LessonPlanController extends Controller
             )
             ->get();
 
+        // Map data untuk mengecek apakah waktu rilis gembok (1 minggu dari day2 terakhir) sudah terpenuhi
+        $classes = $classes->map(function ($item) use ($teacherId, $dayNames) {
+
+            // 1. Cari data lesson plan terakhir yang dibuat oleh teacher untuk kelas & jam ini
+            $lastLessonPlan = DB::table('lesson_plan')
+                ->where('teacher_id', $teacherId)
+                ->where('class', $item->priceid)
+                ->where('course_time', $item->course_time)
+                ->orderBy('created_at', 'desc')
+                ->first();
+
+            $isLocked = false;
+
+            if ($lastLessonPlan) {
+                $createdAt = \Carbon\Carbon::parse($lastLessonPlan->created_at);
+
+                // 2. Tentukan target hari mengajar kedua (day2) dari lesson plan yang terakhir dibuat itu
+                $day2TargetName = $dayNames[$item->day2] ?? null;
+
+                if ($day2TargetName) {
+                    // Ambil tanggal day2 yang jatuh pada rentang minggu pembuatan lesson plan tersebut
+                    $lastDay2Date = $createdAt->copy()->next($day2TargetName);
+
+                    // Jika ternyata next() melompat ke minggu depannya, kembalikan ke minggu rilisnya yang tepat
+                    if ($lastDay2Date->diffInDays($createdAt) > 6) {
+                        $lastDay2Date = $createdAt->copy()->previous($day2TargetName);
+                    }
+
+                    // 3. Batas gembok: 1 minggu (7 hari) setelah hari day2 dari siklus materi tersebut
+                    $lockUntilDate = $lastDay2Date->copy()->addWeek()->startOfDay();
+
+                    // Jika waktu sekarang belum melewati tanggal pembukaan gembok, maka statusnya READONLY
+                    if (\Carbon\Carbon::now()->startOfDay()->lessThan($lockUntilDate)) {
+                        $isLocked = true;
+                    }
+                }
+            }
+
+            $item->already_filled_this_week = $isLocked;
+            return $item;
+        });
+
         return response()->json($classes);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        if (!Auth::guard('teacher')->check()) {
-            return redirect()->back()->with('error', 'You are not authorized to create a lesson plan.');
-        }
-        // if (now()->between('15:00', '23:59')) {
-        //     return redirect()->route('lesson-plan.index')->with('error', 'You can only create a lesson plan between 15:00 and 00:00.');
-        // }
-        return view('lesson-plan.create');
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
     public function store(Request $request)
     {
         // Validasi dasar, pastikan ada paket array plan yang dikirim
@@ -133,12 +288,6 @@ class LessonPlanController extends Controller
         }
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function show($id)
     {
         $item = LessonPlan::with(['teacher', 'price'])->findOrFail($id);
@@ -152,69 +301,6 @@ class LessonPlanController extends Controller
             ->count();
 
         return view('lesson-plan.detail', compact('item', 'totalStudents'));
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        // 1. Ambil baris data lesson plan yang akan diedit
-        $item = DB::table('lesson_plan')->where('id', $id)->first();
-
-        if (!$item) {
-            return redirect()->route('lesson-plan.index')->with('error', 'Data Lesson Plan tidak ditemukan.');
-        }
-
-        // Ekstraksi opsional jika Anda menggunakan relasi Eloquent / manual join untuk info price & teacher
-        // Di sini diasumsikan data query pelengkap disamakan seperti halaman detail:
-        $item->teacher = DB::table('teacher')->where('id', $item->teacher_id)->first();
-        $item->price = DB::table('price')->where('id', $item->class)->first(); // Menyesuaikan relasi priceid
-
-        // 2. Hitung jumlah siswa aktif di kelas tersebut
-        $totalStudents = DB::table('student')
-            ->where('priceid', $item->class)
-            ->where('status', 'ACTIVE')
-            ->count();
-
-        return view('lesson-plan.edit', compact('item', 'totalStudents'));
-    }
-
-
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, $id)
-    {
-        // 1. Validasi input field pengeditan konten
-        $request->validate([
-            'topic'       => 'required|string|max:255',
-            'flashcards'  => 'nullable|string',
-            'exercise'    => 'nullable|string',
-            'activity'    => 'nullable|string',
-        ]);
-
-        // 2. Lakukan update data konten ke database
-        $updated = DB::table('lesson_plan')
-            ->where('id', $id)
-            ->update([
-                'topic'      => $request->topic,
-                'flashcards' => $request->flashcards,
-                'exercise'   => $request->exercise,
-                'activity'   => $request->activity,
-
-            ]);
-
-        return redirect()->route('lesson-plan.index')
-            ->with('success', 'Lesson Plan Updated Successfully!');
     }
 
     /**

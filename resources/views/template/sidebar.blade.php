@@ -172,6 +172,12 @@
                         <p>Lesson Plan</p>
                     </a>
                 </li>
+                <li class="nav-item {{ Request::segment(1) == 'print-out' ? 'active' : '' }}">
+                    <a href="{{ url('/print-out') }}" class="collapsed">
+                        <i class="fas fa-print"></i>
+                        <p>Print Out</p>
+                    </a>
+                </li>
                 <li class="nav-item {{ Request::segment(1) == 'calendar-academic' ? 'active' : '' }}">
                     <a href="{{ url('/calendar-academic') }}" class="collapsed">
                         <i class="fas fa-calendar-alt"></i>

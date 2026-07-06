@@ -1061,6 +1061,9 @@
             </div>
             <div class="modal-body px-4">
 
+                <!-- cek dulu apakah ada variabel lesson plan, klok ga ada abaikan -->
+                @if(isset($lesson_plan))
+
                 {{-- BAGIAN 1: DATA UTAMA (CLASS & SCHEDULE) --}}
                 @if(count($lesson_plan) > 0)
                 <div class="table-responsive mb-4 shadow-sm rounded">
@@ -1085,6 +1088,7 @@
                 </div>
 
                 {{-- BAGIAN 2: LOOPING SEMUA AGENDA MATERI --}}
+                @if(isset($lesson_plan))
                 <div class="container-fluid px-0">
                     <div class="d-flex flex-nowrap overflow-x-auto pb-3" style="width: 100%; max-width: 100%; overflow-x: auto !important; -webkit-overflow-scrolling: touch;">
                         @foreach($lesson_plan as $item)
@@ -1165,11 +1169,15 @@
                         @endforeach
                     </div>
                 </div>
+
+                @endif
                 @else
                 <div class="text-center text-muted my-5 py-4">
                     <i class="fas fa-folder-open fa-3x text-gray-300 mb-3"></i>
                     <p class="mb-0 font-weight-medium">No lesson plan data available.</p>
                 </div>
+                @endif
+
                 @endif
 
             </div>

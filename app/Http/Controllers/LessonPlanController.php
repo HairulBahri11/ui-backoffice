@@ -17,6 +17,17 @@ class LessonPlanController extends Controller
 
         $query = LessonPlan::with(['teacher', 'price']);
 
+        // ==========================================
+        // FILTER DEFAULT: HANYA MINGGU INI 
+        // Diaktifkan jika: tidak ada 'show_all' DAN tidak ada filter spesifik (seperti date/teacher/class)
+        // ==========================================
+        if (!$request->has('show_all') && !$request->filled('date') && !$request->filled('teacher_id') && !$request->filled('class_id')) {
+            $query->whereBetween('created_at', [
+                Carbon::now()->startOfWeek(),
+                Carbon::now()->endOfWeek()
+            ]);
+        }
+
         if (Auth::guard('teacher')->check() && Auth::guard('teacher')->id() != 21) {
             // Fitur 3: Teacher Area
             $teacherId = Auth::guard('teacher')->id();
@@ -154,17 +165,6 @@ class LessonPlanController extends Controller
         $day = $request->query('day');
         $teacherId = Auth::guard('teacher')->id();
 
-        // Mapping ID hari ke nama hari bahasa Inggris untuk Carbon
-        $dayNames = [
-            1 => 'Monday',
-            2 => 'Tuesday',
-            3 => 'Wednesday',
-            4 => 'Thursday',
-            5 => 'Friday',
-            6 => 'Saturday',
-            7 => 'Sunday'
-        ];
-
         $classes = DB::table('student')
             ->join('price', 'price.id', '=', 'student.priceid')
             ->join('day as day_one', 'day_one.id', '=', 'student.day1')
@@ -197,12 +197,13 @@ class LessonPlanController extends Controller
                 'day_one.day',
                 'day_two.day'
             )
+            ->orderBy('student.course_time', 'asc')
             ->get();
 
-        // Map data untuk mengecek apakah waktu rilis gembok (1 minggu dari day2 terakhir) sudah terpenuhi
-        $classes = $classes->map(function ($item) use ($teacherId, $dayNames) {
+        // Loop data untuk validasi gembok berdasarkan Minggu Berjalan (Current Calendar Week)
+        $classes = $classes->map(function ($item) use ($teacherId) {
 
-            // 1. Cari data lesson plan terakhir yang dibuat oleh teacher untuk kelas & jam ini
+            // 1. Ambil data lesson plan TERAKHIR untuk kombinasi kelas, jam, dan guru ini
             $lastLessonPlan = DB::table('lesson_plan')
                 ->where('teacher_id', $teacherId)
                 ->where('class', $item->priceid)
@@ -215,28 +216,20 @@ class LessonPlanController extends Controller
             if ($lastLessonPlan) {
                 $createdAt = \Carbon\Carbon::parse($lastLessonPlan->created_at);
 
-                // 2. Tentukan target hari mengajar kedua (day2) dari lesson plan yang terakhir dibuat itu
-                $day2TargetName = $dayNames[$item->day2] ?? null;
+                // 2. LOGIKA KUNCI: Ambil awal minggu (Senin) dari tanggal pembuatan lesson plan terakhir tersebut
+                $lastPlanStartOfWeek = $createdAt->copy()->startOfWeek()->format('Y-m-d');
 
-                if ($day2TargetName) {
-                    // Ambil tanggal day2 yang jatuh pada rentang minggu pembuatan lesson plan tersebut
-                    $lastDay2Date = $createdAt->copy()->next($day2TargetName);
+                // Ambil awal minggu (Senin) dari waktu SEKARANG (saat guru mengakses form)
+                $currentStartOfWeek = \Carbon\Carbon::now()->startOfWeek()->format('Y-m-d');
 
-                    // Jika ternyata next() melompat ke minggu depannya, kembalikan ke minggu rilisnya yang tepat
-                    if ($lastDay2Date->diffInDays($createdAt) > 6) {
-                        $lastDay2Date = $createdAt->copy()->previous($day2TargetName);
-                    }
-
-                    // 3. Batas gembok: 1 minggu (7 hari) setelah hari day2 dari siklus materi tersebut
-                    $lockUntilDate = $lastDay2Date->copy()->addWeek()->startOfDay();
-
-                    // Jika waktu sekarang belum melewati tanggal pembukaan gembok, maka statusnya READONLY
-                    if (\Carbon\Carbon::now()->startOfDay()->lessThan($lockUntilDate)) {
-                        $isLocked = true;
-                    }
+                // Jika awal minggunya SAMA, artinya guru SUDAH PERNAH membuat lesson plan untuk kelas ini di minggu ini.
+                // Jika awal minggunya BERBEDA (seperti kasus dibuat tanggal 5 Juli [minggu lalu] vs diakses tanggal 6 Juli [minggu baru]), gembok otomatis LEPAS.
+                if ($lastPlanStartOfWeek === $currentStartOfWeek) {
+                    $isLocked = true;
                 }
             }
 
+            // Return status gembok ke view
             $item->already_filled_this_week = $isLocked;
             return $item;
         });

@@ -32,4 +32,9 @@ class PrintOut extends Model
     {
         return $this->belongsTo(Days::class, 'day2_id', 'id');
     }
+
+    public function documentPrintouts()
+    {
+        return $this->hasMany(DocumentPrintout::class, 'id_printout', 'id');
+    }
 }

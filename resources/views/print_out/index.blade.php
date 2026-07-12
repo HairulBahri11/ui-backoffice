@@ -114,7 +114,7 @@
                                                     <i class="fas fa-folder-open mr-1"></i> Files
                                                 </button>
 
-                                                <form action="{{ route('print-out.destroy', $item->id) }}" method="POST" class="form-inline" onsubmit="return confirm('Are you sure you want to delete this print request and all associated files?')">
+                                                <form action="{{ route('print-out.destroy', $item->id) }}" method="POST" class="form-inline" onsubmit="return confirm('Are you sure you want to delete this print request and all files?')">
                                                     @method('delete')
                                                     @csrf
                                                     <button type="submit" class="btn btn-sm btn-danger"><i class="fas fa-trash"></i></button>

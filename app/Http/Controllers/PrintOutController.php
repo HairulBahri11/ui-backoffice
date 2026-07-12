@@ -306,17 +306,30 @@ class PrintOutController extends Controller
     public function destroy($id)
     {
         try {
-            $printOut = PrintOut::findOrFail($id);
+            // Gunakan database transaction agar jika salah satu proses gagal, data tidak pincang
+            DB::beginTransaction();
 
-            // Delete the associated file if it exists
-            if ($printOut->file_link && file_exists(public_path($printOut->file_link))) {
-                unlink(public_path($printOut->file_link));
+            // Load data PrintOut beserta semua relasi dokumennya
+            $printOut = PrintOut::with('documentPrintouts')->findOrFail($id);
+
+            // 1. Looping untuk menghapus semua file fisik dari storage/public
+            foreach ($printOut->documentPrintouts as $document) {
+                if ($document->file_link && file_exists(public_path($document->file_link))) {
+                    unlink(public_path($document->file_link));
+                }
+
+                // Hapus data baris dokumen dari tabel document_print_out
+                $document->delete();
             }
 
+            // 2. Hapus data utama dari tabel print_out
             $printOut->delete();
 
-            return redirect('/print-out')->with('success', 'Print request deleted successfully!');
+            DB::commit();
+
+            return redirect('/print-out')->with('success', 'Print request and all files deleted successfully!');
         } catch (\Exception $e) {
+            DB::rollBack();
             return redirect()->back()->with('error', 'Failed to delete data: ' . $e->getMessage());
         }
     }

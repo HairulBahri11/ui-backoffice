@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class LessonPlanController extends Controller
 {
@@ -180,16 +181,19 @@ class LessonPlanController extends Controller
             })
             ->select(
                 'price.program',
+                'price.level',
                 'student.priceid',
                 'student.course_time',
                 'student.day1',
                 'student.day2',
                 'day_one.day as day1_name',
                 'day_two.day as day2_name',
-                DB::raw('COUNT(student.id) as total_students')
+                DB::raw('COUNT(student.id) as total_students'),
+                DB::raw("GROUP_CONCAT(student.name SEPARATOR ', ') as student_names")
             )
             ->groupBy(
                 'price.program',
+                'price.level',
                 'student.priceid',
                 'student.course_time',
                 'student.day1',
@@ -275,7 +279,9 @@ class LessonPlanController extends Controller
             return redirect()->route('lesson-plan.index')
                 ->with('success', "Successfully saved $insertedCount Lesson Plan(s)!");
         } catch (\Exception $e) {
+            Log::error('Error saving lesson plans: ' . $e->getMessage());
             DB::rollBack(); // Batalkan semua input jika di tengah jalan ada error internet/database
+
             return redirect()->back()
                 ->with('error', 'An error occurred while saving the data: ' . $e->getMessage());
         }

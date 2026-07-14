@@ -210,6 +210,19 @@
                                 @php
                                 $dayDate = $weekDays[$dayName];
                                 $isToday = $dayDate->isToday();
+
+                                // 1. Filter jadwal terlebih dahulu: Hanya ambil yang total_students > 0
+                                $filteredSchedules = [];
+                                if (isset($schedules[$dayName])) {
+                                $filteredSchedules = array_filter($schedules[$dayName], function($item) {
+                                return $item->total_students > 0;
+                                });
+
+                                // 2. Lakukan sorting berdasarkan jam mengajar seperti kode asli Anda
+                                usort($filteredSchedules, function($a, $b) {
+                                return strtotime($a->course_time) - strtotime($b->course_time);
+                                });
+                                }
                                 @endphp
 
                                 <div class="col-md-4 mb-4">
@@ -222,17 +235,12 @@
                                         </div>
 
                                         <div class="card-body p-3">
-                                            @if (isset($schedules[$dayName]))
-                                            @php
-                                            usort($schedules[$dayName], function($a, $b) {
-                                            return strtotime($a->course_time) - strtotime($b->course_time);
-                                            });
-                                            @endphp
+                                            {{-- Ganti pengecekan menggunakan variabel yang sudah difilter --}}
+                                            @if (!empty($filteredSchedules))
 
-                                            @foreach ($schedules[$dayName] as $schedule)
+                                            @foreach ($filteredSchedules as $schedule)
                                             @php
                                             $isAssist = $schedule->role === 'assist';
-                                            // Logika deteksi kelas Private (sesuaikan string 'private' dengan data di DB Anda)
                                             $isPrivate = (strpos(strtolower($schedule->class), 'private') !== false);
                                             @endphp
 
@@ -264,7 +272,6 @@
                                                     <li class="text-muted small italic">No student names.</li>
                                                     @endif
                                                 </ul>
-
                                                 @endif
                                                 <div class="text-xs mt-1 {{ $isAssist ? 'text-secondary' : 'text-dark' }}" style="{{ $isAssist ? 'color: var(--assist-color) !important;' : 'font-weight: 500;' }}">
                                                     <span>{{ $isAssist ? str_replace('Assist: ', 'Main: ', $schedule->teacher_name) : 'Teacher: '.$schedule->teacher_name }}</span>
@@ -272,6 +279,7 @@
                                             </div>
                                             @endforeach
                                             @else
+                                            {{-- Jika tidak ada jadwal ATAU semua jadwal di hari itu muridnya 0 --}}
                                             <div class="text-center p-4 text-muted border border-dashed rounded" style="border-style: dashed !important; border-color: #dee2e6 !important;">
                                                 <i class="far fa-smile-wink fa-2x mb-2"></i>
                                                 <p class="mb-0">No classes scheduled.</p>

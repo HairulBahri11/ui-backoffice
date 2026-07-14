@@ -142,12 +142,14 @@
 
                     selectionWrapper.innerHTML += `
                         <div class="custom-control custom-checkbox class-card-checkbox m-1 ${isLockedByDay2Rule ? 'disabled-card' : ''}">
-                            <input type="checkbox" class="custom-control-input class-selector-checkbox" 
-                                   value="${item.priceid}" id="chk-${index}" 
+                            <input type="checkbox" class="custom-control-input class-selector-checkbox"
+                                   value="${item.priceid}" id="chk-${index}"
                                    data-index="${index}"
-                                   data-time="${item.course_time}" 
+                                   data-time="${item.course_time}"
                                    data-program="${item.program || 'No Program'}"
+                                   data-level="${item.level || ''}"
                                    data-students="${item.total_students}"
+                                   data-student-names="${item.student_names || ''}"
                                    data-day1="${item.day1_name || '-'}"
                                    data-day2="${item.day2_name || '-'}"
                                    data-day1_id="${item.day1 || '-'}"
@@ -202,12 +204,16 @@
         const index = this.getAttribute('data-index');
         const courseTime = this.getAttribute('data-time');
         const program = this.getAttribute('data-program');
+        const level = this.getAttribute('data-level');
         const students = this.getAttribute('data-students');
+        const studentNames = this.getAttribute('data-student-names');
         const day1 = this.getAttribute('data-day1');
         const day2 = this.getAttribute('data-day2');
         const day1Id = this.getAttribute('data-day1_id');
         const day2Id = this.getAttribute('data-day2_id');
-        const formId = `form-card-${classId.replace(/[^a-zA-Z0-9]/g, '-')}`;
+        // Gunakan index (unik per row) untuk formId, bukan classId (priceid bisa sama untuk beberapa Private class berbeda jam)
+        const formId = `form-card-${index}`;
+        const isPrivate = level === 'Private' || program === 'Private';
 
         if (this.checked) {
             if (document.getElementById(formId)) return;
@@ -229,6 +235,10 @@
                             <span><i class="far fa-clock text-warning"></i> <strong>Time:</strong> ${courseTime}</span>
                             <span><i class="far fa-calendar-alt text-info"></i> <strong>Schedule:</strong> ${day1} & ${day2}</span>
                         </div>
+                        ${isPrivate && studentNames ? `
+                        <div class="bg-light mt-2 px-3 pb-2 border-bottom text-dark" style="font-size: 14px;">
+                            <i class="fas fa-user-graduate text-success mr-1"></i> <strong>Student:</strong> ${studentNames}
+                        </div>` : ''}
                         
                         <input type="hidden" name="plans[${index}][class_id]" value="${classId}">
                         

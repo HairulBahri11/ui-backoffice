@@ -790,33 +790,80 @@
                                 </div>
                             </div>
                             <h2 class="mt-3">Agenda</h2>
+                            @php
+                            // Inisialisasi nilai default
+                            $topicStart = '';
+                            $topicEnd = '';
+                            $flashcardStart = '';
+                            $flashcardEnd = '';
+
+                            // Jika tipenya update, pecah string page dari database
+                            if (isset($data) && $data->type == 'update') {
+                            // Kolom topic_page (misal: "5-8")
+                            $topicPages = explode('-', $data->topic_page ?? '');
+                            $topicStart = $topicPages[0] ?? '';
+                            $topicEnd = $topicPages[1] ?? '';
+
+                            // Kolom flashcard_page (misal: "1-25")
+                            $flashcardPages = explode('-', $data->flashcard_page ?? '');
+                            $flashcardStart = $flashcardPages[0] ?? '';
+                            $flashcardEnd = $flashcardPages[1] ?? '';
+                            }
+                            @endphp
+
+                            <!-- Section 1: Topic/Textbook -->
                             <div class="row mt-3">
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        <label for="">Topic</label>
-                                        <textarea name="comment" class="form-control" id="comment_textarea" cols="30" rows="3">{{ $data->type == 'update' ? $data->comment : '' }}</textarea>
+                                        <label class="mb-1 fw-bold text-dark">Topic/Textbook <span class="text-danger">*</span></label>
+                                        <!-- Range input untuk halaman/bab -->
+                                        <div class="d-flex align-items-center mb-2">
+                                            <input type="number" class="form-control text-center" name="topic_start"
+                                                value="{{ old('topic_start', $topicStart) }}" style="width: 80px;" required>
+                                            <span class="mx-2 fw-bold">—</span>
+                                            <input type="number" class="form-control text-center" name="topic_end"
+                                                value="{{ old('topic_end', $topicEnd) }}" style="width: 80px;" required>
+                                        </div>
+                                        <!-- Input utama untuk Text/Topic harusnya pake textarea -->
+                                        <textarea class="form-control" name="comment" required placeholder="e.g., Bedouin People">{{ old('comment', ($data->type == 'update' ? $data->comment : '')) }}</textarea>
                                     </div>
                                 </div>
                             </div>
+
+                            <!-- Section 2: Flashcards -->
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        <label for="">Text Book</label>
-                                        <input type="text" class="form-control"
-                                            value="{{ $data->type == 'update' ? $data->textBook : '' }}" name="textBook">
+                                        <label class="mb-1 fw-bold text-dark">Flashcards</label>
+                                        <!-- Range input untuk nomor flashcard -->
+                                        <div class="d-flex align-items-center">
+                                            <input type="number" class="form-control text-center" name="flashcards_start"
+                                                value="{{ old('flashcards_start', $flashcardStart) }}" style="width: 80px;">
+                                            <span class="mx-2 fw-bold">—</span>
+                                            <input type="number" class="form-control text-center" name="flashcards_end"
+                                                value="{{ old('flashcards_end', $flashcardEnd) }}" style="width: 80px;">
+                                        </div>
                                     </div>
                                 </div>
                             </div>
+
+                            <!-- Section 3: Exercise/Supplement -->
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        <label for="">Exercise Book</label>
-                                        <input type="text" class="form-control"
-                                            value="{{ $data->type == 'update' ? $data->excerciseBook : '' }}"
-                                            name="excerciseBook">
-
+                                        <label class="mb-1 fw-bold text-dark">Exercise/Supplement</label>
+                                        <textarea class="form-control" name="excerciseBook" rows="2">{{ old('excerciseBook', ($data->type == 'update' ? $data->excerciseBook : '')) }}</textarea>
                                     </div>
+                                </div>
+                            </div>
 
+                            <!-- Section 4: Class Activity -->
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="mb-1 fw-bold text-dark">Class Activity</label>
+                                        <textarea class="form-control" name="activity_class" rows="2" placeholder="e.g., Fun quiz">{{ old('activity_class', ($data->type == 'update' ? $data->activity_class : '')) }}</textarea>
+                                    </div>
                                 </div>
                             </div>
                             {{-- <div class="row"> --}}
@@ -954,9 +1001,13 @@
                                 <div class="card-body">
                                     <p>{{ $item->date }}
                                         <br>{{ $item->activity }}
+
                                         <br>Text Book : {{ $item->text_book }}
                                         <br>Exercise Book :
                                         {{ $item->excercise_book != null ? $item->excercise_book : '-' }}
+                                        <br>Flashcard Page : {{ $item->flashcard_page != null ? $item->flashcard_page : '-' }}
+                                        <br>Activity Class : {{ $item->activity_class != null ? $item->activity_class : '-' }}
+                                        <br>Topic Page : {{ $item->topic_page != null ? $item->topic_page : '-' }}
                                     </p>
 
                                 </div>
@@ -1097,9 +1148,10 @@
                                 <div class="card-header bg-light d-flex justify-content-between align-items-center py-2">
                                     <div class="d-flex align-items-center w-75">
                                         <h6 class="m-0 font-weight-bold text-primary mr-2">{{ $loop->iteration }}. Topic :</h6>
-                                        <span class="text-dark font-weight-bold text-truncate mr-2">{{ $item->topic }}</span>
+                                        <span class="text-dark font-weight-bold text-truncate mr-2">{{ $item->topic == '-' ? ' ': $item->topic  }} ({{ $item->topic_page ?? '-' }} page)</span>
                                         <button type="button" class="btn btn-xs btn-link p-0 text-muted btn-inline-copy mr-2"
-                                            data-copy="{{ $item->topic }}" title="Copy Topic">
+                                            data-copy="{{ $item->topic }}"
+                                            title="Copy Topic">
                                             <i class="far fa-copy"></i>
                                         </button>
 
@@ -1113,7 +1165,7 @@
                                             <p class="mb-1 text-xs text-uppercase font-weight-bold text-muted tracking-wider">Flashcards</p>
                                             <div class="d-flex align-items-start p-2 border rounded bg-light" style="min-height: 44px;">
                                                 <div class="w-100 text-dark user-select-all font-weight-medium text-sm pr-2" style="word-break: break-word;">
-                                                    {{ $item->flashcards ?? '-' }}
+                                                    {{ $item->flashcards ?? '-' }}({{ $item->flashcard_page ?? '-' }} page)
                                                 </div>
                                                 @if(!empty($item->flashcards))
                                                 <button type="button" class="btn btn-xs btn-link p-0 text-muted btn-inline-copy ml-auto"
@@ -1158,7 +1210,8 @@
                                 <div class="card-footer">
                                     <button type="button" class="btn btn-sm btn-primary btn-insert-data"
                                         data-topic="{{ $item->topic }}"
-                                        data-flashcards="{{ $item->flashcards ?? '-' }}"
+                                        data-topic-page="{{ $item->topic_page ?? '' }}"
+                                        data-flashcard-page="{{ $item->flashcard_page ?? '' }}"
                                         data-exercise="{{ $item->exercise ?? '-' }}"
                                         data-activity="{{ $item->activity ?? '-' }}">
                                         <i class="fas fa-plus mr-1"></i> Copy to Agenda Topic
@@ -1214,28 +1267,54 @@
 
     // Script untuk mengisi otomatis ke Textarea
     // Script untuk mengisi otomatis ke Textarea + Notifikasi Toast
+    // Script untuk mengisi otomatis ke masing-masing field input Agenda + Notifikasi Toast
     document.querySelectorAll('.btn-insert-data').forEach(button => {
         button.addEventListener('click', function() {
-            // Ambil data-attribute dari tombol yang diklik
+            // 1. Ambil data-attribute dari tombol yang diklik
             const topic = this.getAttribute('data-topic');
-            const flashcards = this.getAttribute('data-flashcards');
+            const topicPage = this.getAttribute('data-topic-page');
+            const flashcardPage = this.getAttribute('data-flashcard-page');
             const exercise = this.getAttribute('data-exercise');
             const activity = this.getAttribute('data-activity');
 
-            // Menyusun teks yang akan dimasukkan ke textarea
-            const formattedText = `Topic: ${topic}\nFlashcards: ${flashcards}\nExercise: ${exercise}\nActivity: ${activity}`;
+            // 2. Set Nilai Utama Topik (Textarea: name="comment")
+            const inputComment = document.querySelector('textarea[name="comment"]');
+            if (inputComment) inputComment.value = (topic && topic !== '-') ? topic : '';
 
-            // Cari element textarea berdasarkan ID
-            const textarea = document.getElementById('comment_textarea');
-
-            if (textarea) {
-                // Masukkan teks ke dalam textarea (Tanpa Scroll)
-                textarea.value = formattedText;
-                // textarea.focus();
-
-                // TAMPILKAN PEMBERITAHUAN (TOAST)
-                showToastNotification("Already copied to the agenda topic!");
+            // 3. Pecah dan Set Nilai Range Halaman Topic/Textbook
+            const inputTopicStart = document.querySelector('input[name="topic_start"]');
+            const inputTopicEnd = document.querySelector('input[name="topic_end"]');
+            if (topicPage && topicPage.includes('-')) {
+                const splitTopic = topicPage.split('-');
+                if (inputTopicStart) inputTopicStart.value = splitTopic[0] || '';
+                if (inputTopicEnd) inputTopicEnd.value = splitTopic[1] || '';
+            } else {
+                if (inputTopicStart) inputTopicStart.value = '';
+                if (inputTopicEnd) inputTopicEnd.value = '';
             }
+
+            // 4. Pecah dan Set Nilai Range Flashcards
+            const inputFlashStart = document.querySelector('input[name="flashcards_start"]');
+            const inputFlashEnd = document.querySelector('input[name="flashcards_end"]');
+            if (flashcardPage && flashcardPage.includes('-')) {
+                const splitFlash = flashcardPage.split('-');
+                if (inputFlashStart) inputFlashStart.value = splitFlash[0] || '';
+                if (inputFlashEnd) inputFlashEnd.value = splitFlash[1] || '';
+            } else {
+                if (inputFlashStart) inputFlashStart.value = '';
+                if (inputFlashEnd) inputFlashEnd.value = '';
+            }
+
+            // 5. Set Nilai Exercise/Supplement
+            const inputExercise = document.querySelector('textarea[name="excerciseBook"]');
+            if (inputExercise) inputExercise.value = (exercise && exercise !== '-') ? exercise : '';
+
+            // 6. Set Nilai Class Activity
+            const inputActivity = document.querySelector('textarea[name="activity_class"]');
+            if (inputActivity) inputActivity.value = (activity && activity !== '-') ? activity : '';
+
+            // TAMPILKAN PEMBERITAHUAN (TOAST SUKSES)
+            showToastNotification("Already copied to the agenda fields!");
         });
     });
 
@@ -1665,6 +1744,9 @@
                     <p>${agenda.activity || '-'}</p>
                     <p><strong>Text Book:</strong> ${agenda.text_book || '-'}</p>
                     <p><strong>Exercise Book:</strong> ${agenda.excercise_book || '-'}</p>
+                    <p><strong>Flashcard Page:</strong> ${agenda.flashcard_page || '-'}</p>
+                    <p><strong>Activity Class:</strong> ${agenda.activity_class || '-'}</p>
+                    <p><strong>Topic Page:</strong> ${agenda.topic_page || '-'}</p>
                 </div>
             </div>
         `;

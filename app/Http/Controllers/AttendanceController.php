@@ -263,6 +263,9 @@ class AttendanceController extends Controller
                 'id_test' => $cek->id_test,
                 'date_review' => $cek->date_review,
                 'date_test' => $cek->date_test,
+                'flashcard_page' => $cek->flashcard_page,
+                'activity_class' => $cek->activity_class,
+                'topic_page' => $cek->topic_page,
             ];
             // return $data;
         } else {
@@ -279,6 +282,9 @@ class AttendanceController extends Controller
                 'id_test' => '',
                 'date_review' => '',
                 'date_test' => '',
+                'flashcard_page' => '',
+                'activity_class' => '',
+                'topic_page' => '',
             ];
         }
 
@@ -586,6 +592,7 @@ class AttendanceController extends Controller
                         $idTest .= $file . $comma;
                     }
                 }
+
                 $countStudent = 0;
                 $pointCategories = PointCategories::all();
                 $createAttendance = [
@@ -596,13 +603,16 @@ class AttendanceController extends Controller
                     'date' => date('Y-m-d'),
                     'teacher_id' => $request->teacher,
                     'activity' => $request->comment,
-                    'text_book' => $request->textBook,
-                    'excercise_book' => $request->excerciseBook,
+                    'text_book' => $request->textBook ?? null,
+                    'excercise_book' => $request->excerciseBook ?? null,
                     'is_presence' => true,
                     'id_test' => $idTest,
                     'date_review' => $request->date_review,
                     'date_test' => $request->date_test,
                     'is_class_new' => $request->is_new,
+                    'flashcard_page' => $request->flashcards_start . '-' . $request->flashcards_end,
+                    'activity_class' => $request->activity_class,
+                    'topic_page' => $request->topic_start . '-' . $request->topic_end,
                 ];
                 $attendance = Attendance::create($createAttendance);
                 for ($i = 0; $i < count($request->totalPoint); $i++) {
@@ -920,6 +930,9 @@ class AttendanceController extends Controller
                 'id_test' => $cek->id_test,
                 'date_review' => $cek->date_review,
                 'date_test' => $cek->date_test,
+                'flashcard_page' => $cek->flashcard_page,
+                'activity_class' => $cek->activity_class,
+                'topic_page' => $cek->topic_page
             ];
         } else {
             // $agenda = [];
@@ -935,6 +948,9 @@ class AttendanceController extends Controller
                 'id_test' => '',
                 'date_review' => '',
                 'date_test' => '',
+                'flashcard_page' => '',
+                'activity_class' => '',
+                'topic_page' => ''
             ];
         }
 
@@ -1012,6 +1028,9 @@ class AttendanceController extends Controller
                 'id_test' => $request->id_test,
                 'date_review' => $request->date_review,
                 'date_test' => $request->date_test,
+                'flashcard_page' => $request->flashcards_start . '-' . $request->flashcards_end,
+                'activity_class' => $request->activity_class,
+                'topic_page' => $request->topic_start . '-' . $request->topic_end,
             ]);
             for ($i = 0; $i < count($request->totalPoint); $i++) {
                 $dataDetail = AttendanceDetail::where('attendance_id', $request->attendanceId)

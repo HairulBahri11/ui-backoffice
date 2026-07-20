@@ -66,7 +66,6 @@
                         </div>
                     </div>
                 </div>
-
                 <div class="col-md-8">
                     <div class="card">
                         <div class="card-header d-flex align-items-center justify-content-between">
@@ -74,53 +73,77 @@
                         </div>
                         <div class="card-body">
 
+                            @php
+                            // Memecah string topic_page (contoh: "5-8" menjadi ["5", "8"])
+                            $topicPages = explode('-', $item->topic_page ?? '');
+                            $topicStart = $topicPages[0] ?? '';
+                            $topicEnd = $topicPages[1] ?? '';
 
+                            // Memecah string flashcard_page (contoh: "1-25" menjadi ["1", "25"])
+                            $flashcardPages = explode('-', $item->flashcard_page ?? '');
+                            $flashcardStart = $flashcardPages[0] ?? '';
+                            $flashcardEnd = $flashcardPages[1] ?? '';
+                            @endphp
+
+                            <!-- Section 1: Topic/Textbook -->
                             <div class="card mb-3 border">
                                 <div class="card-header bg-light py-2">
                                     <label class="font-weight-bold text-dark m-0">
-                                        <i class="fas fa-book-open text-primary mr-2"></i> Topic <span class="text-danger">*</span>
+                                        <i class="fas fa-book-open text-primary mr-2"></i> Topic/Textbook <span class="text-danger">*</span>
                                     </label>
                                 </div>
                                 <div class="card-body p-2" style="background:#fafafa;">
-                                    <input type="text" class="form-control" name="topic" value="{{ old('topic', $item->topic) }}" required placeholder="Masukkan topik pembelajaran...">
+                                    <!-- Range input untuk halaman/bab -->
+                                    <div class="d-flex align-items-center mb-2">
+                                        <input type="number" class="form-control text-center" name="topic_start" value="{{ old('topic_start', $topicStart) }}" style="width: 80px;" required>
+                                        <span class="mx-2 font-weight-bold">—</span>
+                                        <input type="number" class="form-control text-center" name="topic_end" value="{{ old('topic_end', $topicEnd) }}" style="width: 80px;" required>
+                                    </div>
+                                    <!-- Input teks utama untuk topik -->
+                                    <input type="text" class="form-control" name="topic" value="{{ old('topic', $item->topic) }}" required placeholder="e.g., Bedouin People">
                                 </div>
                             </div>
 
-                            <div class="card border">
+                            <!-- Section 2: Flashcards -->
+                            <div class="card mb-3 border">
                                 <div class="card-header bg-light py-2">
                                     <label class="font-weight-bold text-dark m-0">
                                         <i class="fas fa-images text-danger mr-2"></i> Flashcards
                                     </label>
                                 </div>
                                 <div class="card-body p-2" style="background:#fafafa;">
-                                    <textarea class="form-control" name="flashcards" rows="3" placeholder="Masukkan data flashcard...">{{ old('flashcards', $item->flashcards) }}</textarea>
+                                    <!-- Range input untuk nomor flashcard -->
+                                    <div class="d-flex align-items-center">
+                                        <input type="number" class="form-control text-center" name="flashcards_start" value="{{ old('flashcards_start', $flashcardStart) }}" style="width: 80px;">
+                                        <span class="mx-2 font-weight-bold">—</span>
+                                        <input type="number" class="form-control text-center" name="flashcards_end" value="{{ old('flashcards_end', $flashcardEnd) }}" style="width: 80px;">
+                                    </div>
                                 </div>
                             </div>
 
-
-
+                            <!-- Section 3: Exercise/Supplement -->
                             <div class="card mb-3 border">
                                 <div class="card-header bg-light py-2">
                                     <label class="font-weight-bold text-dark m-0">
-                                        <i class="fas fa-dumbbell text-info mr-2"></i> Exercise
+                                        <i class="fas fa-dumbbell text-info mr-2"></i> Exercise/Supplement
                                     </label>
                                 </div>
                                 <div class="card-body p-2" style="background:#fafafa;">
-                                    <textarea class="form-control" name="exercise" rows="3" placeholder="Masukkan data latihan...">{{ old('exercise', $item->exercise) }}</textarea>
+                                    <textarea class="form-control" name="exercise" rows="3" placeholder="e.g., Booklet page 7">{{ old('exercise', $item->exercise) }}</textarea>
                                 </div>
                             </div>
 
+                            <!-- Section 4: Class Activity -->
                             <div class="card border">
                                 <div class="card-header bg-light py-2">
                                     <label class="font-weight-bold text-dark m-0">
-                                        <i class="fas fa-chalkboard text-success mr-2"></i> Activity
+                                        <i class="fas fa-chalkboard text-success mr-2"></i> Class Activity
                                     </label>
                                 </div>
                                 <div class="card-body p-2" style="background:#fafafa;">
-                                    <textarea class="form-control" name="activity" rows="3" placeholder="Masukkan data aktivitas...">{{ old('activity', $item->activity) }}</textarea>
+                                    <textarea class="form-control" name="activity" rows="3" placeholder="e.g., Fun quiz">{{ old('activity', $item->activity) }}</textarea>
                                 </div>
                             </div>
-
 
                         </div>
 

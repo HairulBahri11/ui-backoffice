@@ -92,7 +92,15 @@
                                 <label for="note" class="font-weight-bold">Notes / Special Instructions (Applies to all files) <span class="text-danger">*</span></label>
                                 <textarea class="form-control border-success" id="note" name="note" rows="8" placeholder="Please write instructions here (e.g., Print double-sided, Page 1-5 only, Black &amp; White, number of copies...)" required>{{ old('note') }}</textarea>
                             </div>
+                            <!-- due date -->
+                            <div class="form-group">
+                                <label for="due_date" class="font-weight-bold">Due Date <span class="text-danger">*</span></label>
+                                <input type="date" class="form-control border-success" id="due_date" name="due_date" value="{{ old('due_date') }}" required>
+                            </div>
+
                         </div>
+
+
                         <div class="card-action bg-light text-right">
                             <button type="submit" class="btn btn-success btn-lg px-4 mr-2">
                                 <i class="fas fa-save mr-1"></i> Save Request

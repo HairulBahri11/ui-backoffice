@@ -215,6 +215,7 @@ class PrintOutController extends Controller
                 'day2_id'     => (int)$request->day2_id,
                 'note'        => $request->note, // Catatan global
                 'teacher_id'  => $teacherId,
+                'due_date'    => $request->due_date, // Men
                 'created_at'  => now(),
                 'updated_at'  => now()
             ]);

@@ -239,27 +239,50 @@
                         <div class="bg-light mt-2 px-3 pb-2 border-bottom text-dark" style="font-size: 14px;">
                             <i class="fas fa-user-graduate text-success mr-1"></i> <strong>Student:</strong> ${studentNames}
                         </div>` : ''}
-                        
+
+                        <div class="px-3 py-2 border-bottom" id="last-agenda-${index}" style="font-size: 13px; background:#fffdf5;">
+                            <span class="text-muted"><i class="fas fa-spinner fa-spin mr-1"></i> Loading last agenda...</span>
+                        </div>
+
                         <input type="hidden" name="plans[${index}][class_id]" value="${classId}">
                         
-                        <div class="card-body py-3">
-                            <div class="form-group px-0 py-1 mb-2">
-                                <label class="mb-1 fw-bold text-dark">Topic <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" name="plans[${index}][topic]" required placeholder="What is the topic today?">
-                            </div>
-                            <div class="form-group px-0 py-1 mb-2">
-                                <label class="mb-1 fw-bold text-dark">Flashcards</label>
-                                <textarea class="form-control" name="plans[${index}][flashcards]" rows="2" placeholder="List vocabulary..."></textarea>
-                            </div>
-                            <div class="form-group px-0 py-1 mb-2">
-                                <label class="mb-1 fw-bold text-dark">Exercise</label>
-                                <textarea class="form-control" name="plans[${index}][exercise]" rows="2" placeholder="Task or quiz..."></textarea>
-                            </div>
-                            <div class="form-group px-0 py-1 mb-0">
-                                <label class="mb-1 fw-bold text-dark">Activity</label>
-                                <textarea class="form-control" name="plans[${index}][activity]" rows="2" placeholder="Games or practice steps..."></textarea>
-                            </div>
-                        </div>
+                       <div class="card-body py-3">
+    <!-- Section 1: Topic/Textbook -->
+    <div class="form-group px-0 py-1 mb-2">
+        <label class="mb-1 fw-bold text-dark">Topic/Textbook <span class="text-danger">*</span></label>
+        <!-- Range input untuk halaman/bab -->
+        <div class="d-flex align-items-center mb-2">
+            <input type="number" class="form-control text-center" name="plans[${index}][topic_start]" style="width: 80px;"  required>
+            <span class="mx-2 fw-bold">—</span>
+            <input type="number" class="form-control text-center" name="plans[${index}][topic_end]" style="width: 80px;"  required>
+        </div>
+        <!-- Input teks utama untuk topik -->
+        <input type="text" class="form-control" name="plans[${index}][topic]" required placeholder="e.g., Bedouin People">
+    </div>
+
+    <!-- Section 2: Flashcards -->
+    <div class="form-group px-0 py-1 mb-2">
+        <label class="mb-1 fw-bold text-dark">Flashcards</label>
+        <!-- Range input untuk nomor flashcard -->
+        <div class="d-flex align-items-center">
+            <input type="number" class="form-control text-center" name="plans[${index}][flashcards_start]" style="width: 80px;" >
+            <span class="mx-2 fw-bold">—</span>
+            <input type="number" class="form-control text-center" name="plans[${index}][flashcards_end]" style="width: 80px;" >
+        </div>
+    </div>
+
+    <!-- Section 3: Exercise/Supplement -->
+    <div class="form-group px-0 py-1 mb-2">
+        <label class="mb-1 fw-bold text-dark">Exercise/Supplement</label>
+        <textarea class="form-control" name="plans[${index}][exercise]" rows="2" placeholder="e.g., Booklet page 7"></textarea>
+    </div>
+
+    <!-- Section 4: Class Activity -->
+    <div class="form-group px-0 py-1 mb-0">
+        <label class="mb-1 fw-bold text-dark">Class Activity</label>
+        <textarea class="form-control" name="plans[${index}][activity]" rows="2" placeholder="e.g., Fun quiz"></textarea>
+    </div>
+</div>
                     </div>
                 </div>
                 <input type="hidden" name="plans[${index}][day1]" value="${day1Id}">
@@ -267,6 +290,7 @@
                 <input type="hidden" name="plans[${index}][course_time]" value="${courseTime}">
             `;
             formsContainer.insertAdjacentHTML('beforeend', cardHTML);
+            loadLastAgenda(index, classId, day1Id, day2Id, courseTime);
         } else {
             const existingCard = document.getElementById(formId);
             if (existingCard) existingCard.remove();
@@ -274,6 +298,44 @@
 
         const totalChecked = document.querySelectorAll('.class-selector-checkbox:checked').length;
         submitContainer.style.display = totalChecked > 0 ? 'block' : 'none';
+    }
+
+    // 3. Ambil & Render Last Agenda via AJAX ketika class dipilih
+    function loadLastAgenda(index, priceId, day1Id, day2Id, courseTime) {
+        const box = document.getElementById(`last-agenda-${index}`);
+        if (!box) return;
+
+        const params = new URLSearchParams({
+            price_id: priceId,
+            day1: day1Id,
+            day2: day2Id,
+            course_time: courseTime
+        });
+
+        fetch(`{{ route('lesson-plan.get-last-agenda') }}?${params.toString()}`)
+            .then(response => response.json())
+            .then(agenda => {
+                if (!box.isConnected) return; // Card sudah di-unselect sebelum response datang
+
+                if (!agenda) {
+                    box.innerHTML = `<span class="text-muted"><i class="fas fa-info-circle mr-1"></i>No previous agenda found for this class.</span>`;
+                    return;
+                }
+
+                box.innerHTML = `
+                    <strong class="text-dark"><i class="fas fa-history text-primary mr-1"></i>Last Agenda (${agenda.date || '-'}):</strong>
+                    <div class="mt-1 text-dark">
+                        <div><strong>Topic:</strong> ${agenda.activity || '-'} ${agenda.topic_page ? `(page ${agenda.topic_page})` : ''}</div>
+                        <div><strong>Flashcards:</strong> ${agenda.flashcard_page ? `page ${agenda.flashcard_page}` : '-'}</div>
+                        <div><strong>Exercise:</strong> ${agenda.excercise_book || '-'}</div>
+                        <div><strong>Class Activity:</strong> ${agenda.activity_class || '-'}</div>
+                    </div>
+                `;
+            })
+            .catch(error => {
+                console.error('Error loading last agenda:', error);
+                box.innerHTML = `<span class="text-danger"><i class="fas fa-exclamation-circle mr-1"></i>Failed to load last agenda.</span>`;
+            });
     }
 </script>
 @endsection

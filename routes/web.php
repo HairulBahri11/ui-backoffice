@@ -193,6 +193,7 @@ Route::middleware(['web'])->group(function () {
         Route::get('/create', [\App\Http\Controllers\LessonPlanController::class, 'create'])->name('lesson-plan.create');
         Route::post('/store', [\App\Http\Controllers\LessonPlanController::class, 'store'])->name('lesson-plan.store');
         Route::get('/get-classes', [\App\Http\Controllers\LessonPlanController::class, 'getClassesByDay'])->name('lesson-plan.get-classes');
+        Route::get('/get-last-agenda', [\App\Http\Controllers\LessonPlanController::class, 'getLastAgenda'])->name('lesson-plan.get-last-agenda');
         Route::get('/{id}', [\App\Http\Controllers\LessonPlanController::class, 'show'])->name('lesson-plan.show');
         Route::get('/{id}/edit', [\App\Http\Controllers\LessonPlanController::class, 'edit'])->name('lesson-plan.edit');
         Route::put('/{id}/update', [\App\Http\Controllers\LessonPlanController::class, 'update'])->name('lesson-plan.update');

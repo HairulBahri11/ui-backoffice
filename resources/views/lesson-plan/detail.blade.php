@@ -86,6 +86,7 @@
                                         </div>
                                         <div class="card-body" style="background:#fafafa;">
                                             {!! nl2br(e($item->topic ?? 'Tidak ada data konten belajar.')) !!}
+                                            ({{ $item->topic_page ?? '-' }} page)
                                         </div>
                                     </div>
 
@@ -96,7 +97,8 @@
                                             </div>
                                         </div>
                                         <div class="card-body" style="background:#fafafa;">
-                                            {!! nl2br(e($item->flashcards ?? 'Tidak ada data flashcard.')) !!}
+                                            {!! nl2br(e($item->flashcards == '-' ? '' : $item->flashcards)) !!}
+                                            ({{ $item->flashcard_page ?? '-' }} page)
                                         </div>
                                     </div>
 

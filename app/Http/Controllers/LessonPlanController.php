@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Attendance;
 use App\Models\LessonPlan;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -147,7 +148,20 @@ class LessonPlanController extends Controller
             'flashcards'  => 'nullable|string',
             'exercise'    => 'nullable|string',
             'activity'    => 'nullable|string',
+            'topic_start' => 'nullable|integer|min:1',
+            'topic_end'   => 'nullable|integer|min:1',
+            'flashcards_start' => 'nullable|integer|min:1',
+            'flashcards_end' => 'nullable|integer|min:1',
         ]);
+
+        // 1. Gabungkan range Topic/Textbook (wajib isi karena ada 'required')
+        $topicPage = $request->topic_start . '-' . $request->topic_end;
+
+        // 2. Gabungkan range Flashcards (opsional, cek jika diisi)
+        $flashcardPage = null;
+        if ($request->filled('flashcards_start') && $request->filled('flashcards_end')) {
+            $flashcardPage = $request->flashcards_start . '-' . $request->flashcards_end;
+        }
 
         DB::table('lesson_plan')
             ->where('id', $id)
@@ -156,6 +170,8 @@ class LessonPlanController extends Controller
                 'flashcards' => $request->flashcards,
                 'exercise'   => $request->exercise,
                 'activity'   => $request->activity,
+                'topic_page' => $topicPage,
+                'flashcard_page' => $flashcardPage,
             ]);
 
         return redirect()->route('lesson-plan.index')->with('success', 'Lesson Plan Updated Successfully!');
@@ -241,6 +257,29 @@ class LessonPlanController extends Controller
         return response()->json($classes);
     }
 
+    public function getLastAgenda(Request $request)
+    {
+        // ambil price_id, day1, day2, course_time dant student_id kalok ada
+        $priceId = $request->query('price_id');
+        $day1 = $request->query('day1');
+        $day2 = $request->query('day2');
+        $courseTime = $request->query('course_time');
+        $studentId = $request->query('student_id');
+        $teacherId = Auth::guard('teacher')->id();
+
+        $lastAgenda = Attendance::where('price_id', $priceId)
+            ->where(function ($query) use ($day1, $day2) {
+                $query->where('day1', $day1)
+                    ->orWhere('day2', $day2);
+            })
+            ->where('teacher_id', $teacherId)
+            ->where('course_time', $courseTime)
+            ->orderBy('date', 'desc')
+            ->first();
+
+        return response()->json($lastAgenda);
+    }
+
     public function store(Request $request)
     {
         // Validasi dasar, pastikan ada paket array plan yang dikirim
@@ -266,9 +305,11 @@ class LessonPlanController extends Controller
                     'day2'         => $plan['day2'],
                     'course_time'  => $plan['course_time'],
                     'topic'        => $plan['topic'],
-                    'flashcards'   => $plan['flashcards'] ?? null,
-                    'exercise'     => $plan['exercise'] ?? null,
-                    'activity'     => $plan['activity'] ?? null,
+                    'flashcards'   => $plan['flashcards'] ?? '-',
+                    'exercise'     => $plan['exercise'] ?? '-',
+                    'activity'     => $plan['activity'] ?? '-',
+                    'topic_page'   => $plan['topic_start'] . "-" . $plan['topic_end'] ?? '-',
+                    'flashcard_page' => $plan['flashcards_start'] . "-" . $plan['flashcards_end'] ?? '-',
                     'created_at'   => now(),
                 ]);
                 $insertedCount++;

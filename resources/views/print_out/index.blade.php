@@ -60,6 +60,7 @@
                                         <th>Notes</th>
                                         <th>Total Files</th>
                                         <th>Created On</th>
+                                        <th>Due Date</th>
                                         <th class="text-center" style="width: 15%">Action</th>
                                     </tr>
                                 </thead>
@@ -105,6 +106,7 @@
                                             <span class="badge badge-info">{{ count($filesData) }} Files</span>
                                         </td>
                                         <td>{{ \Carbon\Carbon::parse($item->created_at)->format('d M Y h:i A') }}</td>
+                                        <td>{{ \Carbon\Carbon::parse($item->due_date)->format('d M Y') }}</td>
                                         <td class="text-center">
                                             <div class="d-flex flex-row justify-content-center align-items-center">
                                                 <button type="button"

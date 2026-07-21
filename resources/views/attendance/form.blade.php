@@ -819,10 +819,10 @@
                                         <!-- Range input untuk halaman/bab -->
                                         <div class="d-flex align-items-center mb-2">
                                             <input type="number" class="form-control text-center" name="topic_start"
-                                                value="{{ old('topic_start', $topicStart) }}" style="width: 80px;" required>
+                                                value="{{ old('topic_start', $topicStart) }}" style="width: 80px;">
                                             <span class="mx-2 fw-bold">—</span>
                                             <input type="number" class="form-control text-center" name="topic_end"
-                                                value="{{ old('topic_end', $topicEnd) }}" style="width: 80px;" required>
+                                                value="{{ old('topic_end', $topicEnd) }}" style="width: 80px;">
                                         </div>
                                         <!-- Input utama untuk Text/Topic harusnya pake textarea -->
                                         <textarea class="form-control" name="comment" required placeholder="e.g., Bedouin People">{{ old('comment', ($data->type == 'update' ? $data->comment : '')) }}</textarea>

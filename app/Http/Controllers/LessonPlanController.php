@@ -85,9 +85,9 @@ class LessonPlanController extends Controller
         }
 
         // Komentar asli di view: jam 15:01 - 23:59 tidak boleh create data hari berjalan
-        // if (Carbon::now()->format('H:i') >= '15:01' && Carbon::now()->format('H:i') <= '23:59') {
-        //     return redirect()->route('lesson-plan.index')->with('error', 'Cannot create data after 15:00 on the current day.');
-        // }
+        if (Carbon::now()->format('H:i') >= '15:01' && Carbon::now()->format('H:i') <= '23:59') {
+            return redirect()->route('lesson-plan.index')->with('error', 'Cannot create data after 15:00 on the current day.');
+        }
 
         return view('lesson-plan.create');
     }

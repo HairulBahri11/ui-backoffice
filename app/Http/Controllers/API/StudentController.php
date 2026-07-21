@@ -123,7 +123,7 @@ class StudentController extends Controller
 
             $billing = PaymentBillDetail::where('category', 'COURSE')->where('student_id', $studentId)->where('status', 'Waiting')->where('payment', 'COURSE ' . Carbon::now()->format('m-Y'))->sum('price');
             $agenda = AttendanceDetail::join('attendances', 'attendances.id', 'attendance_details.attendance_id')
-                ->select('attendances.activity', 'attendances.date', 'attendances.text_book', 'attendances.id')
+                ->select('attendances.activity', 'attendances.flashcard_page', 'attendances.topic_page', 'attendances.activity_class', 'attendances.excercise_book', 'attendances.text_book', 'attendances.date', 'attendances.id')
                 ->where('attendance_details.student_id', $studentId)
                 ->orderBy('attendance_details.id', 'DESC')
                 ->take(5)->get();

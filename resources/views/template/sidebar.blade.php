@@ -188,6 +188,8 @@
                 @endif
 
 
+
+
                 @if (Auth::guard('staff')->check() && in_array(Auth::guard('staff')->user()->id, [4, 7]) || Auth::guard('teacher')->check() == true)
                 <li class="nav-item {{ Request::segment(1) == 'calendar' ? 'active' : '' }}">
                     <a href="{{ url('/calendar') }}" class="collapsed">
@@ -315,6 +317,28 @@
                         <p>History Chat</p>
                     </a>
                 </li>
+                @endif
+
+                @if(Auth::guard('teacher')->check() == true)
+                <li class="nav-item {{ Request::segment(2) == 'reminder' ? 'active' : '' }}">
+                    <a href="{{ url('/attendance/reminder') }}" class="collapsed">
+                        <i class="fas fa-bell"></i>
+                        <p>Absence Reminder</p>
+                    </a>
+                </li>
+                <li class="nav-item {{ Request::segment(1) == 'review' ? 'active' : '' }}">
+                    <a href="{{ url('/review') }}" class="collapsed">
+                        <i class="fas fa-book"></i>
+                        <p>Review & Test Order</p>
+                    </a>
+                </li>
+                <li class="nav-item {{ Request::segment(1) == 'lesson-plan' ? 'active' : '' }}">
+                    <a href="{{ url('/lesson-plan') }}" class="collapsed">
+                        <i class="fas fa-pen-alt"></i>
+                        <p>Lesson Plan</p>
+                    </a>
+                </li>
+
                 @endif
 
             </ul>

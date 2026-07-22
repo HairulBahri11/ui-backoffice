@@ -326,12 +326,7 @@
                         <p>Absence Reminder</p>
                     </a>
                 </li>
-                <li class="nav-item {{ Request::segment(1) == 'review' ? 'active' : '' }}">
-                    <a href="{{ url('/review') }}" class="collapsed">
-                        <i class="fas fa-book"></i>
-                        <p>Review & Test Order</p>
-                    </a>
-                </li>
+
                 <li class="nav-item {{ Request::segment(1) == 'lesson-plan' ? 'active' : '' }}">
                     <a href="{{ url('/lesson-plan') }}" class="collapsed">
                         <i class="fas fa-pen-alt"></i>

@@ -74,13 +74,13 @@
                         <div class="card-body">
 
                             @php
-                            // Memecah string topic_page (contoh: "5-8" menjadi ["5", "8"])
-                            $topicPages = explode('-', $item->topic_page ?? '');
+                            // Memecah string topic_page (contoh: "1-3&5" menjadi ["1-3", "5"])
+                            $topicPages = explode('&', $item->topic_page ?? '');
                             $topicStart = $topicPages[0] ?? '';
                             $topicEnd = $topicPages[1] ?? '';
 
-                            // Memecah string flashcard_page (contoh: "1-25" menjadi ["1", "25"])
-                            $flashcardPages = explode('-', $item->flashcard_page ?? '');
+                            // Memecah string flashcard_page (contoh: "1-3&5" menjadi ["1-3", "5"])
+                            $flashcardPages = explode('&', $item->flashcard_page ?? '');
                             $flashcardStart = $flashcardPages[0] ?? '';
                             $flashcardEnd = $flashcardPages[1] ?? '';
                             @endphp
@@ -93,11 +93,11 @@
                                     </label>
                                 </div>
                                 <div class="card-body p-2" style="background:#fafafa;">
-                                    <!-- Range input untuk halaman/bab -->
+                                    <!-- Range input untuk halaman/bab, contoh: "1-3" & "5" -> tersimpan "1-3&5" -->
                                     <div class="d-flex align-items-center mb-2">
-                                        <input type="number" class="form-control text-center" name="topic_start" value="{{ old('topic_start', $topicStart) }}" style="width: 80px;" required>
-                                        <span class="mx-2 font-weight-bold">—</span>
-                                        <input type="number" class="form-control text-center" name="topic_end" value="{{ old('topic_end', $topicEnd) }}" style="width: 80px;" required>
+                                        <input type="text" class="form-control text-center" name="topic_start" value="{{ old('topic_start', $topicStart) }}" style="width: 80px;" placeholder="e.g. 1-3">
+                                        <span class="mx-2 font-weight-bold">&amp;</span>
+                                        <input type="text" class="form-control text-center" name="topic_end" value="{{ old('topic_end', $topicEnd) }}" style="width: 80px;" placeholder="e.g. 5 (optional)">
                                     </div>
                                     <!-- Input teks utama untuk topik -->
                                     <input type="text" class="form-control" name="topic" value="{{ old('topic', $item->topic) }}" required placeholder="e.g., Bedouin People">
@@ -112,11 +112,11 @@
                                     </label>
                                 </div>
                                 <div class="card-body p-2" style="background:#fafafa;">
-                                    <!-- Range input untuk nomor flashcard -->
+                                    <!-- Range input untuk nomor flashcard, contoh: "1-3" & "5" -> tersimpan "1-3&5" -->
                                     <div class="d-flex align-items-center">
-                                        <input type="number" class="form-control text-center" name="flashcards_start" value="{{ old('flashcards_start', $flashcardStart) }}" style="width: 80px;">
-                                        <span class="mx-2 font-weight-bold">—</span>
-                                        <input type="number" class="form-control text-center" name="flashcards_end" value="{{ old('flashcards_end', $flashcardEnd) }}" style="width: 80px;">
+                                        <input type="text" class="form-control text-center" name="flashcards_start" value="{{ old('flashcards_start', $flashcardStart) }}" style="width: 80px;" placeholder="e.g. 1-3">
+                                        <span class="mx-2 font-weight-bold">&amp;</span>
+                                        <input type="text" class="form-control text-center" name="flashcards_end" value="{{ old('flashcards_end', $flashcardEnd) }}" style="width: 80px;" placeholder="e.g. 5 (optional)">
                                     </div>
                                 </div>
                             </div>

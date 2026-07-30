@@ -22,6 +22,27 @@ use Illuminate\Support\Facades\Log;
 
 class AttendanceController extends Controller
 {
+    // Gabungkan dua input page (start & end) jadi satu string dipisah '&', contoh: "1-3" & "5" -> "1-3&5"
+    private function combinePageRange($start, $end)
+    {
+        $start = trim((string) $start);
+        $end = trim((string) $end);
+
+        if ($start === '' && $end === '') {
+            return null;
+        }
+
+        if ($start === '') {
+            return $end;
+        }
+
+        if ($end === '') {
+            return $start;
+        }
+
+        return $start . '&' . $end;
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -609,9 +630,9 @@ class AttendanceController extends Controller
                     'date_review' => $request->date_review,
                     'date_test' => $request->date_test,
                     'is_class_new' => $request->is_new,
-                    'flashcard_page' => $request->flashcards_start . '-' . $request->flashcards_end,
+                    'flashcard_page' => $this->combinePageRange($request->flashcards_start, $request->flashcards_end),
                     'activity_class' => $request->activity_class,
-                    'topic_page' => $request->topic_start . '-' . $request->topic_end,
+                    'topic_page' => $this->combinePageRange($request->topic_start, $request->topic_end),
                 ];
                 $attendance = Attendance::create($createAttendance);
                 for ($i = 0; $i < count($request->totalPoint); $i++) {
@@ -1027,9 +1048,9 @@ class AttendanceController extends Controller
                 'id_test' => $request->id_test,
                 'date_review' => $request->date_review,
                 'date_test' => $request->date_test,
-                'flashcard_page' => $request->flashcards_start . '-' . $request->flashcards_end,
+                'flashcard_page' => $this->combinePageRange($request->flashcards_start, $request->flashcards_end),
                 'activity_class' => $request->activity_class,
-                'topic_page' => $request->topic_start . '-' . $request->topic_end,
+                'topic_page' => $this->combinePageRange($request->topic_start, $request->topic_end),
             ]);
             for ($i = 0; $i < count($request->totalPoint); $i++) {
                 $dataDetail = AttendanceDetail::where('attendance_id', $request->attendanceId)

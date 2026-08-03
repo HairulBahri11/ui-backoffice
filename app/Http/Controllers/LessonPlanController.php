@@ -84,12 +84,43 @@ class LessonPlanController extends Controller
             return redirect()->back()->with('error', 'You are not authorized to create a lesson plan.');
         }
 
-        // Komentar asli di view: jam 15:01 - 23:59 tidak boleh create data hari berjalan
-        if (Carbon::now()->format('H:i') >= '15:01' && Carbon::now()->format('H:i') <= '23:59') {
-            return redirect()->route('lesson-plan.index')->with('error', 'Cannot create data after 15:00 on the current day.');
+        if (!$this->isWithinCreateWindow()) {
+            return redirect()->route('lesson-plan.index')->with('error', $this->createWindowMessage());
         }
 
         return view('lesson-plan.create');
+    }
+
+    // Fitur: Batasan jam create lesson plan. Hari Minggu tidak boleh sama sekali,
+    // hari Sabtu hanya jam 08:00-13:00, hari lain tidak boleh create data setelah jam 15:00 hari berjalan.
+    private function isWithinCreateWindow()
+    {
+        $now = Carbon::now();
+
+        if ($now->isSunday()) {
+            return false;
+        }
+
+        if ($now->isSaturday()) {
+            return $now->format('H:i') >= '08:00' && $now->format('H:i') <= '13:00';
+        }
+
+        return $now->format('H:i') < '15:01';
+    }
+
+    private function createWindowMessage()
+    {
+        $now = Carbon::now();
+
+        if ($now->isSunday()) {
+            return 'Lesson plans cannot be created on Sunday.';
+        }
+
+        if ($now->isSaturday()) {
+            return 'On Saturday, lesson plans can only be created between 08:00 and 13:00.';
+        }
+
+        return 'Cannot create data after 15:00 on the current day.';
     }
 
     // Gabungkan dua input page (start & end) jadi satu string dipisah '&', contoh: "1-3" & "5" -> "1-3&5"
@@ -300,6 +331,10 @@ class LessonPlanController extends Controller
 
     public function store(Request $request)
     {
+        if (!$this->isWithinCreateWindow()) {
+            return redirect()->route('lesson-plan.index')->with('error', $this->createWindowMessage());
+        }
+
         // Validasi dasar, pastikan ada paket array plan yang dikirim
         $request->validate([
             'selected_day' => 'required',

@@ -56,7 +56,7 @@ class AttendanceController extends Controller
         if (Auth::guard('teacher')->check() == true) {
             $where = 'AND id_teacher = ' . Auth::guard('teacher')->user()->id;
         }
-        if (Auth::guard('staff')->check() && !in_array(Auth::guard('staff')->user()->id, [2, 4, 3, 7, 6])) {
+        if (Auth::guard('staff')->check() && !in_array(Auth::guard('staff')->user()->id, [1, 2, 4, 3, 7, 6])) {
             $where .= ' AND id_staff = ' . Auth::guard('staff')->user()->id;
         }
         if ($request->teacher) {

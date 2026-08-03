@@ -412,6 +412,12 @@ class LessonPlanController extends Controller
                 ->with('error', 'Lesson Plan tidak ditemukan.');
         }
 
+        // Fitur: Data hanya boleh dihapus di hari yang sama dengan hari pembuatannya
+        if (!Carbon::parse($lessonPlan->created_at)->isToday()) {
+            return redirect()->route('lesson-plan.index')
+                ->with('error', 'This lesson plan can no longer be deleted (past its creation day).');
+        }
+
         // Hapus data dari database
         DB::table('lesson_plan')->where('id', $id)->delete();
 

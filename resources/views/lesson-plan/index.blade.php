@@ -206,6 +206,7 @@
                                                 $isBeforeThreePm = now()->format('H:i') < '15:00' ;
                                                     $isPastDays=\Carbon\Carbon::parse($item->created_at)->isPast() && !$isCreatedToday;
                                                     $canEdit = ($isCreatedToday && $isBeforeThreePm) || $isPastDays;
+                                                    $canDelete = $isCreatedToday;
                                                     @endphp
 
                                                     @if($canEdit)
@@ -219,9 +220,15 @@
                                                     @endif
 
                                                     <input type="hidden" name="id" value="{{ $item->id }}">
+                                                    @if($canDelete)
                                                     <button type="submit" onclick="return confirm('Are you sure you want to delete this data ??')" class="btn btn-xs btn-danger" title="Hapus Data">
                                                         <i class="fas fa-trash"></i>
                                                     </button>
+                                                    @else
+                                                    <button type="button" class="btn btn-xs btn-secondary" title="Deleting Locked (past creation day)" disabled>
+                                                        <i class="fas fa-lock"></i>
+                                                    </button>
+                                                    @endif
                                             </form>
                                         </td>
                                     </tr>

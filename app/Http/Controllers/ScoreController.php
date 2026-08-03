@@ -86,6 +86,9 @@ class ScoreController extends Controller
      */
     public function create(Request $request)
     {
+        if ($this->isScoreActionBlocked()) {
+            return redirect()->back()->with('error', $this->scoreBlockedMessage());
+        }
 
         $students = Students::where('status', 'ACTIVE')->get();
         $test = ModelsTests::all();
@@ -137,6 +140,28 @@ class ScoreController extends Controller
         return view('score.last', compact('student', 'class', 'testItem', 'studentScore1', 'studentScore2', 'studentScore3'));
     }
 
+    // Fitur: Batasan jam buka halaman/aksi Student Score. Hari biasa terkunci jam 15:00-19:00,
+    // khusus hari Sabtu terkunci jam 08:00-13:00.
+    private function isScoreActionBlocked()
+    {
+        $now = Carbon::now();
+
+        if ($now->isSaturday()) {
+            return $now->format('H:i') >= '08:00' && $now->format('H:i') <= '13:00';
+        }
+
+        return $now->format('H:i') >= '15:00' && $now->format('H:i') <= '19:00';
+    }
+
+    private function scoreBlockedMessage()
+    {
+        if (Carbon::now()->isSaturday()) {
+            return 'On Saturday, Student Score cannot be accessed between 08:00 and 13:00.';
+        }
+
+        return 'Student Score cannot be accessed between 15:00 and 19:00.';
+    }
+
     /**
      * Store a newly created resource in storage.
      *
@@ -145,6 +170,10 @@ class ScoreController extends Controller
      */
     public function store(Request $request)
     {
+        if ($this->isScoreActionBlocked()) {
+            return back()->with('error', $this->scoreBlockedMessage());
+        }
+
         try {
             $scores = new StudentScore;
             $scores->test_id = $request->test;
@@ -209,6 +238,10 @@ class ScoreController extends Controller
      */
     public function update(Request $request, $score)
     {
+        if ($this->isScoreActionBlocked()) {
+            return back()->with('error', $this->scoreBlockedMessage());
+        }
+
         // return $request->all();
         try {
             StudentScore::where('id', $score)->update([

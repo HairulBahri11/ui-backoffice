@@ -270,13 +270,20 @@ class LessonPlanController extends Controller
             ->get();
 
         // Loop data untuk validasi gembok berdasarkan Minggu Berjalan (Current Calendar Week)
-        $classes = $classes->map(function ($item) use ($teacherId) {
+        $classes = $classes->map(function ($item) use ($teacherId, $day) {
 
-            // 1. Ambil data lesson plan TERAKHIR untuk kombinasi kelas, jam, dan guru ini
+            // 1. Ambil data lesson plan TERAKHIR untuk kombinasi kelas, jam, guru, DAN hari spesifik ini
+            // (for_day membedakan kelas yang jadwalnya 2 hari berbeda, mis. Tuesday & Wednesday,
+            // supaya masing-masing hari punya kesempatan create sendiri-sendiri dalam 1 minggu.
+            // Data lama yang for_day-nya masih NULL tetap dianggap mengunci semua hari, sesuai perilaku lama.)
             $lastLessonPlan = DB::table('lesson_plan')
                 ->where('teacher_id', $teacherId)
                 ->where('class', $item->priceid)
                 ->where('course_time', $item->course_time)
+                ->where(function ($query) use ($day) {
+                    $query->where('for_day', $day)
+                        ->orWhereNull('for_day');
+                })
                 ->orderBy('created_at', 'desc')
                 ->first();
 
@@ -356,6 +363,9 @@ class LessonPlanController extends Controller
                     'class'     => $plan['class_id'],
                     'day1'         => $plan['day1'],
                     'day2'         => $plan['day2'],
+                    // Hari spesifik yang dipilih di dropdown "Choose Day" saat batch ini dibuat,
+                    // dipakai buat membedakan slot Tuesday vs Wednesday pada kelas yang jadwalnya 2 hari beda.
+                    'for_day'      => $request->selected_day,
                     'course_time'  => $plan['course_time'],
                     'topic'        => $plan['topic'],
                     'flashcards'   => $plan['flashcards'] ?? '-',

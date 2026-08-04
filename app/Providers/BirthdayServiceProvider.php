@@ -6,6 +6,7 @@ use App\Models\Students;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 
@@ -177,28 +178,34 @@ class BirthdayServiceProvider extends ServiceProvider
                 ->toArray();
 
             // 2. Ambil tanggal nonaktif terakhir (date_inactive) dari table student_review
-            // Menggunakan max() atau orderByDesc untuk memastikan mendapatkan history terakhir jika ada multi-record
+            // Dibatasi ke tahun berjalan saja, karena yang relevan hanya nonaktif SEBELUM ulang tahun DI TAHUN INI.
+            // Riwayat nonaktif dari tahun-tahun sebelumnya tidak relevan untuk ulang tahun tahun ini.
             $lastInactiveDates = DB::table('student_review')
                 ->whereIn('student_id', $studentListActive->pluck('id'))
                 ->whereNotNull('date_inactive')
+                ->whereYear('date_inactive', $currentYear)
                 ->groupBy('student_id')
                 ->select('student_id', DB::raw('MAX(date_inactive) as last_inactive'))
                 ->pluck('last_inactive', 'student_id')
                 ->toArray();
 
             foreach ($studentListActive as $item) {
-                $birthdayString = trim($item->birthday);
+                // Beberapa data lama punya residu tanda "-" atau spasi ganda di depan/belakang
+                // (contoh: "- July 16") karena belum lengkap diisi tahun lahirnya di form.
+                $birthdayString = trim(trim($item->birthday), "- \t\n\r\0\x0B");
 
                 try {
-                    if (preg_match('/^\d{4} [A-Za-z]+ \d{1,2}$/', $birthdayString)) {
-                        $birthdayDate = Carbon::createFromFormat('Y F d', $birthdayString);
-                    } elseif (preg_match('/^[A-Za-z]+ \d{1,2}$/', $birthdayString)) {
-                        $birthdayDate = Carbon::createFromFormat('F d', $birthdayString)->year(now()->year);
+                    if (preg_match('/^(\d{4})\s+([A-Za-z]+)\s+(\d{1,2})$/', $birthdayString, $m)) {
+                        $birthdayDate = Carbon::createFromFormat('Y F d', $m[1] . ' ' . $m[2] . ' ' . $m[3]);
+                    } elseif (preg_match('/^([A-Za-z]+)\s+(\d{1,2})$/', $birthdayString, $m)) {
+                        // Tanpa tahun lahir: pakai tahun berjalan hanya untuk keperluan perhitungan bulan-tanggal
+                        $birthdayDate = Carbon::createFromFormat('F d', $m[1] . ' ' . $m[2])->year(now()->year);
                     } else {
+                        Log::warning("Unparseable birthday format for student " . $item->id . ": [" . $birthdayString . "]");
                         continue; // Skip if format is incorrect
                     }
                 } catch (\Exception $e) {
-                    \Log::error("Error parsing birthday for student " . $item->id . ": " . $birthdayString . " - " . $e->getMessage());
+                    Log::error("Error parsing birthday for student " . $item->id . ": " . $birthdayString . " - " . $e->getMessage());
                     continue;
                 }
 

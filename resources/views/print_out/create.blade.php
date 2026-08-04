@@ -65,13 +65,13 @@
                             </div>
 
                             <div class="form-group pb-0">
-                                <label class="font-weight-bold">Upload Document Files <span class="text-danger">*</span></label>
+                                <label class="font-weight-bold">Upload Document Files <span class="text-muted font-weight-normal">(optional)</span></label>
                                 <div class="border border-primary rounded p-4 text-center bg-light position-relative" style="border-style: dashed !important; border-width: 2px !important;">
                                     <i class="fas fa-cloud-upload-alt text-primary fa-3x mb-3"></i>
                                     <h5 class="font-weight-bold text-dark mb-1">Click to select one or multiple files</h5>
                                     <p class="text-muted small mb-3">Supports PDF, DOCX, PNG, JPG, JPEG (Max 5MB/file)</p>
 
-                                    <input type="file" name="document_files[]" id="document_file" class="form-control-file position-absolute w-100 h-100" style="opacity: 0; top: 0; left:0; cursor: pointer;" accept=".pdf,.docx,.png,.jpg,.jpeg" multiple required>
+                                    <input type="file" name="document_files[]" id="document_file" class="form-control-file position-absolute w-100 h-100" style="opacity: 0; top: 0; left:0; cursor: pointer;" accept=".pdf,.docx,.png,.jpg,.jpeg" multiple>
 
                                     <div id="file_list_preview" class="mt-2 text-left"></div>
                                 </div>

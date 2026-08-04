@@ -176,15 +176,15 @@ class PrintOutController extends Controller
 
     public function store(Request $request)
     {
-        // Validasi input masal
+        // Validasi input masal (document_files bersifat opsional, file_link di DB sudah nullable)
         $request->validate([
             'class_id'         => 'required',
             'course_time'      => 'required|string',
             'day1_id'          => 'required|integer',
             'day2_id'          => 'required|integer',
             'note'             => 'required|string',
-            'document_files'   => 'required|array',
-            'document_files.*' => 'required|file|mimes:pdf,docx,jpeg,png,jpg|max:5120',
+            'document_files'   => 'nullable|array',
+            'document_files.*' => 'file|mimes:pdf,docx,jpeg,png,jpg|max:5120',
         ]);
 
         // Menggunakan DB Transaction demi keamanan integritas relasi data
@@ -192,7 +192,7 @@ class PrintOutController extends Controller
 
         try {
             $teacherId = Auth::guard('teacher')->id();
-            $files = $request->file('document_files');
+            $files = $request->file('document_files') ?? [];
 
             // 1. Dapatkan nama teacher yang sedang login (Ganti spasi/simbol dengan underscore)
             $teacherName = Auth::guard('teacher')->user()->name ?? 'Teacher_' . $teacherId;

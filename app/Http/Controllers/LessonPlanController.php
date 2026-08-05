@@ -92,7 +92,7 @@ class LessonPlanController extends Controller
     }
 
     // Fitur: Batasan jam create lesson plan. Hari Minggu tidak boleh sama sekali,
-    // hari Sabtu hanya jam 08:00-13:00, hari lain tidak boleh create data setelah jam 15:00 hari berjalan.
+    // hari Sabtu hanya jam 08:00-13:00, hari lain terkunci jam 15:00-19:00 (boleh di luar itu, termasuk malam s/d 15:00 keesokan harinya).
     private function isWithinCreateWindow()
     {
         $now = Carbon::now();
@@ -105,7 +105,7 @@ class LessonPlanController extends Controller
             return $now->format('H:i') >= '08:00' && $now->format('H:i') <= '13:00';
         }
 
-        return $now->format('H:i') < '15:01';
+        return $now->format('H:i') < '15:00' || $now->format('H:i') > '19:00';
     }
 
     private function createWindowMessage()
@@ -120,7 +120,7 @@ class LessonPlanController extends Controller
             return 'On Saturday, lesson plans can only be created between 08:00 and 13:00.';
         }
 
-        return 'Cannot create data after 15:00 on the current day.';
+        return 'Lesson plans cannot be created between 15:00 and 19:00.';
     }
 
     // Gabungkan dua input page (start & end) jadi satu string dipisah '&', contoh: "1-3" & "5" -> "1-3&5"

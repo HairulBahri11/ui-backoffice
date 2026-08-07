@@ -123,7 +123,8 @@
             return;
         }
 
-        fetch(`/lesson-plan/get-classes?day=${day}`)
+        // cache: 'no-store' + timestamp: cegah browser menampilkan status lock yang basi (stale)
+        fetch(`/lesson-plan/get-classes?day=${day}&_=${Date.now()}`, { cache: 'no-store' })
             .then(response => response.json())
             .then(data => {
                 availableClasses = data;

@@ -275,15 +275,14 @@ class LessonPlanController extends Controller
             // 1. Ambil data lesson plan TERAKHIR untuk kombinasi kelas, jam, guru, DAN hari spesifik ini
             // (for_day membedakan kelas yang jadwalnya 2 hari berbeda, mis. Tuesday & Wednesday,
             // supaya masing-masing hari punya kesempatan create sendiri-sendiri dalam 1 minggu.
-            // Data lama yang for_day-nya masih NULL tetap dianggap mengunci semua hari, sesuai perilaku lama.)
+            // Data lama (dibuat sebelum kolom for_day ada) tidak punya nilai for_day, jadi dianggap
+            // "dibuat untuk day1"-nya masing-masing (day1 selalu terisi di data lama) via COALESCE,
+            // supaya data lama otomatis benar tanpa perlu di-backfill manual satu-satu.
             $lastLessonPlan = DB::table('lesson_plan')
                 ->where('teacher_id', $teacherId)
                 ->where('class', $item->priceid)
                 ->where('course_time', $item->course_time)
-                ->where(function ($query) use ($day) {
-                    $query->where('for_day', $day)
-                        ->orWhereNull('for_day');
-                })
+                ->whereRaw('COALESCE(for_day, day1) = ?', [$day])
                 ->orderBy('created_at', 'desc')
                 ->first();
 

@@ -105,30 +105,10 @@
                             <div class="row">
                                 @foreach ($general as $key => $item)
                                   @php
-
-                                        $student_total = \App\Models\Students::where('priceid', $item->priceid)
-                                            ->where('course_time', $item->course_time)
-                                            ->where('day1', $item->day1)
-                                            ->where('day2', $item->day2)
-                                            ->where('status', 'ACTIVE')
-                                            ->where('id_teacher', $item->id_teacher)
-                                            ->count();
-
-                                             // 2. Ambil data attendance terakhir secara aman
-        $star = DB::table('attendances')
-            ->leftJoin('teacher as t2', 'attendances.assist_id', '=', 't2.id')
-            ->where('attendances.price_id', $item->priceid)
-            ->where('attendances.day1', $item->day1)
-            ->where('attendances.day2', $item->day2)
-            ->where('attendances.course_time', $item->course_time)
-            ->where('attendances.teacher_id', $item->id_teacher)
-            ->select('attendances.star', 't2.name as assist_name', 'attendances.is_presence')
-            ->orderBy('attendances.date', 'asc') // Ambil yang paling baru
-            ->first();
-
-        $assistName = $star ? $star->assist_name : null;
-        $classStar = $star ? $star->star : null; // Simpan star di variabel agar aman  
-                                        
+                                        // Data ini sudah dihitung sekali di controller (batch), tinggal dipakai di sini.
+                                        $student_total = $item->student_total;
+                                        $assistName = $item->assist_name;
+                                        $classStar = $item->star;
                                     @endphp
                                     <div class="col-sm-6 col-md-4 ">
                                         <div class="card">
@@ -140,26 +120,7 @@
                                                             <b>
                                                                 {{ $item->program }}</b>
                                                             @if ($item->is_class_new == true)
-                                                                @php
-                                                                    $already_absent = DB::table('attendances')
-                                                                        ->where([
-                                                                            ['price_id', $item->priceid],
-                                                                            ['day1', $item->day1],
-                                                                            ['day2', $item->day2],
-                                                                            ['course_time', $item->course_time],
-                                                                            ['teacher_id', $item->id_teacher],
-                                                                            ['is_presence', 1],
-                                                                        ])
-                                                                        ->first();
-
-                                                                    if ($already_absent != null) {
-                                                                        $new_label = 'hidden';
-                                                                    } else {
-                                                                        $new_label = '';
-                                                                    }
-                                                                @endphp
-                                                                
-                                                                <span style="color: red" {{ $new_label }}>(New!)</span>
+                                                                <span style="color: red" {{ $item->already_absent ? 'hidden' : '' }}>(New!)</span>
                                                             @endif
 
                                                         </div>
@@ -306,7 +267,7 @@
                                                         @endif
 
                                                         <!-- jika ada star -->
-                                                         @if($star && $star->star != null)
+                                                         @if($classStar !== null)
                                                           <a class="dropdown-item" href="javascript:void(0)" data-toggle="modal" data-target="#removeStarModal"
                                                             data-priceid="{{ $item->program }}"
                                                             data-idteacher="{{ $item->teacher_name }}"
@@ -345,36 +306,10 @@
                             <div class="row">
                                 @foreach ($semiPrivate as $keySemiPrivate => $itemSemiPrivate)
                                  @php
-
-                                        $student_total_semi_private = \App\Models\Students::where(
-                                            'priceid',
-                                            $itemSemiPrivate->priceid,
-                                        )
-                                            ->where('course_time', $itemSemiPrivate->course_time)
-                                            ->where('day1', $itemSemiPrivate->day1)
-                                            ->where('day2', $itemSemiPrivate->day2)
-                                            ->where('status', 'ACTIVE')
-                                            ->where('id_teacher', $itemSemiPrivate->id_teacher)
-                                            ->count();
-
-                                        
-    $star = DB::table('attendances')
-        ->leftJoin('teacher as t2', 'attendances.assist_id', '=', 't2.id')
-        ->where('attendances.price_id', $itemSemiPrivate->priceid)
-        ->where('attendances.day1', $itemSemiPrivate->day1)
-        ->where('attendances.day2', $itemSemiPrivate->day2)
-        ->where('attendances.course_time', $itemSemiPrivate->course_time)
-        ->where('attendances.teacher_id', $itemSemiPrivate->id_teacher)
-        ->select('attendances.*', 't2.name as assist_name')
-        ->orderBy('attendances.date', 'asc') // Tambahkan ini agar mendapat star terbaru
-        ->first();
-
-    // Gunakan null coalescing atau ternary untuk mencegah error
-    $assistName = $star ? $star->assist_name : null;
-    $classStar = $star ? $star->star : null; 
-
-                                        
-                                        
+                                        // Data ini sudah dihitung sekali di controller (batch), tinggal dipakai di sini.
+                                        $student_total_semi_private = $itemSemiPrivate->student_total;
+                                        $assistName = $itemSemiPrivate->assist_name;
+                                        $classStar = $itemSemiPrivate->star;
                                     @endphp
                                     <div class="col-sm-6 col-md-4 ">
                                         <div class="card">
@@ -386,25 +321,7 @@
                                                             <b>
                                                                 {{ $itemSemiPrivate->program }}</b>
                                                             @if ($itemSemiPrivate->is_class_new == true)
-                                                                @php
-                                                                    $already_absent = DB::table('attendances')
-                                                                        ->where([
-                                                                            ['price_id', $item->priceid],
-                                                                            ['day1', $item->day1],
-                                                                            ['day2', $item->day2],
-                                                                            ['course_time', $item->course_time],
-                                                                            ['teacher_id', $item->id_teacher],
-                                                                            ['is_presence', 1],
-                                                                        ])
-                                                                        ->first();
-
-                                                                    if ($already_absent != null) {
-                                                                        $new_label = 'hidden';
-                                                                    } else {
-                                                                        $new_label = '';
-                                                                    }
-                                                                @endphp
-                                                                <span style="color: red" {{ $new_label }}>(New!)</span>
+                                                                <span style="color: red" {{ $itemSemiPrivate->already_absent ? 'hidden' : '' }}>(New!)</span>
                                                             @endif
                                                         </div>
                                                         @if (Auth::guard('staff')->check() == true)
@@ -546,7 +463,7 @@
                                                             data-priceid-fix="{{ $itemSemiPrivate->priceid }}"><i class="fas fa-user-times"></i> Remove Assist</a>
                                                         @endif
                                                         <!-- jika ada star -->
-                                                         @if($star && $star->star != null)
+                                                         @if($classStar !== null)
                                                           <a class="dropdown-item" href="javascript:void(0)" data-toggle="modal" data-target="#removeStarModal"
                                                             data-priceid="{{ $itemSemiPrivate->program }}"
                                                             data-idteacher="{{ $itemSemiPrivate->teacher_name }}"
@@ -580,14 +497,12 @@
                             <div class="row">
                                 @foreach ($private as $key => $item)
                                     @php
-                                        $studentName = DB::table('student')
-                                            ->where('priceid', $item->priceid)
-                                            ->where('day1', $item->day1)
-                                            ->where('day2', $item->day2)
-                                            ->where('id_teacher', $item->id_teacher)
-                                            ->where('course_time', $item->course_time)
-                                            ->groupBy('id')
-                                            ->get();
+                                        // Data ini sudah dihitung sekali di controller (batch), tinggal dipakai di sini.
+                                        // Dulu $star di-query ULANG per siswa di dalam loop bawah, padahal nilainya
+                                        // sama untuk semua siswa dalam 1 kelas private yang sama -> dipindah ke sini.
+                                        $studentName = $item->students;
+                                        $assistName = $item->assist_name;
+                                        $classStar = $item->star;
                                     @endphp
                                     @foreach ($studentName as $keyStudentName => $itemStudentName)
                                         <div class="col-sm-6 col-md-4 ">
@@ -638,23 +553,6 @@
                                                         <br>
                                                         <b>{{ $item->course_time }}</b>
                                                         <span>
-                                                            @php
-    // Ambil data attendance beserta join dalam satu kali panggil secara aman
-    $star = DB::table('attendances')
-        ->leftJoin('teacher as t2', 'attendances.assist_id', '=', 't2.id')
-        ->where('attendances.price_id', $item->priceid)
-        ->where('attendances.day1', $item->day1)
-        ->where('attendances.day2', $item->day2)
-        ->where('attendances.course_time', $item->course_time)
-        ->where('attendances.teacher_id', $item->id_teacher)
-        ->select('attendances.star', 't2.name as assist_name')
-        ->orderBy('attendances.date', 'asc') // Mengambil data absensi terbaru
-        ->first();
-
-    // Definisikan variabel penampung agar tidak error saat dipanggil di bawah
-    $assistName = $star ? $star->assist_name : null;
-    $classStar = $star ? $star->star : null; 
-@endphp
 
                                                            
                                                             @if ($classStar != null)
@@ -862,12 +760,10 @@
 
                                             @php
                                                 $teachers = \App\Models\Teacher::all();
-                                            @endphp
-
-                                            @php
-                                                $day1 = DB::table('day')->get();
-                                                $day2 = DB::table('day')->get();
-                                                $staff = DB::table('staff')->get();
+                                                // $day dan $staff sudah dikirim dari controller, dipakai ulang di sini
+                                                // (dulu di-query lagi di sini, termasuk $day1/$day2 yang isinya duplikat persis sama).
+                                                $day1 = $day;
+                                                $day2 = $day;
                                             @endphp
                                             <div class="boxnya d-flex justify-content-center">
                                                 <select name="transfer_teacher" id="transfer_teacher"

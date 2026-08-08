@@ -82,10 +82,64 @@ class AttendanceController extends Controller
         -- join attendance_details ad on student.id = ad.student_id
         join teacher on student.id_teacher = teacher.id  WHERE day1 is NOT null AND day2 is NOT null AND course_time is NOT null AND id_teacher is NOT null AND student.status = 'ACTIVE' $where ORDER BY priceid ASC, day1,course_time;");
 
+        $day = DB::table('day')->get();
+        $staff = DB::table('staff')->get();
+        $isNew = Attendance::where('is_class_new', '1')->get();
+
+        // ==========================================================================
+        // Optimasi performa: sebelumnya tiap class card di view menjalankan query
+        // terpisah sendiri-sendiri (hitung siswa, ambil star/assist, cek is_presence,
+        // bahkan diulang lagi PER SISWA untuk kelas Private) -> N+1 query yang bikin
+        // halaman ini sangat lambat kalau jumlah kelasnya banyak.
+        // Sekarang semua data pendukung itu diambil sekali jalan (batch) di sini,
+        // lalu ditempel ke tiap baris $class lewat composite key gabungan jadwalnya.
+        // ==========================================================================
+        $classKey = fn ($priceid, $day1, $day2, $courseTime, $teacherId) =>
+            $priceid . '|' . $day1 . '|' . $day2 . '|' . $courseTime . '|' . $teacherId;
+
+        $priceIds = collect($class)->pluck('priceid')->unique()->values();
+
+        // 1. Jumlah siswa aktif per kombinasi kelas (dipakai General & Semi Private)
+        $studentCounts = DB::table('student')
+            ->select('priceid', 'course_time', 'day1', 'day2', 'id_teacher', DB::raw('COUNT(*) as total'))
+            ->where('status', 'ACTIVE')
+            ->whereIn('priceid', $priceIds)
+            ->groupBy('priceid', 'course_time', 'day1', 'day2', 'id_teacher')
+            ->get()
+            ->keyBy(fn ($row) => $classKey($row->priceid, $row->day1, $row->day2, $row->course_time, $row->id_teacher));
+
+        // 2. Daftar siswa per kombinasi kelas (dipakai Private, satu card per siswa)
+        $studentsByClass = DB::table('student')
+            ->select('id', 'name', 'priceid', 'course_time', 'day1', 'day2', 'id_teacher')
+            ->where('status', 'ACTIVE')
+            ->whereIn('priceid', $priceIds)
+            ->get()
+            ->groupBy(fn ($row) => $classKey($row->priceid, $row->day1, $row->day2, $row->course_time, $row->id_teacher));
+
+        // 3. Data attendance (star, assist, status kehadiran) per kombinasi kelas
+        $attendancesByClass = DB::table('attendances')
+            ->leftJoin('teacher as t2', 'attendances.assist_id', '=', 't2.id')
+            ->whereIn('attendances.price_id', $priceIds)
+            ->select('attendances.price_id', 'attendances.day1', 'attendances.day2', 'attendances.course_time', 'attendances.teacher_id', 'attendances.star', 'attendances.is_presence', 'attendances.date', 't2.name as assist_name')
+            ->get()
+            ->groupBy(fn ($row) => $classKey($row->price_id, $row->day1, $row->day2, $row->course_time, $row->teacher_id));
+
         $private = [];
         $general = [];
         $semiPrivate = [];
         foreach ($class as $key => $value) {
+            $ck = $classKey($value->priceid, $value->day1, $value->day2, $value->course_time, $value->id_teacher);
+
+            $value->student_total = $studentCounts[$ck]->total ?? 0;
+            $value->students = $studentsByClass[$ck] ?? collect();
+
+            // Ambil baris attendance sesuai urutan asli (orderBy date ASC lalu ambil yang pertama)
+            $groupAttendances = $attendancesByClass[$ck] ?? collect();
+            $latestAttendance = $groupAttendances->sortBy('date')->first();
+            $value->star = $latestAttendance->star ?? null;
+            $value->assist_name = $latestAttendance->assist_name ?? null;
+            $value->already_absent = $groupAttendances->contains(fn ($row) => $row->is_presence == 1);
+
             if ($value->level == 'Private') {
                 if ($value->program == 'Private') {
                     array_push($private, $value);
@@ -96,19 +150,8 @@ class AttendanceController extends Controller
                 array_push($general, $value);
             }
         }
-        // dd($general);
-        $day = DB::table('day',)->get();
 
-        $isNew = Attendance::where('is_class_new', '1')->get();
-        // // dd($checkAbsent->toArray());
-        // $already_absent = [];
-        // foreach ($checkAbsent as $key => $value) {
-        //     $check = AttendanceDetail::where('attendance_id', $value->id)->where('is_absent', '1')->get();
-        //     array_push($already_absent, $check);
-        // };
-        // dd($already_absent);
-
-        return view('attendance.index', compact('private', 'general', 'day', 'teachers', 'level', 'semiPrivate', 'isNew'));
+        return view('attendance.index', compact('private', 'general', 'day', 'teachers', 'level', 'semiPrivate', 'isNew', 'staff'));
     }
 
 

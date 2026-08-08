@@ -86,7 +86,8 @@ class ScoreController extends Controller
      */
     public function create(Request $request)
     {
-        if ($this->isScoreActionBlocked()) {
+        // Batasan jam dinonaktifkan sementara untuk mode edit (type=edit), masih berlaku untuk create
+        if ($request->type !== 'edit' && $this->isScoreActionBlocked()) {
             return redirect()->back()->with('error', $this->scoreBlockedMessage());
         }
 
@@ -238,9 +239,10 @@ class ScoreController extends Controller
      */
     public function update(Request $request, $score)
     {
-        if ($this->isScoreActionBlocked()) {
-            return back()->with('error', $this->scoreBlockedMessage());
-        }
+        // Batasan jam dinonaktifkan sementara untuk edit
+        // if ($this->isScoreActionBlocked()) {
+        //     return back()->with('error', $this->scoreBlockedMessage());
+        // }
 
         // return $request->all();
         try {

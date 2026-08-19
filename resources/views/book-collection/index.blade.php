@@ -7,7 +7,7 @@
             <div class="d-flex align-items-left align-items-md-center flex-column flex-md-row">
                 <div>
                     <h2 class="text-white pb-2 fw-bold">Book Collection</h2>
-                    <h5 class="text-white op-7 mb-2">List of book collections awaiting distribution to certification and failed-promoted students.</h5>
+                    <h5 class="text-white op-7 mb-2">List of book/booklet collections for certification and failed-promoted students, including payment and pickup status.</h5>
                 </div>
             </div>
         </div>
@@ -30,8 +30,8 @@
             <div class="col-md-12">
                 <div class="card">
                     <div class="card-header d-flex justify-content-between align-items-center">
-                        <h4 class="card-title">Pending Distribution</h4>
-                        <span class="badge badge-warning">{{ count($data) }} Students Pending</span>
+                        <h4 class="card-title">Book Collection Status</h4>
+                        <span class="badge badge-warning">{{ count($data) }} Students</span>
                     </div>
                     <div class="card-body">
                         <div class="table-responsive">
@@ -43,11 +43,16 @@
                                         <th>Level / Program</th>
                                         <th>Teacher</th>
                                         <th>Status</th>
+                                        <th>Date Taken</th>
                                         <th class="text-center">Action</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     @foreach ($data as $item)
+                                    @php
+                                        $isPaid = $item->payment_status !== 'UNPAID';
+                                        $isTaken = $item->payment_status === 'TAKEN' || $item->is_book_taken == 1;
+                                    @endphp
                                     <tr>
                                         <td>
                                             <strong>{{ ucwords($item->student_name) }}</strong>
@@ -66,9 +71,9 @@
                                         <td class="fw-bold">{{ $item->program.' - '. $item->day_one_name. ' - '.$item->day_two_name.' - '.$item->course_time }}</td>
                                         <td>{{ ucwords($item->teacher_name) }}</td>
                                         <td>
-                                            @if($item->payment_status == 'READY TO TAKE')
+                                            @if($isPaid)
                                             <span class="badge badge-success" style="background: #d4edda; color: #155724; border: 1px solid #c3e6cb;">
-                                                <i class="fas fa-check-circle mr-1"></i> Ready to Take (PAID)
+                                                <i class="fas fa-check-circle mr-1"></i> Paid
                                             </span>
                                             @else
                                             <span class="badge badge-danger" style="background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb;">
@@ -76,12 +81,15 @@
                                             </span>
                                             @endif
                                         </td>
+                                        <td>
+                                            @if($item->book_taken_at)
+                                            {{ \Carbon\Carbon::parse($item->book_taken_at)->format('d M Y, H:i') }}
+                                            @else
+                                            <span class="text-muted">-</span>
+                                            @endif
+                                        </td>
                                         <td class="text-center">
-                                            {{--
-                                                Silakan sesuaikan kondisi di bawah ini dengan kolom penanda di database Anda.
-                                                Contoh di bawah memeriksa jika properti status bernilai 'TAKEN' atau 'SUDAH DIAMBIL'
-                                            --}}
-                                            @if(isset($item->collection_status) && ($item->collection_status == 'TAKEN' || $item->collection_status == 'SUDAH DIAMBIL') || (isset($item->is_taken) && $item->is_taken == 1) || (isset($item->is_book_taken) && $item->is_book_taken == 1))
+                                            @if($isTaken)
                                             <span class="badge badge-count" style="background: #e0e0e0; color: #424242; font-weight: bold; padding: 5px 10px;">
                                                 Already Collected
                                             </span>
@@ -91,17 +99,16 @@
                                                 @csrf
                                                 <input type="hidden" name="item_ids" value="{{ $item->combined_ids }}">
                                                 <input type="hidden" name="studentid" value="{{ $item->studentid }}">
+                                                <input type="hidden" name="teacher_id" value="{{ $item->teacher_id }}">
+                                                <input type="hidden" name="price_id" value="{{ $item->price_id }}">
+                                                <input type="hidden" name="day_1" value="{{ $item->day_1_id }}">
+                                                <input type="hidden" name="day_2" value="{{ $item->day_2_id }}">
+                                                <input type="hidden" name="course_time" value="{{ $item->course_time }}">
+                                                <input type="hidden" name="book_taken" value="{{ $item->combined_categories }}">
 
-                                                @if($item->payment_status == 'READY TO TAKE')
-                                                <button type="button" class="btn btn-sm btn-success btn-round btn-confirm-take" data-name="{{ $item->student_name }}" data-paid="true">
+                                                <button type="button" class="btn btn-sm btn-success btn-round btn-confirm-take" data-name="{{ $item->student_name }}" data-paid="{{ $isPaid ? 'true' : 'false' }}">
                                                     <i class="fas fa-check-double mr-1"></i> Mark as Taken
                                                 </button>
-                                                @else
-
-                                                <button type="button" class="btn btn-sm btn-success btn-round btn-confirm-take" data-name="{{ $item->student_name }}" data-paid="false">
-                                                    <i class="fas fa-check-double mr-1"></i> Mark as Taken
-                                                </button>
-                                                @endif
                                             </form>
                                             @endif
                                         </td>

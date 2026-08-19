@@ -251,12 +251,7 @@
     <!-- Section 1: Topic/Textbook -->
     <div class="form-group px-0 py-1 mb-2">
         <label class="mb-1 fw-bold text-dark">Topic/Textbook <span class="text-danger">*</span></label>
-        <!-- Range input untuk halaman/bab, contoh: "1-3" & "5" -> tersimpan "1-3&5" -->
-        <div class="d-flex align-items-center mb-2">
-            <input type="text" class="form-control text-center" name="plans[${index}][topic_start]" style="width: 80px;" placeholder="e.g. 1-3">
-            <span class="mx-2 fw-bold">&amp;</span>
-            <input type="text" class="form-control text-center" name="plans[${index}][topic_end]" style="width: 80px;" placeholder="e.g. 5 (optional)">
-        </div>
+        <input type="text" class="form-control mb-2" name="plans[${index}][topic_page]" placeholder="e.g. 1-3 & 5 (optional)">
         <!-- Input teks utama untuk topik -->
         <input type="text" class="form-control" name="plans[${index}][topic]" required placeholder="e.g., Bedouin People">
     </div>
@@ -264,12 +259,7 @@
     <!-- Section 2: Flashcards -->
     <div class="form-group px-0 py-1 mb-2">
         <label class="mb-1 fw-bold text-dark">Flashcards</label>
-        <!-- Range input untuk nomor flashcard, contoh: "1-3" & "5" -> tersimpan "1-3&5" -->
-        <div class="d-flex align-items-center">
-            <input type="text" class="form-control text-center" name="plans[${index}][flashcards_start]" style="width: 80px;" placeholder="e.g. 1-3">
-            <span class="mx-2 fw-bold">&amp;</span>
-            <input type="text" class="form-control text-center" name="plans[${index}][flashcards_end]" style="width: 80px;" placeholder="e.g. 5 (optional)">
-        </div>
+        <input type="text" class="form-control" name="plans[${index}][flashcard_page]" placeholder="e.g. 1-3 & 5 (optional)">
     </div>
 
     <!-- Section 3: Exercise/Supplement -->

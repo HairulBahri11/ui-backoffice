@@ -123,27 +123,6 @@ class LessonPlanController extends Controller
         return 'Lesson plans cannot be created between 15:00 and 19:00.';
     }
 
-    // Gabungkan dua input page (start & end) jadi satu string dipisah '&', contoh: "1-3" & "5" -> "1-3&5"
-    private function combinePageRange($start, $end)
-    {
-        $start = trim((string) $start);
-        $end = trim((string) $end);
-
-        if ($start === '' && $end === '') {
-            return null;
-        }
-
-        if ($start === '') {
-            return $end;
-        }
-
-        if ($end === '') {
-            return $start;
-        }
-
-        return $start . '&' . $end;
-    }
-
     // Fungsi helper privat untuk mengecek validasi waktu edit/update sesuai Fitur 1
     private function isEditable($createdAt)
     {
@@ -196,21 +175,13 @@ class LessonPlanController extends Controller
         }
 
         $request->validate([
-            'topic'       => 'required|string|max:255',
-            'flashcards'  => 'nullable|string',
-            'exercise'    => 'nullable|string',
-            'activity'    => 'nullable|string',
-            'topic_start' => 'nullable|string|max:50',
-            'topic_end'   => 'nullable|string|max:50',
-            'flashcards_start' => 'nullable|string|max:50',
-            'flashcards_end' => 'nullable|string|max:50',
+            'topic'          => 'required|string|max:255',
+            'topic_page'     => 'nullable|string|max:100',
+            'flashcards'     => 'nullable|string',
+            'flashcard_page' => 'nullable|string|max:100',
+            'exercise'       => 'nullable|string',
+            'activity'       => 'nullable|string',
         ]);
-
-        // 1. Gabungkan range Topic/Textbook, contoh: "1-3" & "5" -> "1-3&5"
-        $topicPage = $this->combinePageRange($request->topic_start, $request->topic_end);
-
-        // 2. Gabungkan range Flashcards (opsional, cek jika diisi)
-        $flashcardPage = $this->combinePageRange($request->flashcards_start, $request->flashcards_end);
 
         DB::table('lesson_plan')
             ->where('id', $id)
@@ -219,8 +190,8 @@ class LessonPlanController extends Controller
                 'flashcards' => $request->flashcards,
                 'exercise'   => $request->exercise,
                 'activity'   => $request->activity,
-                'topic_page' => $topicPage,
-                'flashcard_page' => $flashcardPage,
+                'topic_page' => $request->topic_page,
+                'flashcard_page' => $request->flashcard_page,
             ]);
 
         return redirect()->route('lesson-plan.index')->with('success', 'Lesson Plan Updated Successfully!');
@@ -370,8 +341,8 @@ class LessonPlanController extends Controller
                     'flashcards'   => $plan['flashcards'] ?? '-',
                     'exercise'     => $plan['exercise'] ?? '-',
                     'activity'     => $plan['activity'] ?? '-',
-                    'topic_page'   => $this->combinePageRange($plan['topic_start'] ?? null, $plan['topic_end'] ?? null) ?? '-',
-                    'flashcard_page' => $this->combinePageRange($plan['flashcards_start'] ?? null, $plan['flashcards_end'] ?? null) ?? '-',
+                    'topic_page'   => $plan['topic_page'] ?? '-',
+                    'flashcard_page' => $plan['flashcard_page'] ?? '-',
                     'created_at'   => now(),
                 ]);
                 $insertedCount++;

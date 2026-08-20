@@ -973,9 +973,8 @@
                                         <br>Text Book : {{ $item->topic_page != null ? $item->topic_page : '-' }}
                                         <br>Exercise Book :
                                         {{ $item->excercise_book != null ? $item->excercise_book : '-' }}
-                                        <br>Flashcard Page : {{ $item->flashcard_page != null ? $item->flashcard_page : '-' }}
+                                        <br>Flashcard : {{ $item->flashcard_page != null ? $item->flashcard_page : '-' }}
                                         <br>Class Activity : {{ $item->activity_class != null ? $item->activity_class : '-' }}
-                                        <br>Topic : {{ $item->activity != null ? $item->activity : '-' }}
                                     </p>
 
                                 </div>
@@ -1696,9 +1695,8 @@
                     <p>${agenda.activity || '-'}</p>
                     <p><strong>Text Book:</strong> ${agenda.topic_page || '-'}</p>
                     <p><strong>Exercise Book:</strong> ${agenda.excercise_book || '-'}</p>
-                    <p><strong>Flashcard Page:</strong> ${agenda.flashcard_page || '-'}</p>
+                    <p><strong>Flashcard:</strong> ${agenda.flashcard_page || '-'}</p>
                     <p><strong>Class Activity:</strong> ${agenda.activity_class || '-'}</p>
-                    <p><strong>Topic:</strong> ${agenda.activity || '-'}</p>
                 </div>
             </div>
         `;

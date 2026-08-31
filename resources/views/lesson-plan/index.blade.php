@@ -127,6 +127,11 @@
                                     <i class="fas fa-database mr-1"></i> Showing: All Data History
                                 </span>
                                 @endif
+                                @if($effectiveDayFilter)
+                                <span class="badge badge-count badge-warning ml-2" style="font-size: 11px; padding: 4px 10px;">
+                                    <i class="fas fa-calendar-day mr-1"></i>{{ $dayOptions[$effectiveDayFilter] ?? $effectiveDayFilter }}
+                                </span>
+                                @endif
                             </div>
 
                             <div class="d-flex align-items-center mt-2 mt-md-0">

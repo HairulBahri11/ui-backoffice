@@ -211,7 +211,7 @@
                                                 $isBeforeThreePm = now()->format('H:i') < '15:00' ;
                                                     $isPastDays=\Carbon\Carbon::parse($item->created_at)->isPast() && !$isCreatedToday;
                                                     $canEdit = ($isCreatedToday && $isBeforeThreePm) || $isPastDays;
-                                                    $canDelete = $isCreatedToday;
+                                                    $canDelete = $canEdit;
                                                     @endphp
 
                                                     @if($canEdit)
@@ -230,7 +230,7 @@
                                                         <i class="fas fa-trash"></i>
                                                     </button>
                                                     @else
-                                                    <button type="button" class="btn btn-xs btn-secondary" title="Deleting Locked (past creation day)" disabled>
+                                                    <button type="button" class="btn btn-xs btn-secondary" title="Deleting Locked" disabled>
                                                         <i class="fas fa-lock"></i>
                                                     </button>
                                                     @endif

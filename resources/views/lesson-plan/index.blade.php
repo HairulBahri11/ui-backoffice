@@ -230,7 +230,7 @@
                                                         <i class="fas fa-trash"></i>
                                                     </button>
                                                     @else
-                                                    <button type="button" class="btn btn-xs btn-secondary" title="Deleting Locked" disabled>
+                                                    <button type="button" class="btn btn-xs btn-danger" title="Deleting Locked" disabled>
                                                         <i class="fas fa-lock"></i>
                                                     </button>
                                                     @endif

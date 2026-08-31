@@ -18,6 +18,7 @@ class LessonPlanController extends Controller
         $currentDayOfWeek = Carbon::now()->dayOfWeekIso;
 
         $query = LessonPlan::with(['teacher', 'price']);
+        $effectiveDayFilter = null;
 
         // ==========================================
         // FILTER DEFAULT: HANYA MINGGU INI 
@@ -36,11 +37,13 @@ class LessonPlanController extends Controller
             $query->where('teacher_id', $teacherId);
 
             // Filter hari untuk teacher (jika tidak dipilih, default ke hari berjalan)
+            // Pakai for_day (hari spesifik saat lesson plan dibuat), bukan day1/day2 (jadwal tetap kelas),
+            // supaya kelas yang jadwalnya 2 hari beda (mis. Monday & Wednesday) tidak dobel tampil di kedua hari.
+            // Data lama tanpa for_day dianggap dibuat untuk day1-nya via COALESCE.
             $dayFilter = $request->query('day', $currentDayOfWeek);
             if ($dayFilter) {
-                $query->where(function ($q) use ($dayFilter) {
-                    $q->where('day1', $dayFilter)->orWhere('day2', $dayFilter);
-                });
+                $query->whereRaw('COALESCE(for_day, day1) = ?', [$dayFilter]);
+                $effectiveDayFilter = $dayFilter;
             }
         } else {
             // Fitur 4: Superadmin Area dengan multi-filter (Teacher, Day, Tanggal, Class)
@@ -50,14 +53,12 @@ class LessonPlanController extends Controller
 
             if ($request->filled('day')) {
                 $dayFilter = $request->day;
-                $query->where(function ($q) use ($dayFilter) {
-                    $q->where('day1', $dayFilter)->orWhere('day2', $dayFilter);
-                });
+                $query->whereRaw('COALESCE(for_day, day1) = ?', [$dayFilter]);
+                $effectiveDayFilter = $dayFilter;
             } else if (!$request->filled('teacher_id') && !$request->filled('date') && !$request->filled('class_id')) {
                 // Jika superadmin tidak memfilter apapun, default tampilkan hari berjalan
-                $query->where(function ($q) use ($currentDayOfWeek) {
-                    $q->where('day1', $currentDayOfWeek)->orWhere('day2', $currentDayOfWeek);
-                });
+                $query->whereRaw('COALESCE(for_day, day1) = ?', [$currentDayOfWeek]);
+                $effectiveDayFilter = $currentDayOfWeek;
             }
 
             if ($request->filled('date')) {
@@ -75,7 +76,7 @@ class LessonPlanController extends Controller
         $teachers = DB::table('teacher')->get();
         $classes = DB::table('price')->get();
 
-        return view('lesson-plan.index', compact('lessonPlans', 'teachers', 'classes'));
+        return view('lesson-plan.index', compact('lessonPlans', 'teachers', 'classes', 'effectiveDayFilter'));
     }
 
     public function create()

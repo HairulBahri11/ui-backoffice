@@ -1582,6 +1582,16 @@ class AttendanceController extends Controller
         return view('attendance.mutasi', compact('data', 'students', 'price'));
     }
 
+    public function historyAttendance(Request $request)
+    {
+        try {
+            $students = Students::where('status', 'ACTIVE')->orderBy('id', 'asc')->get();
+            return view('attendance.history', compact('students'));
+        } catch (\Throwable $th) {
+            //throw $th;
+        }
+    }
+
     public function storeMutasi(Request $request)
     {
         try {

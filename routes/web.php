@@ -111,6 +111,7 @@ Route::middleware(['web'])->group(function () {
     });
     Route::get('/mutasi', [AttendanceController::class, 'mutasi']);
     Route::post('/mutasi', [AttendanceController::class, 'storeMutasi']);
+    Route::get('/history-attendance', [AttendanceController::class, 'historyAttendance']);
     Route::get('/reedemPoint', [ReedemPointController::class, 'create']);
     Route::post('/reedemPoint', [ReedemPointController::class, 'store']);
     Route::get('/saldo-awal', [ReedemPointController::class, 'saldoAwal']);

@@ -140,6 +140,13 @@
                     </a>
 
                 </li>
+                <li class="nav-item {{ Request::segment(1) == 'history-attendance' ? 'active' : '' }}">
+                    <a href="{{ url('/history-attendance') }}" class="collapsed">
+                        <i class="fas fa-book"></i>
+                        <p>Attendance History</p>
+                    </a>
+
+                </li>
 
                 @if ((Auth::guard('staff')->check() && Auth::guard('staff')->user()->id == 7) ||
                 (Auth::guard('teacher')->check() && Auth::guard('teacher')->user()->id == 21))

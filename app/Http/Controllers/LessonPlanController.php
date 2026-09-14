@@ -157,7 +157,13 @@ class LessonPlanController extends Controller
 
         $totalStudents = DB::table('student')
             ->where('priceid', $item->class)
+            ->where('course_time', $item->course_time)
+            ->where('id_teacher', $item->teacher_id)
             ->where('status', 'ACTIVE')
+            ->where(function ($query) use ($item) {
+                $query->where('day1', $item->day1)
+                    ->orWhere('day2', $item->day2);
+            })
             ->count();
 
         return view('lesson-plan.edit', compact('item', 'totalStudents'));
@@ -368,6 +374,8 @@ class LessonPlanController extends Controller
         $totalStudents = DB::table('student')
             ->where('priceid', $item->class)
             ->where('course_time', $item->course_time)
+            ->where('id_teacher', $item->teacher_id)
+            ->where('status', 'ACTIVE')
             ->where(function ($query) use ($item) {
                 $query->where('day1', $item->day1)
                     ->orWhere('day2', $item->day2);

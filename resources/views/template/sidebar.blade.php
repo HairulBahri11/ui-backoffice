@@ -51,7 +51,7 @@
 
                 </li>
 
-                @if (Auth::guard('teacher')->user() == null)
+                @if (Auth::guard('teacher')->user() == null || Auth::guard('teacher')->user()->id == 33)
                 <li
                     class="nav-item {{ Request::segment(1) == 'advertise' || Request::segment(1) == 'announces' || Request::segment(1) == 'pointCategories' || Request::segment(1) == 'reedemItems' || Request::segment(1) == 'testMaster' || Request::segment(1) == 'tests' || Request::segment(1) == 'parents' ? 'active' : '' }} submenu">
                     <a data-toggle="collapse" href="#tables">
@@ -106,7 +106,7 @@
                 </li>
                 <!-- book-collection -->
 
-                @if(Auth::guard('staff')->check() == true)
+                @if(Auth::guard('staff')->check() == true || (Auth::guard('teacher')->check() && Auth::guard('teacher')->user()->id == 33))
                 <li class="nav-item {{ Request::segment(1) == 'book-collection' ? 'active' : '' }}">
                     <a href="{{ url('/book-collection') }}" class="collapsed">
                         <i class="fas fa-book-open"></i>
@@ -118,7 +118,7 @@
 
 
 
-                @if (Auth::guard('staff')->check() == true)
+                @if (Auth::guard('staff')->check() == true || (Auth::guard('teacher')->check() && Auth::guard('teacher')->user()->id == 33))
                 <li class="nav-item {{ Request::segment(1) == 'extra-point' ? 'active' : '' }}">
                     <a href="{{ url('/extra-point') }}" class="collapsed">
                         <i class="fas fa-star"></i>
@@ -149,7 +149,7 @@
                 </li>
 
                 @if ((Auth::guard('staff')->check() && Auth::guard('staff')->user()->id == 7) ||
-                (Auth::guard('teacher')->check() && Auth::guard('teacher')->user()->id == 21))
+                (Auth::guard('teacher')->check() && (Auth::guard('teacher')->user()->id == 21 || Auth::guard('teacher')->user()->id == 33)))
                 <li class="nav-item {{ Request::segment(1) == 'class-info' ? 'active' : '' }}">
                     <a href="{{ url('/class-info') }}" class="collapsed">
                         <i class="fas fa-info"></i>
@@ -157,7 +157,7 @@
                     </a>
                 </li>
                 @endif
-                @if (Auth::guard('teacher')->user() == null)
+                @if (Auth::guard('teacher')->user() == null || Auth::guard('teacher')->user()->id == 33)
                 <li class="nav-item {{ Request::segment(1) == 'history-test' ? 'active' : '' }}">
                     <a href="{{ url('/history-test') }}" class="collapsed">
                         <i class="fas fa-book"></i>
@@ -185,6 +185,9 @@
                         <p>Absence Reminder</p>
                     </a>
                 </li>
+                @endif
+                @if ((Auth::guard('staff')->user() == true && in_array(Auth::guard('staff')->user()->id, [1, 7])) ||
+                (Auth::guard('teacher')->check() && Auth::guard('teacher')->user()->id == 33))
                 <li class="nav-item {{ Request::segment(1) == 'birthday-point' ? 'active' : '' }}">
                     <a href="{{ url('/birthday-point') }}" class="collapsed">
                         <i class="fas fa-birthday-cake"></i>
@@ -215,7 +218,7 @@
                 </li>
 
                 @endif
-                @if (Auth::guard('staff')->check() == true)
+                @if (Auth::guard('staff')->check() == true || (Auth::guard('teacher')->check() && Auth::guard('teacher')->user()->id == 33))
                 <!-- teacher notes -->
                 <li class="nav-item {{ Request::segment(1) == 'teacher-notes' ? 'active' : '' }}">
                     <a href="{{ url('/teacher-notes') }}" class="collapsed">
@@ -225,7 +228,7 @@
                 </li>
                 @endif
                 @if ((Auth::guard('staff')->check()) ||
-                (Auth::guard('teacher')->check() && Auth::guard('teacher')->user()->id == 21))
+                (Auth::guard('teacher')->check() && (Auth::guard('teacher')->user()->id == 21 || Auth::guard('teacher')->user()->id == 33)))
                 <li class="nav-item {{ Request::segment(1) == 'saldo-awal' ? 'active' : '' }}">
                     <a href="{{ url('/saldo-awal') }}" class="collapsed">
                         <i class="fas fa-upload"></i>
@@ -266,7 +269,7 @@
                     </a>
 
                 </li>
-                @if (Auth::guard('teacher')->user() == null)
+                @if (Auth::guard('teacher')->user() == null || Auth::guard('teacher')->user()->id == 33)
 
                 <li class="nav-item {{ Request::segment(1) == 'history-certificate' ? 'active' : '' }}">
                     <a href="{{ url('/history-certificate') }}" class="collapsed">
@@ -279,20 +282,25 @@
 
                 @endif
 
-                @if (Auth::guard('staff')->check() && in_array(Auth::guard('staff')->user()->id, [2, 7]))
+                @if ((Auth::guard('staff')->check() && in_array(Auth::guard('staff')->user()->id, [2, 7])) ||
+                (Auth::guard('teacher')->check() && Auth::guard('teacher')->user()->id == 33))
                 <li class="nav-item {{ Request::segment(1) == 'e-certificate' ? 'active' : '' }}">
                     <a href="{{ url('/e-certificate') }}" class="collapsed">
                         <i class="fas fa-certificate"></i>
                         <p>Certificate Authorization</p>
                     </a>
                 </li>
+                @endif
+                @if (Auth::guard('staff')->check() && in_array(Auth::guard('staff')->user()->id, [2, 7]))
                 <li class="nav-item {{ Request::segment(1) == 'print-out' ? 'active' : '' }}">
                     <a href="{{ url('/print-out') }}" class="collapsed">
                         <i class="fas fa-print"></i>
                         <p>Print Out</p>
                     </a>
                 </li>
-
+                @endif
+                @if ((Auth::guard('staff')->check() && in_array(Auth::guard('staff')->user()->id, [2, 7])) ||
+                (Auth::guard('teacher')->check() && Auth::guard('teacher')->user()->id == 33))
                 <li class="nav-item {{ Request::segment(1) == 'calendar-academic' ? 'active' : '' }}">
                     <a href="{{ url('/calendar-academic') }}" class="collapsed">
                         <i class="fas fa-calendar-alt"></i>
@@ -317,7 +325,7 @@
 
 
                 @if ((Auth::guard('staff')->check() && Auth::guard('staff')->user()->id == 7) ||
-                (Auth::guard('teacher')->check() && Auth::guard('teacher')->user()->id == 21))
+                (Auth::guard('teacher')->check() && (Auth::guard('teacher')->user()->id == 21 || Auth::guard('teacher')->user()->id == 33)))
                 <li class="nav-item {{ Request::segment(1) == 'history-chat' ? 'active' : '' }}">
                     <a href="{{ url('/history-chat') }}" class="collapsed">
                         <i class="fas fa-comments"></i>

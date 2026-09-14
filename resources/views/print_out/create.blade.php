@@ -49,6 +49,11 @@
                             </div>
                         </div>
                         <div class="card-body d-flex flex-column justify-content-center">
+
+                            <div class="form-group">
+                                <label for="due_date" class="font-weight-bold">Due Date <span class="text-danger">*</span></label>
+                                <input type="date" class="form-control border-success" id="due_date" name="due_date" value="{{ old('due_date') }}" required>
+                            </div>
                             <div class="form-group pt-0">
                                 <label for="schedule_select" class="font-weight-bold">Select Active Schedule <span class="text-danger">*</span></label>
                                 <select class="form-control form-control-lg border-primary" id="schedule_select" required>
@@ -92,10 +97,10 @@
                                 <label for="note" class="font-weight-bold">Notes / Special Instructions (Applies to all files) <span class="text-danger">*</span></label>
                                 <textarea class="form-control border-success" id="note" name="note" rows="8" placeholder="Please write instructions here (e.g., Print double-sided, Page 1-5 only, Black &amp; White, number of copies...)" required>{{ old('note') }}</textarea>
                             </div>
-                            <!-- due date -->
+
                             <div class="form-group">
-                                <label for="due_date" class="font-weight-bold">Due Date <span class="text-danger">*</span></label>
-                                <input type="date" class="form-control border-success" id="due_date" name="due_date" value="{{ old('due_date') }}" required>
+                                <label for="link" class="font-weight-bold">Link</label>
+                                <input type="text" class="form-control border-success" id="link" name="link" value="{{ old('link') }}" placeholder="Optional: Provide a link to the document if applicable">
                             </div>
 
                         </div>
@@ -132,19 +137,67 @@
         }
     });
 
-    // Perbaikan selektor penangkapan berkas real-time
-    document.getElementById('document_file').addEventListener('change', function(e) {
+    // Akumulasi file yang dipilih, karena input file native akan mengganti
+    // seluruh FileList tiap kali dialog dibuka, bukan menambahkannya.
+    const fileInput = document.getElementById('document_file');
+    let selectedFiles = [];
+
+    function renderFileList() {
         const previewContainer = document.getElementById('file_list_preview');
         previewContainer.innerHTML = '';
 
-        if (e.target.files.length > 0) {
-            Array.from(e.target.files).forEach(file => {
-                const badge = document.createElement('div');
-                badge.className = 'badge badge-success text-wrap p-2 m-1 d-inline-block';
-                badge.innerHTML = '<i class="fas fa-file mr-1"></i> ' + file.name;
-                previewContainer.appendChild(badge);
+        selectedFiles.forEach((file, index) => {
+            const badge = document.createElement('span');
+            badge.className = 'badge badge-success p-2 m-1 d-inline-flex align-items-center';
+            badge.style.maxWidth = '100%';
+
+            const icon = document.createElement('i');
+            icon.className = 'fas fa-file mr-1';
+            badge.appendChild(icon);
+
+            const nameSpan = document.createElement('span');
+            nameSpan.textContent = file.name;
+            nameSpan.title = file.name;
+            nameSpan.style.overflow = 'hidden';
+            nameSpan.style.textOverflow = 'ellipsis';
+            nameSpan.style.whiteSpace = 'nowrap';
+            nameSpan.style.maxWidth = '220px';
+            badge.appendChild(nameSpan);
+
+            const removeIcon = document.createElement('i');
+            removeIcon.className = 'fas fa-times ml-2';
+            removeIcon.style.cursor = 'pointer';
+            removeIcon.addEventListener('click', function() {
+                selectedFiles.splice(index, 1);
+                syncInputFiles();
+                renderFileList();
             });
-        }
+            badge.appendChild(removeIcon);
+
+            previewContainer.appendChild(badge);
+        });
+    }
+
+    function syncInputFiles() {
+        const dataTransfer = new DataTransfer();
+        selectedFiles.forEach(file => dataTransfer.items.add(file));
+        fileInput.files = dataTransfer.files;
+    }
+
+    fileInput.addEventListener('change', function(e) {
+        Array.from(e.target.files).forEach(newFile => {
+            const isDuplicate = selectedFiles.some(file =>
+                file.name === newFile.name &&
+                file.size === newFile.size &&
+                file.lastModified === newFile.lastModified
+            );
+            if (!isDuplicate) {
+                selectedFiles.push(newFile);
+            }
+        });
+
+        syncInputFiles();
+        renderFileList();
     });
 </script>
 @endsection

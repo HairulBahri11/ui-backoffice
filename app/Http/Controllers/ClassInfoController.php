@@ -19,7 +19,7 @@ class ClassInfoController extends Controller
 
         $grouped_data = collect();
 
-        if (Auth::guard('staff')->check()) {
+        if (Auth::guard('staff')->check() || (Auth::guard('teacher')->check() && Auth::guard('teacher')->user()->id == 33)) {
 
             if ($request->filled('class') || $request->filled('teacher')) {
 

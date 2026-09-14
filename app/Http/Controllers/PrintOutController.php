@@ -185,6 +185,7 @@ class PrintOutController extends Controller
             'note'             => 'required|string',
             'document_files'   => 'nullable|array',
             'document_files.*' => 'file|mimes:pdf,docx,jpeg,png,jpg|max:5120',
+            'link'             => 'nullable|string|max:255',
         ]);
 
         // Menggunakan DB Transaction demi keamanan integritas relasi data
@@ -216,6 +217,7 @@ class PrintOutController extends Controller
                 'note'        => $request->note, // Catatan global
                 'teacher_id'  => $teacherId,
                 'due_date'    => $request->due_date, // Men
+                'link'        => $request->link, // Menyimpan link opsional
                 'created_at'  => now(),
                 'updated_at'  => now()
             ]);

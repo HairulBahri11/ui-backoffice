@@ -30,16 +30,16 @@ class ScoreController extends Controller
         try {
             $where = '';
             $level = Price::get();
-            if (Auth::guard('teacher')->check() == true) {
+            if (Auth::guard('teacher')->check() == true && Auth::guard('teacher')->user()->id != 33) {
                 $where = 'AND id_teacher = ' . Auth::guard('teacher')->user()->id;
             }
             if ($request->branch && Auth::guard('staff')->check() == true) {
                 $where = $where . ' AND branch_id = ' . $request->branch;
             }
-            if ($request->level && Auth::guard('staff')->check() == true) {
+            if ($request->level && (Auth::guard('staff')->check() == true || (Auth::guard('teacher')->check() == true && Auth::guard('teacher')->user()->id == 33))) {
                 $where = $where . ' AND priceid = ' . $request->level;
             }
-            if ($request->level && Auth::guard('teacher')->check() == true) {
+            if ($request->level && Auth::guard('teacher')->check() == true && Auth::guard('teacher')->user()->id != 33) {
                 $where = $where . ' AND priceid = ' . $request->level . ' AND id_teacher =' . Auth::guard('teacher')->user()->id;
             }
             $class = DB::select("SELECT DISTINCT priceid,day1,day2,course_time,id_teacher,price.level,price.program,day_1.day day_one,day_2.day day_two,teacher.name teacher_name,

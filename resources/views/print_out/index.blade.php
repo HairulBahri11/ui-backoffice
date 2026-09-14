@@ -61,6 +61,7 @@
                                         <th>Total Files</th>
                                         <th>Created On</th>
                                         <th>Due Date</th>
+                                        <th class="text-center">Link</th>
                                         <th class="text-center" style="width: 15%">Action</th>
                                     </tr>
                                 </thead>
@@ -107,6 +108,9 @@
                                         </td>
                                         <td>{{ \Carbon\Carbon::parse($item->created_at)->format('d M Y h:i A') }}</td>
                                         <td>{{ \Carbon\Carbon::parse($item->due_date)->format('d M Y') }}</td>
+                                        <td class="text-center">
+                                            {{ $item->link ?? '-' }}
+                                        </td>
                                         <td class="text-center">
                                             <div class="d-flex flex-row justify-content-center align-items-center">
                                                 <button type="button"

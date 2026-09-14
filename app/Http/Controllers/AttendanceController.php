@@ -32,7 +32,7 @@ class AttendanceController extends Controller
         $where = '';
         $teachers = Teacher::where('status', 'active')->get();
         $level = Price::get();
-        if (Auth::guard('teacher')->check() == true) {
+        if (Auth::guard('teacher')->check() == true && Auth::guard('teacher')->user()->id != 33) {
             $where = 'AND id_teacher = ' . Auth::guard('teacher')->user()->id;
         }
         if (Auth::guard('staff')->check() && !in_array(Auth::guard('staff')->user()->id, [1, 2, 4, 3, 10, 7, 6])) {
@@ -44,14 +44,17 @@ class AttendanceController extends Controller
         if ($request->branch) {
             $where = $where . ' AND branch_id = ' . $request->branch;
         }
-        if ($request->level && Auth::guard('staff')->check() == true) {
+        if ($request->level && (Auth::guard('staff')->check() == true || (Auth::guard('teacher')->check() == true && Auth::guard('teacher')->user()->id == 33))) {
             $where = $where . ' AND priceid = ' . $request->level;
         }
-        if ($request->level && Auth::guard('teacher')->check() == true) {
+        if ($request->level && Auth::guard('teacher')->check() == true && Auth::guard('teacher')->user()->id != 33) {
             $where = $where . ' AND priceid = ' . $request->level . ' AND id_teacher =' . Auth::guard('teacher')->user()->id;
         }
-        if ($request->day && Auth::guard('teacher')->check() == true) {
+        if ($request->day && Auth::guard('teacher')->check() == true && Auth::guard('teacher')->user()->id != 33) {
             $where = $where . ' AND (day1 = ' . $request->day . ' OR day2 = ' . $request->day . ') AND id_teacher =' . Auth::guard('teacher')->user()->id;
+        }
+        if ($request->day && Auth::guard('teacher')->check() == true && Auth::guard('teacher')->user()->id == 33) {
+            $where = $where . ' AND (day1 = ' . $request->day . ' OR day2 = ' . $request->day . ')';
         }
         $class = DB::select("SELECT DISTINCT priceid,day1,day2,course_time,id_teacher,price.level,price.program,day_1.day day_one,day_2.day day_two,teacher.name teacher_name, is_class_new, branch.location from student
         join price on student.priceid = price.id

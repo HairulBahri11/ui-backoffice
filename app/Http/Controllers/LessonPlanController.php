@@ -92,14 +92,14 @@ class LessonPlanController extends Controller
         return view('lesson-plan.create');
     }
 
-    // Fitur: Batasan jam create lesson plan. Hari Minggu tidak boleh sama sekali,
+    // Fitur: Batasan jam create lesson plan. Hari Minggu dibuka penuh (tanpa limiter),
     // hari Sabtu terkunci jam 08:00-14:00 (samakan dengan Score), hari lain terkunci jam 15:00-19:00 (boleh di luar itu, termasuk malam s/d 15:00 keesokan harinya).
     private function isWithinCreateWindow()
     {
         $now = Carbon::now();
 
         if ($now->isSunday()) {
-            return false;
+            return true;
         }
 
         if ($now->isSaturday()) {
@@ -113,10 +113,6 @@ class LessonPlanController extends Controller
     {
         $now = Carbon::now();
 
-        if ($now->isSunday()) {
-            return 'Lesson plans cannot be created on Sunday.';
-        }
-
         if ($now->isSaturday()) {
             return 'Lesson plans cannot be created between 08:00 and 14:00 on Saturday.';
         }
@@ -125,18 +121,26 @@ class LessonPlanController extends Controller
     }
 
     // Fungsi helper privat untuk mengecek validasi waktu edit/update sesuai Fitur 1
-    private function isEditable($createdAt)
+    // Batasan ditentukan oleh tanggal TARGET kelasnya (for_day, dihitung dalam minggu saat
+    // data dibuat), bukan tanggal dibuatnya data. Jadi kalau dibuat H-1 untuk hari besok
+    // (mis. Senin bikin rencana buat Selasa), tetap bebas diedit sampai hari Selasa itu tiba.
+    private function isEditable($createdAt, $forDay = null)
     {
         $createdDate = Carbon::parse($createdAt)->startOfDay();
         $today = Carbon::today();
 
-        // Jika data dibuat hari ini, hanya bisa diedit SEBELUM jam 15:00 (Jam 3 Sore)
-        if ($createdDate->equalTo($today)) {
+        // Data lama tanpa for_day: fallback ke tanggal dibuatnya data (behavior lama)
+        $targetDate = $forDay
+            ? $createdDate->copy()->startOfWeek()->addDays($forDay - 1)
+            : $createdDate;
+
+        // Jika hari target adalah HARI INI, hanya bisa diedit SEBELUM jam 15:00 (Jam 3 Sore)
+        if ($targetDate->equalTo($today)) {
             return Carbon::now()->format('H:i') < '15:00';
         }
 
-        // Hari berikutnya / sesudahnya bebas bisa diedit kapan saja
-        return $createdDate->lessThan($today);
+        // Hari target belum tiba (masa depan) atau sudah lewat (masa lalu) -> bebas diedit kapan saja
+        return true;
     }
 
     public function edit($id)
@@ -148,7 +152,7 @@ class LessonPlanController extends Controller
         }
 
         // Fitur 1: Cek Batasan Waktu Edit
-        if (!$this->isEditable($item->created_at)) {
+        if (!$this->isEditable($item->created_at, $item->for_day)) {
             return redirect()->route('lesson-plan.index')->with('error', 'This lesson plan can no longer be edited (Time limit exceeded).');
         }
 
@@ -177,7 +181,7 @@ class LessonPlanController extends Controller
         }
 
         // Fitur 1: Cek Batasan Waktu Update ke Database
-        if (!$this->isEditable($item->created_at)) {
+        if (!$this->isEditable($item->created_at, $item->for_day)) {
             return redirect()->route('lesson-plan.index')->with('error', 'This lesson plan can no longer be updated.');
         }
 
@@ -402,7 +406,7 @@ class LessonPlanController extends Controller
         }
 
         // Fitur: Delete tunduk ke batasan waktu yang sama dengan edit (isEditable)
-        if (!$this->isEditable($lessonPlan->created_at)) {
+        if (!$this->isEditable($lessonPlan->created_at, $lessonPlan->for_day)) {
             return redirect()->route('lesson-plan.index')
                 ->with('error', 'This lesson plan can no longer be deleted (Time limit exceeded).');
         }

@@ -207,12 +207,15 @@
                                                 </a>
 
                                                 @php
-                                                $isCreatedToday = \Carbon\Carbon::parse($item->created_at)->isToday();
-                                                $isBeforeThreePm = now()->format('H:i') < '15:00' ;
-                                                    $isPastDays=\Carbon\Carbon::parse($item->created_at)->isPast() && !$isCreatedToday;
-                                                    $canEdit = ($isCreatedToday && $isBeforeThreePm) || $isPastDays;
-                                                    $canDelete = $canEdit;
-                                                    @endphp
+                                                // Batasan sama dengan LessonPlanController::isEditable() - berdasarkan tanggal
+                                                // TARGET kelas (for_day dalam minggu saat data dibuat), bukan tanggal dibuatnya data.
+                                                $createdDate = \Carbon\Carbon::parse($item->created_at)->startOfDay();
+                                                $targetDate = $item->for_day
+                                                    ? $createdDate->copy()->startOfWeek()->addDays($item->for_day - 1)
+                                                    : $createdDate;
+                                                $canEdit = !$targetDate->isToday() || now()->format('H:i') < '15:00';
+                                                $canDelete = $canEdit;
+                                                @endphp
 
                                                     @if($canEdit)
                                                     <a href="{{ url('/lesson-plan/' . $item->id . '/edit') }}" class="btn btn-xs btn-info mr-1" title="Edit Data">

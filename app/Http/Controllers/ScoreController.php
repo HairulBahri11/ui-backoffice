@@ -140,11 +140,15 @@ class ScoreController extends Controller
         return view('score.last', compact('student', 'class', 'testItem', 'studentScore1', 'studentScore2', 'studentScore3'));
     }
 
-    // Fitur: Batasan jam buka halaman/aksi Student Score. Hari biasa terkunci jam 15:00-19:00,
-    // khusus hari Sabtu terkunci jam 08:00-14:00.
+    // Fitur: Batasan jam buka halaman/aksi Student Score. Hari Minggu dibuka penuh (tanpa limiter),
+    // hari biasa terkunci jam 15:00-19:00, khusus hari Sabtu terkunci jam 08:00-14:00.
     private function isScoreActionBlocked()
     {
         $now = Carbon::now();
+
+        if ($now->isSunday()) {
+            return false;
+        }
 
         if ($now->isSaturday()) {
             return $now->format('H:i') >= '08:00' && $now->format('H:i') <= '14:00';

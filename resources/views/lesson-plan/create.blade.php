@@ -20,6 +20,19 @@
     </script>
     @endif
 
+    @if ($errors->any())
+    <script>
+        swal("Gagal", "{{ $errors->first() }}", {
+            icon: "danger",
+            buttons: {
+                confirm: {
+                    className: 'btn btn-danger'
+                }
+            },
+        });
+    </script>
+    @endif
+
     <div class="page-inner mt--5">
         <form action="{{ route('lesson-plan.store') }}" method="POST" id="main-lesson-plan-form">
             @csrf
@@ -246,7 +259,10 @@
                         </div>
 
                         <input type="hidden" name="plans[${index}][class_id]" value="${classId}">
-                        
+                        <input type="hidden" name="plans[${index}][day1]" value="${day1Id}">
+                        <input type="hidden" name="plans[${index}][day2]" value="${day2Id}">
+                        <input type="hidden" name="plans[${index}][course_time]" value="${courseTime}">
+
                        <div class="card-body py-3">
     <!-- Section 1: Topic/Textbook -->
     <div class="form-group px-0 py-1 mb-2">
@@ -276,9 +292,6 @@
 </div>
                     </div>
                 </div>
-                <input type="hidden" name="plans[${index}][day1]" value="${day1Id}">
-                <input type="hidden" name="plans[${index}][day2]" value="${day2Id}">
-                <input type="hidden" name="plans[${index}][course_time]" value="${courseTime}">
             `;
             formsContainer.insertAdjacentHTML('beforeend', cardHTML);
             loadLastAgenda(index, classId, day1Id, day2Id, courseTime);

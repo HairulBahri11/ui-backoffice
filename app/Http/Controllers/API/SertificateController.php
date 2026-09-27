@@ -1000,10 +1000,10 @@ class SertificateController extends Controller
             $pdf->Cell(40, 10, $getStudent->teacher->name ?? '', '', 0, 'L');
 
             if ($getStudent->teacher && $getStudent->teacher->signature) {
-                $pdf->Image('https://ui-payment.primtechdev.com/upload/signature/' . $getStudent->teacher->signature, 215, 170, 19.2, 12.6);
+                $pdf->Image('https://ui-payment.primtechdev.com/storage/signatures/' . $getStudent->teacher->signature, 215, 170, 19.2, 12.6);
             }
 
-            $pdf->Image('https://ui-payment.primtechdev.com/upload/signature/principal.png', 70, 170, 19.2, 12.6);
+            $pdf->Image('https://ui-payment.primtechdev.com/principal.png', 70, 170, 19.2, 12.6);
 
             $pdfContent = $pdf->Output('', 'S');
             return response($pdfContent, 200)

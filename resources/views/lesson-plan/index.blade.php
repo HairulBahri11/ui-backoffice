@@ -193,7 +193,7 @@
                                         <td>{{ $item->topic }}</td>
                                         <td>
                                             {{ now()->parse($item->created_at)->format('D d F Y H:i') }}
-                                            @if(\Carbon\Carbon::parse($item->created_at)->isCurrentWeek())
+                                            @if(\App\Models\LessonPlan::planningWeekStart($item->created_at)->equalTo(\App\Models\LessonPlan::planningWeekStart(now())))
                                             <span class="badge badge-success ml-1" style="font-size: 10px; padding: 2px 5px;">This Week</span>
                                             @endif
                                         </td>
@@ -209,10 +209,7 @@
                                                 @php
                                                 // Batasan sama dengan LessonPlanController::isEditable() - berdasarkan tanggal
                                                 // TARGET kelas (for_day dalam minggu saat data dibuat), bukan tanggal dibuatnya data.
-                                                $createdDate = \Carbon\Carbon::parse($item->created_at)->startOfDay();
-                                                $targetDate = $item->for_day
-                                                    ? $createdDate->copy()->startOfWeek()->addDays($item->for_day - 1)
-                                                    : $createdDate;
+                                                $targetDate = \App\Models\LessonPlan::targetDate($item->created_at, $item->for_day);
                                                 $canEdit = !$targetDate->isToday() || now()->format('H:i') < '15:00';
                                                 $canDelete = $canEdit;
                                                 @endphp

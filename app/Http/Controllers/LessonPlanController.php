@@ -25,9 +25,12 @@ class LessonPlanController extends Controller
         // Diaktifkan jika: tidak ada 'show_all' DAN tidak ada filter spesifik (seperti date/teacher/class)
         // ==========================================
         if (!$request->has('show_all') && !$request->filled('date') && !$request->filled('teacher_id') && !$request->filled('class_id')) {
+            // Minggu perencanaan = Minggu (hari sebelum Senin) s/d Sabtu, karena rencana yang dibuat
+            // hari Minggu adalah untuk minggu depan.
+            $weekStart = LessonPlan::planningWeekStart(Carbon::now());
             $query->whereBetween('created_at', [
-                Carbon::now()->startOfWeek(),
-                Carbon::now()->endOfWeek()
+                $weekStart->copy()->subDay(),
+                $weekStart->copy()->addDays(5)->endOfDay()
             ]);
         }
 
@@ -126,13 +129,8 @@ class LessonPlanController extends Controller
     // (mis. Senin bikin rencana buat Selasa), tetap bebas diedit sampai hari Selasa itu tiba.
     private function isEditable($createdAt, $forDay = null)
     {
-        $createdDate = Carbon::parse($createdAt)->startOfDay();
         $today = Carbon::today();
-
-        // Data lama tanpa for_day: fallback ke tanggal dibuatnya data (behavior lama)
-        $targetDate = $forDay
-            ? $createdDate->copy()->startOfWeek()->addDays($forDay - 1)
-            : $createdDate;
+        $targetDate = LessonPlan::targetDate($createdAt, $forDay);
 
         // Jika hari target adalah HARI INI, hanya bisa diedit SEBELUM jam 15:00 (Jam 3 Sore)
         if ($targetDate->equalTo($today)) {
@@ -273,11 +271,13 @@ class LessonPlanController extends Controller
             if ($lastLessonPlan) {
                 $createdAt = \Carbon\Carbon::parse($lastLessonPlan->created_at);
 
-                // 2. LOGIKA KUNCI: Ambil awal minggu (Senin) dari tanggal pembuatan lesson plan terakhir tersebut
-                $lastPlanStartOfWeek = $createdAt->copy()->startOfWeek()->format('Y-m-d');
+                // 2. LOGIKA KUNCI: Ambil awal minggu perencanaan (Senin) dari tanggal pembuatan lesson plan terakhir tersebut.
+                // Hari Minggu dihitung masuk minggu depan, jadi guru yang buka hari Minggu untuk kelas Senin besok
+                // tidak ketabrak lock Senin minggu yang baru berakhir.
+                $lastPlanStartOfWeek = LessonPlan::planningWeekStart($createdAt)->format('Y-m-d');
 
-                // Ambil awal minggu (Senin) dari waktu SEKARANG (saat guru mengakses form)
-                $currentStartOfWeek = \Carbon\Carbon::now()->startOfWeek()->format('Y-m-d');
+                // Ambil awal minggu perencanaan dari waktu SEKARANG (saat guru mengakses form)
+                $currentStartOfWeek = LessonPlan::planningWeekStart(\Carbon\Carbon::now())->format('Y-m-d');
 
                 // Jika awal minggunya SAMA, artinya guru SUDAH PERNAH membuat lesson plan untuk kelas ini di minggu ini.
                 // Jika awal minggunya BERBEDA (seperti kasus dibuat tanggal 5 Juli [minggu lalu] vs diakses tanggal 6 Juli [minggu baru]), gembok otomatis LEPAS.

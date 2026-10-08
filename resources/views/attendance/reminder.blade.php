@@ -177,6 +177,10 @@
                                                                     data-toggle="modal"
                                                                     data-target="#exampleModal">Comment</a>
                                                             @endif
+                                                            <a href="javascript:void(0)"
+                                                                data-id="{{ $item->absent_id }}"
+                                                                data-name="{{ ucwords($item->name) }}"
+                                                                class="btn btn-sm btn-warning text-white editAction">Edit</a>
                                                         </td>
                                                     </tr>
                                                 @endforeach
@@ -244,6 +248,84 @@
             </form>
         </div>
     </div>
+    <!-- Modal Edit -->
+    <div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="editModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <form id="formEdit" method="POST">
+                @csrf
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="editModalLabel">Edit Absence</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body" id="editModalBody"></div>
+                    <div class="modal-footer">
+                        <small class="text-muted mr-auto">Changing status to Present/Permission removes the student
+                            from the reminder. Points are not recalculated.</small>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary" id="editSubmit" disabled>Save</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <script>
+        function escapeHtml(str) {
+            return $('<div>').text(str == null ? '' : str).html();
+        }
+        $('.editAction').click(function() {
+            var id = $(this).data('id');
+            var name = $(this).data('name');
+            $('#editModalLabel').text('Edit absence ' + name);
+            $('#formEdit').attr('action', "{{ url('attendance/reminder-update') }}/" + id);
+            $('#editModalBody').html('<p class="text-center">Loading...</p>');
+            $('#editSubmit').prop('disabled', true);
+            $('#editModal').modal('show');
+
+            $.getJSON("{{ url('attendance/reminder-edit') }}/" + id, function(rows) {
+                if (!rows.length) {
+                    $('#editModalBody').html('<p class="text-center text-danger">Data not found.</p>');
+                    return;
+                }
+                var statuses = {
+                    alpha: 'Alpha',
+                    permission: 'Permission',
+                    present: 'Present'
+                };
+                var html = '';
+                rows.forEach(function(row) {
+                    var prefix = 'details[' + row.id + ']';
+                    var options = '';
+                    $.each(statuses, function(value, label) {
+                        options += '<option value="' + value + '"' + (row.status === value ?
+                            ' selected' : '') + '>' + label + '</option>';
+                    });
+                    html += '<div class="border rounded p-3 mb-3">' +
+                        '<div class="row">' +
+                        '<div class="col-md-4"><div class="form-group">' +
+                        '<label>Date</label><input type="text" class="form-control" value="' +
+                        escapeHtml(row.date) + '" readonly></div>' +
+                        '<div class="form-group"><label>Status</label>' +
+                        '<select class="form-control" name="' + prefix + '[status]">' + options +
+                        '</select></div></div>' +
+                        '<div class="col-md-4"><div class="form-group"><label>Teacher\'s Comment</label>' +
+                        '<textarea class="form-control" rows="4" name="' + prefix +
+                        '[comment_teacher]">' + escapeHtml(row.comment_teacher) + '</textarea></div></div>' +
+                        '<div class="col-md-4"><div class="form-group"><label>Staff\'s Comment</label>' +
+                        '<textarea class="form-control" rows="4" name="' + prefix +
+                        '[comment_staff]">' + escapeHtml(row.comment_staff) + '</textarea></div></div>' +
+                        '</div></div>';
+                });
+                $('#editModalBody').html(html);
+                $('#editSubmit').prop('disabled', false);
+            }).fail(function() {
+                $('#editModalBody').html('<p class="text-center text-danger">Failed to load data.</p>');
+            });
+        });
+    </script>
     <script>
         function capitalize(str) {
             strVal = '';

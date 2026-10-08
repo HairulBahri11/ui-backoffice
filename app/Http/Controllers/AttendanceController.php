@@ -1559,6 +1559,88 @@ class AttendanceController extends Controller
         }
     }
 
+    /**
+     * Query detail absen pada baris reminder ($id berformat "12-15"), dibatasi
+     * ke siswa milik guru yang login jika yang login adalah teacher.
+     */
+    private function reminderDetailQuery($id)
+    {
+        $ids = array_filter(explode('-', $id), 'is_numeric');
+
+        $query = AttendanceDetail::join('attendances as a', 'a.id', 'attendance_details.attendance_id')
+            ->join('student as s', 's.id', 'attendance_details.student_id')
+            ->whereIn('attendance_details.id', $ids);
+
+        if (Auth::guard('teacher')->user() != null) {
+            $query->where('s.id_teacher', Auth::guard('teacher')->user()->id);
+        }
+
+        return $query;
+    }
+
+    public function reminderEdit($id)
+    {
+        $details = $this->reminderDetailQuery($id)
+            ->select('attendance_details.id', 'attendance_details.is_absent', 'attendance_details.is_permission', 'attendance_details.is_alpha', 'attendance_details.comment_teacher', 'attendance_details.comment_staff', 'a.date')
+            ->orderBy('a.date', 'asc')
+            ->get()
+            ->map(function ($row) {
+                if ($row->is_absent == '1') {
+                    $status = 'present';
+                } elseif ($row->is_permission == '1') {
+                    $status = 'permission';
+                } else {
+                    $status = 'alpha';
+                }
+
+                return [
+                    'id' => $row->id,
+                    'date' => $row->date,
+                    'status' => $status,
+                    'comment_teacher' => $row->comment_teacher,
+                    'comment_staff' => $row->comment_staff,
+                ];
+            });
+
+        return response()->json($details);
+    }
+
+    public function reminderUpdate($id, Request $request)
+    {
+        $request->validate([
+            'details' => 'required|array',
+            'details.*.status' => 'required|in:present,permission,alpha',
+            'details.*.comment_teacher' => 'nullable|string',
+            'details.*.comment_staff' => 'nullable|string',
+        ]);
+
+        try {
+            $models = $this->reminderDetailQuery($id)
+                ->select('attendance_details.*')
+                ->get()
+                ->keyBy('id');
+
+            foreach ($request->details as $detailId => $input) {
+                $model = $models->get($detailId);
+                if ($model == null) {
+                    continue;
+                }
+
+                // is_absent = '1' artinya hadir (penamaan kolom terbalik, ikuti store/update absen)
+                $model->is_absent = $input['status'] == 'present' ? '1' : '0';
+                $model->is_permission = $input['status'] == 'permission';
+                $model->is_alpha = $input['status'] == 'alpha';
+                $model->comment_teacher = $input['comment_teacher'] ?? null;
+                $model->comment_staff = $input['comment_staff'] ?? null;
+                $model->save();
+            }
+
+            return redirect()->back()->with('message', 'Berhasil diupdate');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('message', 'Terjadi kesalahan. : ' . $e->getMessage());
+        }
+    }
+
     public function mutasi(Request $request)
     {
         $studentId = $request->student;

@@ -241,8 +241,6 @@ class AttendanceController extends Controller
         // $reqNew = $request->new;
         // $reqAmpm = $request->ampm;
         $student = "";
-        $whereRaw = "";
-        $whereStudent = '';
         $day = DB::table('day')->get();
         $cek = Attendance::where('price_id', $priceId)
             ->where('date', date('Y-m-d'))
@@ -352,11 +350,7 @@ class AttendanceController extends Controller
         $student = $student->get();
 
 
-        foreach ($student as $keyS => $valueS) {
-            $or = $keyS + 1 != count($student) ? ' or ' : '';
-            $whereStudent .= 'student_id = ' . $valueS->id . $or;
-        }
-        $whereRaw = '(' . $whereStudent . ')';
+        $studentIds = $student->pluck('id');
         $pointCategories = PointCategories::where('id', '!=', 5)->orderBy('point', 'ASC')->get();
         $attendance = Attendance::with('detail')->where('price_id', $priceId)
             ->where('day1', $reqDay1)
@@ -370,8 +364,8 @@ class AttendanceController extends Controller
                 $q->where('student_id', $request->student);
             });
         } else {
-            $attendance = $attendance->whereHas('detail', function ($q) use ($whereRaw) {
-                $q->whereRaw($whereRaw);
+            $attendance = $attendance->whereHas('detail', function ($q) use ($studentIds) {
+                $q->whereIn('student_id', $studentIds);
             });
         }
         $all_attendence = $attendance->get();
@@ -919,8 +913,6 @@ class AttendanceController extends Controller
         $reqTeacher = $request->teacher;
         $priceId = $request->class;
         $student = "";
-        $whereRaw = "";
-        $whereStudent = '';
         $day = DB::table('day')->get();
         $cek = Attendance::where('id', $id)
             ->orderBy('id', 'DESC')
@@ -1012,11 +1004,7 @@ class AttendanceController extends Controller
         }
 
         $student = $student->get();
-        foreach ($student as $keyS => $valueS) {
-            $or = $keyS + 1 != count($student) ? ' or ' : '';
-            $whereStudent .= 'student_id = ' . $valueS->id . $or;
-        }
-        $whereRaw = '(' . $whereStudent . ')';
+        $studentIds = $student->pluck('id');
 
         $pointCategories = PointCategories::where('id', '!=', 5)->orderBy('point', 'ASC')->get();
         $attendance = Attendance::where('id', $id)
@@ -1027,8 +1015,8 @@ class AttendanceController extends Controller
                 $q->where('student_id', $request->student);
             });
         } else {
-            $attendance = $attendance->whereHas('detail', function ($q) use ($whereRaw) {
-                $q->whereRaw($whereRaw);
+            $attendance = $attendance->whereHas('detail', function ($q) use ($studentIds) {
+                $q->whereIn('student_id', $studentIds);
             });
         }
         $attendance = $attendance->get();

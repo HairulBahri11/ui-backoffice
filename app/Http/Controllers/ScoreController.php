@@ -142,8 +142,14 @@ class ScoreController extends Controller
 
     // Fitur: Batasan jam buka halaman/aksi Student Score. Hari Minggu dibuka penuh (tanpa limiter),
     // hari biasa terkunci jam 15:00-19:00, khusus hari Sabtu terkunci jam 08:00-14:00.
+    // Staff dengan username 'staff' bebas dari batasan jam dan hari.
     private function isScoreActionBlocked()
     {
+        $staff = Auth::guard('staff')->user();
+        if ($staff && $staff->username === 'staff') {
+            return false;
+        }
+
         $now = Carbon::now();
 
         if ($now->isSunday()) {

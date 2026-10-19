@@ -758,6 +758,16 @@ class SertificateController extends Controller
 
             $getStudent = Students::with('teacher')->findOrFail($studentId);
 
+            // Jika yang diminta adalah kelas saat ini (student.priceid), sertifikat hanya boleh
+            // diunduh jika siswa sudah ditandai is_certificate = 1 (siswa INACTIVE diabaikan pengecekannya)
+            $isCurrentClass = (string) $classId === (string) $getStudent->priceid;
+            $isInactive = strtoupper(trim((string) $getStudent->status)) === 'INACTIVE';
+            if ($isCurrentClass && !$isInactive && (int) $getStudent->is_certificate !== 1) {
+                return response()->json([
+                    'code' => '403',
+                    'message' => 'Certificate is not available yet.',
+                ], 403);
+            }
 
             $class = DB::table('price')
                 ->where('id', $classId)

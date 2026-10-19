@@ -129,9 +129,8 @@ class LessonPlanController extends Controller
     // (mis. Senin bikin rencana buat Selasa), tetap bebas diedit sampai hari Selasa itu tiba.
     private function isEditable($createdAt, $forDay = null)
     {
-        // Staff dengan username 'staff' bebas dari batasan jam dan hari
-        $staff = Auth::guard('staff')->user();
-        if ($staff && $staff->username === 'staff') {
+        // Semua staff bebas dari batasan jam dan hari
+        if (Auth::guard('staff')->check()) {
             return true;
         }
 

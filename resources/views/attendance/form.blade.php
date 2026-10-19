@@ -1112,19 +1112,24 @@
                         @foreach($lesson_plan as $item)
                         <div class="flex-shrink-0 mb-1 px-2" style="width: 49%; min-width: 650px;">
                             <div class="card shadow-md h-100">
-                                <div class="card-header bg-light d-flex justify-content-between align-items-center py-2">
-                                    <div class="d-flex align-items-center w-75">
-                                        <h6 class="m-0 font-weight-bold text-primary mr-2">{{ $loop->iteration }}. Topic :</h6>
-                                        <span class="text-dark font-weight-bold text-truncate mr-2">{{ $item->topic == '-' ? ' ': $item->topic  }} ({{ $item->topic_page ?? '-' }} page)</span>
-                                        <button type="button" class="btn btn-xs btn-link p-0 text-muted btn-inline-copy mr-2"
+                                <div class="card-header bg-light d-flex justify-content-between align-items-start py-2">
+                                    <div class="d-flex align-items-start pr-3" style="min-width: 0; flex: 1;">
+                                        <div style="min-width: 0; flex: 1;">
+                                            <h6 class="m-0 mb-1 font-weight-bold text-primary text-xs text-uppercase">{{ $loop->iteration }}. Topic</h6>
+                                            <div class="text-dark font-weight-bold" style="white-space: normal; word-break: break-word; overflow-wrap: anywhere; line-height: 1.4;">
+                                                {{ $item->topic == '-' ? '-' : $item->topic }}
+                                                <span class="text-muted font-weight-normal text-sm">({{ $item->topic_page ?? '-' }} page)</span>
+                                            </div>
+                                        </div>
+                                        @if(!empty($item->topic) && $item->topic !== '-')
+                                        <button type="button" class="btn btn-xs btn-link p-0 text-muted btn-inline-copy ml-2 mt-1"
                                             data-copy="{{ $item->topic }}"
                                             title="Copy Topic">
                                             <i class="far fa-copy"></i>
                                         </button>
-
-
+                                        @endif
                                     </div>
-                                    <small class="text-muted font-italic text-xs">Created On : {{ \Carbon\Carbon::parse($item->created_at)->format('d M Y') }}</small>
+                                    <small class="text-muted font-italic text-xs flex-shrink-0 mt-1">Created On : {{ \Carbon\Carbon::parse($item->created_at)->format('d M Y') }}</small>
                                 </div>
                                 <div class="card-body bg-white py-3">
                                     <div class="row">

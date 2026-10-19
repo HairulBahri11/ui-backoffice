@@ -27,6 +27,12 @@ class FollowUpController extends Controller
             ->join('day as d2', 'd2.id', 'follow_up.old_day_2')
              ->join('student', 'student.id', 'follow_up.student_id')
             ->where('student.status', 'ACTIVE')
+            // Satu siswa hanya tampil sekali: ambil baris follow_up terbaru per student_id
+            ->whereIn('follow_up.id', function ($query) {
+                $query->select(DB::raw('MAX(id)'))
+                    ->from('follow_up')
+                    ->groupBy('student_id');
+            })
             ->orderBy('follow_up.id', 'DESC');
 
         if (Auth::guard('teacher')->check() == true) {

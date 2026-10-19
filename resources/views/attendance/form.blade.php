@@ -1137,7 +1137,7 @@
                                             <p class="mb-1 text-xs text-uppercase font-weight-bold text-muted tracking-wider">Flashcards</p>
                                             <div class="d-flex align-items-start p-2 border rounded bg-light" style="min-height: 44px;">
                                                 <div class="w-100 text-dark user-select-all font-weight-medium text-sm pr-2" style="word-break: break-word;">
-                                                    {{ $item->flashcards ?? '-' }}({{ $item->flashcard_page ?? '-' }} page)
+                                                    {{ $item->flashcards ?? '-' }}({{ $item->flashcard_page ?? '-' }})
                                                 </div>
                                                 @if(!empty($item->flashcards))
                                                 <button type="button" class="btn btn-xs btn-link p-0 text-muted btn-inline-copy ml-auto"

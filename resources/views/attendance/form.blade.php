@@ -281,7 +281,7 @@
                     </button>
                     <button type="button" class="btn btn-sm btn-warning mb-2" data-toggle="modal"
                         data-target="#exampleModal" data-modal-type="attendance">
-                        <span class="text-bold">Detail of Attendence and Agenda</span>
+                        <span class="text-bold">Detail of Attendance and Agenda</span>
                     </button>
 
                     <div class="table-responsive">

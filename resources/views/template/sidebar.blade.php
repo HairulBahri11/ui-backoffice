@@ -278,6 +278,12 @@
                     </a>
 
                 </li>
+                <li class="nav-item {{ Request::segment(1) == 'students-biodata' ? 'active' : '' }}">
+                    <a href="{{ url('/students-biodata') }}" class="collapsed">
+                        <i class="fas fa-id-card"></i>
+                        <p>Student Biodata</p>
+                    </a>
+                </li>
 
 
                 @endif

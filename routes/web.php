@@ -23,6 +23,7 @@ use App\Http\Controllers\CalendarAcademicController;
 use App\Http\Controllers\EcertificateController;
 use App\Http\Controllers\historyCertificateController;
 use App\Http\Controllers\ScheduleClassController;
+use App\Http\Controllers\StudentBiodataController;
 use App\Http\Controllers\ParentStudentsController;
 use App\Http\Controllers\PointCategoriesController;
 use App\Http\Controllers\ReviewTestPaperController;
@@ -148,6 +149,11 @@ Route::middleware(['web'])->group(function () {
     Route::post('/extra-point/store', [ExamPointController::class, 'store'])->name('extra-point.store');
 
     Route::get('/history-certificate', [historyCertificateController::class, 'index'])->name('history-certificate.index');
+
+    Route::prefix('students-biodata')->group(function () {
+        Route::get('/', [StudentBiodataController::class, 'index'])->name('students-biodata.index');
+        Route::get('/search', [StudentBiodataController::class, 'search'])->name('students-biodata.search');
+    });
 
     Route::prefix('history-chat')->group(function () {
         Route::get('/', [UiChatifyController::class, 'index'])->name('history-chat.index');

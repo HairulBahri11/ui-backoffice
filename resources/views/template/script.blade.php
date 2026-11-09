@@ -122,7 +122,8 @@
 
 <script>
     $(document).ready(function() {
-        $('.select2').select2({
+        // select.select2 (bukan .select2): kontainer yang dibuat select2 juga ber-class "select2"
+        $('select.select2').select2({
             closeOnSelect: true
         });
     });

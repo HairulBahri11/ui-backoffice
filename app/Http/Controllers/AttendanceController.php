@@ -12,6 +12,7 @@ use App\Models\PointCategories;
 use App\Models\PointHistory;
 use App\Models\Price;
 use App\Models\Students;
+use App\Models\StudentClassMovement;
 use App\Models\StudentScore;
 use App\Models\Teacher;
 use Carbon\Carbon;
@@ -1680,9 +1681,27 @@ class AttendanceController extends Controller
             if ($score != null) {
                 $mutasi->score_id = $score->id;
             }
-            $student->priceid = $request->level;
-            $student->save();
-            $mutasi->save();
+            // kondisi kelas sebelum jump, dicatat ke riwayat movement class
+            $from = [
+                'price_id' => $student->priceid,
+                'day1' => $student->day1,
+                'day2' => $student->day2,
+                'course_time' => $student->course_time,
+                'teacher_id' => $student->id_teacher,
+            ];
+            DB::transaction(function () use ($student, $mutasi, $request, $from) {
+                $student->priceid = $request->level;
+                $student->save();
+                $mutasi->save();
+                // jump class hanya mengganti level, jadwal & teacher tetap
+                StudentClassMovement::record(
+                    $student->id,
+                    StudentClassMovement::TYPE_JUMP,
+                    $from,
+                    ['price_id' => $student->priceid] + $from,
+                    $mutasi->user_name
+                );
+            });
             return redirect('mutasi?student=' . $student->id . '&class=' . $student->priceid)->with('message', 'Berhasil dimutasi');
         } catch (\Exception $e) {
             return redirect()->back()->with('status', 'Terjadi kesalahan. : ' . $e->getMessage());
@@ -1714,7 +1733,28 @@ class AttendanceController extends Controller
             $student = DB::table('student')->where('priceid', $priceId)->where("day1", $reqDay1)
                 ->where("day2", $reqDay2)
                 ->where('course_time', $reqTime)->where('is_class_new', false)->where('id_teacher', $teacherOld)->get();
+            // kelas asal dan tujuan sama untuk semua student yang ikut terpindah
+            $movementFrom = [
+                'price_id' => $priceId,
+                'day1' => $reqDay1,
+                'day2' => $reqDay2,
+                'course_time' => $reqTime,
+                'teacher_id' => $teacherOld,
+            ];
+            $movementTo = [
+                'price_id' => $request->update_level,
+                'day1' => $request->update_day_one,
+                'day2' => $request->update_day_two,
+                'course_time' => $request->update_course_time,
+                'teacher_id' => $request->update_teacher,
+            ];
+            $movementUser = Auth::guard('staff')->user()->name ?? Auth::guard('teacher')->user()->name ?? null;
+
             if ($request->type == 'edit') {
+                $movedStudents = DB::table('student')->where('priceid', $priceId)->where("day1", $reqDay1)
+                    ->where("day2", $reqDay2)
+                    ->where('course_time', $reqTime)->where('id_teacher', $teacherOld)->pluck('id');
+
                 DB::table('student')->where('priceid', $priceId)->where("day1", $reqDay1)
                     ->where("day2", $reqDay2)
                     ->where('course_time', $reqTime)->where('id_teacher', $teacherOld)->update([
@@ -1725,6 +1765,11 @@ class AttendanceController extends Controller
                         "id_teacher" => $request->update_teacher,
                     ]);
             } else {
+                // siswa yang benar-benar pindah kelas (kriteria sama dengan update "New Class" di bawah)
+                $movedStudents = DB::table('student')->where('priceid', $priceId)->where('is_class_new', false)->where("day1", $reqDay1)
+                    ->where("day2", $reqDay2)
+                    ->where('course_time', $reqTime)->where('id_teacher', $teacherOld)->where('is_failed_promoted', '0')->pluck('id');
+
                 foreach ($student as $key => $value) {
                     if ($value->priceid != $request->update_level) {
                         $score = StudentScore::where('student_id', $request->student)->where('price_id', $value->priceid)->orderBy('id', 'desc')->first();
@@ -1776,6 +1821,17 @@ class AttendanceController extends Controller
                         "is_failed_promoted" => '0',
                         "is_follow_up" => '0',
                     ]);
+            }
+
+            // riwayat movement class untuk semua siswa yang berpindah kelas
+            foreach ($movedStudents as $movedStudentId) {
+                StudentClassMovement::record(
+                    $movedStudentId,
+                    StudentClassMovement::TYPE_UPDATE,
+                    $movementFrom,
+                    $movementTo,
+                    $movementUser
+                );
             }
 
             return redirect()->back()->with('message', 'Berhasil diupdate');
@@ -2040,6 +2096,19 @@ class AttendanceController extends Controller
 
 
 
+                // siswa yang ikut terpindah (kriteria sama dengan update di bawah), dicatat ke riwayat movement class
+                $movedStudents = DB::table('student')
+                    ->where('id_teacher', $oldTeacherId)
+                    ->where('course_time', $courseTime_old)
+                    ->where('day1', $day1_old)
+                    ->where('day2', $day2_old)
+                    ->when(
+                        $studentId != null,
+                        fn($query) => $query->where('id', $studentId),
+                        fn($query) => $query->where('priceid', $priceId)
+                    )
+                    ->pluck('id');
+
                 // jika student_id ada maka klasnya private dan hanya 1 siswa
                 if ($studentId != null) {
 
@@ -2070,6 +2139,30 @@ class AttendanceController extends Controller
                             'day2' => $day2,
                             'course_time' => $courseTime,
                         ]);
+                }
+
+                // price_id tidak berubah saat transfer; yang berubah jadwal & teacher
+                $userName = Auth::guard('staff')->user()->name ?? Auth::guard('teacher')->user()->name ?? null;
+                foreach ($movedStudents as $movedStudentId) {
+                    StudentClassMovement::record(
+                        $movedStudentId,
+                        StudentClassMovement::TYPE_TRANSFER,
+                        [
+                            'price_id' => $priceId,
+                            'day1' => $day1_old,
+                            'day2' => $day2_old,
+                            'course_time' => $courseTime_old,
+                            'teacher_id' => $oldTeacherId,
+                        ],
+                        [
+                            'price_id' => $priceId,
+                            'day1' => $day1,
+                            'day2' => $day2,
+                            'course_time' => $courseTime,
+                            'teacher_id' => $newTeacherId,
+                        ],
+                        $userName
+                    );
                 }
 
                 $class = DB::table('price')->where('id', $priceId)->first();
